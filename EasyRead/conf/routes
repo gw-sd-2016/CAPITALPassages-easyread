@@ -1,0 +1,42 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                       controllers.Application.index()
+GET     /signup                 controllers.Application.signup()
+POST    /signup                 controllers.Application.signup_submit()
+GET     /login                  controllers.Application.login()
+POST    /login                  controllers.Application.login_submit()
+#GET    /viewAllPassageTags		controllers.Application.viewAllPassageTags()
+#GET     /javascriptRoutes     		controllers.Application.javascriptRoutes
+
+
+
+# SimplePassageController
+GET     /createSimplePassage		controllers.SimplePassageController.createSimplePassage()
+POST    /createSimplePassage        controllers.SimplePassageController.createSimplePassage_submit()
+GET     /viewAllPassages			controllers.SimplePassageController.viewAllPassages()
+GET     /editSimplePassage          controllers.SimplePassageController.edit(passageId : Long)
+POST    /editSimplePassage_submit	controllers.SimplePassageController.edit_submit(passageId : Long)
+POST	/deletePassage				controllers.SimplePassageController.deletePassage(passageId: Long)
+GET     /view						controllers.SimplePassageController.view(passageId : Long, grade : Int)
+GET     /setNumQ                    controllers.SimplePassageController.setNumQuestions(passageId : Long)
+POST    /setNumQ 					controllers.SimplePassageController.setNumQuestions_submit()
+#GET     /viewPassageQuestions		controllers.SimplePassageController.viewPassageQuestions(passageId : Long)
+GET     /viewAllPassagesWithTag     controllers.SimplePassageController.viewAllPassagesWithTag(name : String)
+GET     /analyzePassages			controllers.SimplePassageController.analyzePassages()
+GET     /answerPassageQuestions		controllers.SimplePassageController.answerPassageQuestions(passageId : Long)
+POST    /answerPassageQuestions_submit 	controllers.SimplePassageController.answerPassageQuestions_submit(passageId : Long)
+GET     /viewPassageQuestionAnswers    controllers.SimplePassageController.viewPassageQuestionAnswers(passageId : Long)
+GET     /deletePassageQuestion		controllers.SimplePassageController.deletePassageQuestion(questionId : Long)
+GET     /deletePassageQuestionChoice  controllers.SimplePassageController.deletePassageQuestionChoice(choiceId : Long)
+GET     /editQuestions					controllers.SimplePassageController.editQuestions(passageId : Long)
+POST    /editQuestion_submit          controllers.SimplePassageController.editQuestions_submit(passageId : Long)
+GET     /viewPassageWithSuggestions 	controllers.SimplePassageController.viewS(passageId : Long, grade : Int)
+
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+

@@ -1,0 +1,88 @@
+package controllers;
+
+import formdata.LoginForm;
+import formdata.UserForm;
+import models.PassageTag;
+import models.User;
+import play.Routes;
+import play.data.Form;
+import play.mvc.Controller;
+import play.mvc.Result;
+import views.html.index;
+import views.html.login;
+import views.html.signup;
+import views.html.viewAllPassageTags;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+
+import static play.data.Form.form;
+
+
+public class Application extends Controller {
+
+    public Result index() {
+        return ok(index.render(session("userFirstName")));
+    }
+
+    public Result signup_submit() throws NoSuchAlgorithmException, InvalidKeySpecException{
+
+        Form<UserForm> newUserForm = form(UserForm.class).bindFromRequest();
+
+        if (newUserForm.hasErrors()) {
+            return badRequest(signup.render(newUserForm));
+        } else {
+            User newUser = new User(newUserForm.get());
+            User.create(newUser);
+        }
+        return ok(index.render(session("userFirstName")));
+    }
+
+    public Result login() throws NoSuchAlgorithmException, InvalidKeySpecException{
+
+        Form<LoginForm> loginForm = form(LoginForm.class).bindFromRequest();
+        return ok(login.render(loginForm));
+    }
+
+    public Result login_submit() throws NoSuchAlgorithmException, InvalidKeySpecException{
+
+        Form<LoginForm> loginForm = form(LoginForm.class).bindFromRequest();
+
+
+
+        if (loginForm.hasErrors()) {
+            return badRequest(login.render(loginForm));
+        }else {
+            User loggedInUser = User.byLogin(loginForm.get().usernameOrEmail, loginForm.get().password);
+            session().clear();
+
+            session("userId", loggedInUser.id.toString());
+            session("userFirstName", loggedInUser.firstName);
+            return ok(index.render(session("userFirstName")));
+        }
+    }
+
+    public Result signup() throws NoSuchAlgorithmException, InvalidKeySpecException{
+        Form<UserForm> signupForm = form(UserForm.class).bindFromRequest();
+        return ok(signup.render(signupForm));
+    }
+/*
+    public static Result javascriptRoutes() {
+        response().setContentType("text/javascript");
+        return ok(
+                Routes.javascriptRouter("jsRoutes",
+
+                        routes.javascript.SimplePassageController.deletePassage(),
+                        routes.javascript.SimplePassageController.analyzePassages(),
+                        routes.javascript.SimplePassageController.deletePassageQuestion(),
+                        routes.javascript.SimplePassageController.deletePassageQuestionChoice()
+                )
+        );
+    }*/
+
+    public static Result viewAllPassageTags(){
+        return ok(viewAllPassageTags.render(PassageTag.all()));
+    }
+
+
+}

@@ -1,0 +1,143 @@
+@(form: Form[formdata.SimplePassageNumQuestionsData], passageId : Long)
+
+@main("Create Passage Questions") {
+
+@helper.form(routes.SimplePassageController.setNumQuestions_submit) {
+
+
+@if(form.hasGlobalErrors) {
+<div class="alert alert-danger">
+	@form.globalError.message
+
+</div>
+
+
+}
+<ol class="breadcrumb">
+					<li><a href="/">Home</a></li>
+					/<a href="/viewAllPassages">All Passages</a></li>
+					/<a href="/view?passageId=@passageId&grade=0">Passage</a></li>
+				</ol>
+
+<div style="padding-left:20px">
+	<div class="pull-right" style="width:50%;">
+		@SimplePassage.byId(passageId).text
+	</div>
+	<div>
+		<p>
+			<h3> New Multiple Choice Question for @SimplePassage.byId(passageId).title</h3>
+			<div style="display:none">
+				<input type="text" name="passageId" placeholder="Description" value="@passageId">
+			</div>
+
+			<label> 
+				<button type="button" class="btn btn-primary" onclick="addQuestions();">Add Questions</button>
+			</label>
+
+			<h3>@(SimplePassage.byId(passageId).questions.size+1).</h3>
+			<div class="question" name="question[0]">
+				<label>
+					Question Prompt:
+					<input type="text" name="questions[0]" placeholder="Description" value="questions[0]">
+					<button type="button" name="b0" class="btn btn-primary" onclick="addChoices();">Add Choice</button>
+				</label>
+
+				<strong>Check the box next to the correct answer</strong>
+				<div class="choice0">
+					<input type="text" name="choices[0][0]" placeholder="Description" value="choices[0][0]" style="margin-left:25px;">
+
+					<input type="checkbox" name="correctBox[0][0]" onclick="setCorrectAnswer();" style="padding-left:5px;" checked="true">
+
+					<div style="display:none"><input type="text" name="correctAnswers[0]" value="0" /> </div>
+
+				</div> 
+
+			</div>
+
+
+		</p>
+		<br>
+		<p>
+			<button type="submit" class="btn btn-success">
+				<i class="btn-icon-only icon-check"></i> Submit
+			</button>
+		</p>
+	</div>
+</div>
+}
+
+<script>
+	function addChoices (e) {
+//problem here
+			//http://stackoverflow.com/questions/3001474/how-to-get-caller-element-using-javascript
+			var sender = (e && e.target) || (window.event && window.event.srcElement);
+			var name = sender.name;
+
+			var numQuestions = name.substr(name.indexOf("b") + 1);
+
+			var numChoices = document.getElementsByClassName('choice' + numQuestions).length;
+
+			console.log('choice' + numQuestions);
+
+			var newChoice = '<div class="choice' + numQuestions + '"><input name="choices[' + numQuestions + '][' + numChoices + ']" type="text" id="choice" value=choices[' + numQuestions + '][' + numChoices + ']" style="margin-left:25px;"/> <input type="checkbox" name="correctBox[' + numQuestions + '][' + numChoices + ']" onclick="setCorrectAnswer();" style="padding-left:5px;" /> </div>';
+
+			var lastChoice = document.getElementsByName('correctBox[' + numQuestions + '][' + (numChoices - 1) + ']');
+
+			console.log(lastChoice.length);
+
+			var $this = $(lastChoice); 
+			$(newChoice).insertAfter(lastChoice[lastChoice.length - 1]);
+		}
+
+		function addQuestions () {
+			var numQuestions = $('.question').length; 
+
+
+			var lastQuestion = document.getElementsByName('question[' + (numQuestions - 1) + ']');
+
+
+			var newQ = '<br><h3>' + (numQuestions + 1) + '.</h3> <div class="question" name="question[' + numQuestions +']"><label>Question Prompt: <input type="text" name="questions[' + numQuestions +']" placeholder="Description" value="questions[' + numQuestions +']"> <button type="button" class="btn btn-primary" name="b' + numQuestions +'" onclick="addChoices();">Add Choice</button></label><strong>Check the box next to the correct answer</strong><div class="choice' + numQuestions + '"><input type="text" name="choices[' + numQuestions +'][0]" placeholder="Description" value="choices[' + numQuestions +'][0]" style="margin-left:25px;"> <input type="checkbox" name="correctBox[' + numQuestions +'][0]" onclick="setCorrectAnswer();" style="padding-left:5px;" checked="true"><div style="display:none"><input type="text" name="correctAnswers['+ numQuestions +']" value="0" /> </div></div></div><br>';
+
+			var $this = $(lastQuestion); 
+			$(newQ).insertAfter(lastQuestion[lastQuestion.length - 1]);
+		}
+
+		function setCorrectAnswer(e){
+		//http://stackoverflow.com/questions/3001474/how-to-get-caller-element-using-javascript
+		var sender = (e && e.target) || (window.event && window.event.srcElement);
+		var name = sender.name;
+
+		name = name.substr(name.indexOf("x") + 2);
+
+		var questionNumber = name.substr(0,name.indexOf("]"));
+
+		name = name.substr(name.indexOf("[") + 1);
+
+		var choiceNumber = name.substr(0,name.indexOf("]"));
+
+		
+		
+
+		var previousAnswers = document.getElementsByName("correctAnswers[" + questionNumber + "]");
+
+		console.log(" correctAnswers[" + questionNumber + "] " + previousAnswers.length);
+
+
+		var checkboxes = document.getElementsByTagName("input");
+		if(previousAnswers != null && previousAnswers.length > 0){
+			previousAnswers[0].value = choiceNumber
+		} else {
+			var hiddenChoiceDiv = '<div style="display:none"><input type="text" name="correctAnswers[' + questionNumber + ']" value="' + choiceNumber + '" /> </div>';
+			$(hiddenChoiceDiv).insertAfter(sender);
+		}
+
+		for(var i = 0; i < checkboxes.length; i++){
+			if(checkboxes[i].type == "checkbox" && checkboxes[i].name != sender.name && checkboxes[i].name.indexOf("correctBox[" + questionNumber) >= 0){
+				checkboxes[i].checked = false; 
+			}
+		}
+	}
+
+
+</script> 
+}

@@ -1,0 +1,74 @@
+@(tags: List[models.PassageTag])
+
+@main("View All Tags") {
+
+<!-- Code adapted from browseCourses file --> 
+
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("css/jquery.dataTables.css")'>
+	<script type="text/javascript" src='@routes.Assets.at("js/jquery.dataTables.js")'></script>
+
+    <div>
+	    <ol class="breadcrumb">
+  			<li><a href="/">Home</a></li>
+  			/
+  			<li class="active">View All Tags</li>
+		</ol>
+   
+
+	    
+	 </div>
+	 <div style="margin-left: 15px;"> 
+	 	@for(tag <- tags){
+
+	 		<div style="margin-bottom:10px"> <strong><i class="fa fa-tag fa-2x">@tag.getType()</i></strong> </div>
+	 		<div>
+	 		
+
+	 		<a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px;">
+	            <i class="fa fa-tag">@tag.name</i>
+	        </a>
+
+	        <br>
+	 		
+	 		
+	 		   </div>
+	 		<br> 
+	 		<br> 
+	 	}
+    </div>
+
+    <script type="text/javascript">
+		$('table').dataTable();
+		$('#DataTables_Table_0_wrapper').css("clear", "none");
+		$('#DataTables_Table_0_wrapper').css("display", "inline-block");
+    </script>
+
+    <script>
+        $('button#del').click(function() {
+        	var button = $(this);
+        	button.toggleClass('active');
+
+        	var passageData = $(this).attr('name').split(":|:");
+        	var passageId = passageData[0];
+        	var passageName = passageData[1];
+
+            bootbox.confirm("Are you sure you want to delete course '" + passageName + "'? This cannot be undone.", function(result) {
+            	if (result) {
+		            button.prop("disabled", true);
+		            jsRoutes.controllers.SimplePassageController.deletePassage(passageId).ajax({
+					    success : function(data) {
+					    	window.location = "@routes.SimplePassageController.viewAllPassages()"
+					    },
+					    error : function(err) {
+					    	//window.location = "@routes.MainController.error()";
+					    }
+					});
+		        } else {
+		        	button.toggleClass('active');
+		        	print("NOTHING");
+		        }
+            });
+        });
+    </script>
+
+}

@@ -1,0 +1,184 @@
+@(passage: models.SimplePassage, instructor: models.User, suggestionsOn : Boolean) 
+
+@main("Viewing Passage") {
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+@if(flash.containsKey("success")) {
+<div class="alert alert-success">
+	<h2>Done!</h2> @flash.get("success")
+</div>
+}
+
+<div>
+	<ol class="breadcrumb">
+		<li><a href="/">Home</a></li>
+		/
+		<a href="/viewAllPassages">All Passages</a></li>
+		/
+	</ol>
+
+<div>
+	            <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passage.id" style="margin-bottom: 20px;">
+	                <i class="fa fa-plus"></i>
+	                Add new Questions
+	            </a>
+	            @if(passage.questions.size > 0) {
+
+	           	<a class="btn btn-primary" id="view" href="/viewPassageQuestions?passageId=@passage.id" style="margin-bottom: 20px;">
+	                <i class="fa fa-book"></i>
+	                View Passage Questions
+	            </a>
+	            }
+	        </div>
+<div>
+
+
+
+		<div class="holder" style="padding-bottom: 2cm;">
+			<div class="pull-left">
+				<a class="btn btn-primary" id="add" href="@routes.SimplePassageController.edit(passage.id)" style="margin-bottom: 20px;">
+					<i class="fa fa-edit"> Edit this Passage</i>
+				</a>
+
+					@for(tag <- passage.tags){
+
+					
+					  <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px;">
+						<i class="fa fa-tag"> @tag.name</i>
+						
+					</a>
+					}
+			</div>
+	
+		<div class="pull-right">
+			<h5>Choose The Grade Level this passage should be displayed at</h5> 
+			<div class="dropdown">
+				<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Grade
+					<span class="caret"></span></button>
+					<ul class="dropdown-menu">
+						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=K">K</a></li>
+						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=1">1</a></li>
+						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=2">2</a></li>
+						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=3">3</a></li>
+						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=4">4</a></li>
+						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=5">5</a></li>
+						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=6">6</a></li>
+						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=7">7</a></li>
+						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=8">8</a></li>
+						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=9">9</a></li>
+						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=10">10</a></li>
+						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=11">11</a></li>
+						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=12">12</a></li>
+						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=Advanced">College</a></li>
+					</ul>
+				</div>
+				
+		</div>
+
+
+		</div>
+
+
+
+		<div class="container-fluid"> 
+			
+		
+		
+
+
+			
+		
+		</td>
+
+
+						<a class="btn btn-primary" id="toggle" href="view?passageId=@passage.id&grade=0" style="margin-bottom: 20px;">
+	                <i class="fa fa-flash"></i>
+	                Turn off Suggestions
+	    </a>
+
+
+		<div>
+
+			<span class="label label-default" id="Suggestions">New</span>  
+
+
+
+
+			<h1> @passage.title </h1> 
+			<strong> Added By: </strong> @instructor.firstName @instructor.lastName <br>
+			<strong> Displaying at Grade Level:  </strong> @passage.grade <br>
+			<strong> Source:  </strong> @passage.source <br><br> 
+
+					<!--	<textarea rows="25" disabled style="width: 90%; resize: none;overflow-y: scroll;">>@passage.text</textarea> -->
+
+
+
+		@if(suggestionsOn){
+			@for(word <- passage.text.split(" ")){
+				@if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > passage.grade && !passage.getStopWords().contains(word) && (POS.byWord(word) == null  || POS.byWord(word) != null && POS.byWord(word).name.toLowerCase.indexOf("verb") != -1)){
+					<u>@word</u>
+
+
+					
+					@if(Suggestion.byWord(word).size > 0){
+						<div style="display:none;" id="@word">We suggest:&nbsp
+						@for(w <- Suggestion.byWord(word)){
+
+							@w.suggestedWord,&nbsp
+						}
+						<br>
+					 </div>
+					}
+				} else {
+					@word
+				}
+				&nbsp
+			}
+			} else {
+				@passage.text
+			}
+			
+</div>
+</div>
+</div>
+<script>
+function alertSuggestions(){
+	alert("This word is too complicated for this grade level!");
+}
+$(document).ready(function(){
+
+	$(".dropdown").on("show.bs.dropdown", function(event){
+    var x = $(event.relatedTarget).text(); // Get the text of the element
+    alert(x);
+});
+
+	  function isEmpty( el ){
+      return !$.trim(el.html())
+  }
+ 
+    $("u").click(function(){
+       	var string = $(this).html(); 
+
+       	
+       	if(document.getElementById(string) == null){
+       		alert("This word is too complicated, but we don't have any suggestions for you yet.");
+       	}
+
+
+
+
+    	//$("#" + string).show();
+
+    	document.getElementById("Suggestions").innerHTML = document.getElementById(string).innerText;
+
+
+    });
+
+});
+</script>
+
+
+}
