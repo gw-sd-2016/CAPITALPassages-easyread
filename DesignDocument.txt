@@ -1,0 +1,316 @@
+EasyRead
+Design Document
+Malcolm Goldiner
+
+ 	EasyRead aims to provide a web interface for users to add, tag, and generate simplification suggestions for passages. The system’s goal is, for every passage with reading level greater than Kindergarten, to allow the User to view the passage at any reading level from K up to the Original Grade Level. The main feature of the system will be a text editor with suggestions appearing as you hover over words. EasyRead is also designed to be integrated with the ReMind system wherein Users will be given greater options to set up Courses and Instructors, all with their own specific passages and questions.
+
+Users
+
+Individuals
+Individual accounts are designed for users who only need the ability to simplify passages and share them with a limited number of people. Individual account can create, tag, and edit passages. However, this type of user can only share passages one at a time. 
+
+Organizations
+Organization accounts are designed for groups of users who want to be able to create, tag, and edit a group of passages that they all share. These accounts are designed for integration into a larger system (ReMind) that features Institutions, Courses and the ability to assign different types of questions for each passage. Users part of an Organization account can share multiple passages at a time with anyone they’d like. 
+
+Models 
+
+User
+-	id – Long 
+-	firstName – String 
+-	lastName – String 
+-	password – String 
+-	email – String 
+-	organization – String (Can be null) 
+-	disowned – boolean 
+
+Word
+-	id – int
+-	wordNetId – int
+-	lemma – String
+-	numSyllables – int 
+-	suggestions – Set<Word> 
+-	ageOfAcquisition – double 
+-	createdTime – Timestamp
+-	updatedTime – Timestamp 
+-	partsOfSpeech – List<POS> 
+-	disowned – boolean 
+
+
+SimplePassage 
+-	id – Long 
+-	numWords – int 
+-	numSyllables – int 
+-	numCharacters – int 
+-	sentences – List<Sentence> 
+-	tags – List<PassageTag> 
+-	grade – int 
+-	text – String 
+-	title – String
+-	uploaderId – Long
+-	disowned – boolean 
+
+For compatibility with the ReMind System, SimplePassage will extend ContentText class so that Passages can be used as material for questions within that system.
+
+Sentence
+-	id – Long 
+-	words – List<Word> 
+-	disowned – boolean 
+
+POS
+-	id – Long
+-	name – String 
+-	disowned – boolean 
+
+PassageTag
+-	id – Long 
+-	name – String 
+-	description – String
+-	type – String
+-	createdTime – Timestamp
+-	updatedTime – Timestamp 
+-	disowned – boolean 
+
+Actors
+-	SimplePassageController
+o	Create
+o	Edit 
+o	View
+o	Delete
+o	Analyze 
+-	ApplicationController
+o	Login
+o	Signup
+-	Parsing Controller
+o	External Library Interaction: Stanford Core NLP 
+o	Parse Method
+♣	Input: String
+♣	Expected Behavior
+•	Populate database with Sentence and Word Model objects corresponding to those in the input string. 
+•	Possible failure of parser failure
+-	PassageAnalysisController and MashapeController
+o	External Interaction 
+♣	Asynchronous Request to Mashape Words API for number of syllables 
+♣	Interaction isolated in MashapeController 
+♣	Possible failure of http request.
+o	Determine Grade Level Method
+♣	Input: SimplePassage
+♣	Expected Behavior: Update the grade field of the input SimplePassage object with a positive grade level. 
+♣	Possible invalid (negative) grade level determination
+
+-	WordNetController
+o	External Interaction: JWNL : Word Net Library for Java
+o	Get Synonyms Method
+♣	Input
+•	Word
+•	POS
+♣	Output
+•	List<String>
+♣	Expected Behavior
+•	Returns a List of Strings that are synonyms of the world
+•	Methods from JWNL annotated with throws declaration for WordNet Request Exceptions.
+-	MicrosoftNGramsController
+o	External Interaction
+♣	HTTP Request to NGrams API
+♣	Possible failure of request
+o	This class implements PhraseValidationController and can be swapped out for any class that implements getFrequency(word) 
+o	Get Frequency Method
+♣	Input: Word
+♣	Output: Double
+♣	Expected Behavior
+•	For every input word, outputs a double corresponding to the absolute value of the logarithmic percentage of search queries on bing that contain the input string.
+
+
+Use Cases – Individual or Organization
+-	Case: Home Page
+o	Handled By: ApplicationController
+o	Splash Page that displays options to the user based on the current state:
+♣	Already Logged In
+•	ManagePassages (Button)
+•	Logout (Link)
+•	Contact Us
+♣	Not Logged In/Has Account
+•	Log In (Button)
+•	Contact Us (Link)
+♣	Nog Logged In/No Account
+•	Sign Up (Button)
+•	Contact Us (Link)
+o	When the user navigates to “/” they are sent to the HomePage(index.html) this page is rendered by the Application Controller. Requests to “/” take on parameter and that’s a string called firstName. firstName is the value of the session variable userFirstName, which is set by the Application Controller upon Log In. 
+-	Case: Sign up
+o	Handled By: ApplicationController
+o	A signup for asking the user to enter their name, email, and then pick a username is displayed. Upon submission (Submit Button), if this username is unique, a new instance of User is created and persisted to the database. The password is hashed before being stored. 
+-	Case: Log In 
+o	Handled By: ApplicationController
+o	Prerequisites: There is already an account matching this username/email and password in the database
+o	A form asking the user to enter either their email or username and then their password is displayed. 
+o	Upon submission the system checks to see if a user matching those credentials exists. (Submit Button)
+o	On Success: User is returning to the HomePage
+o	On Failure: User is returned to this form with an error message displayed.
+-	Case: Manage Passages
+o	Handled By: SimplePassageController
+o	Prerequisites: User is logged in
+o	Page shows a searchable table view of Passages objects
+o	Available Actions
+♣	viewPassage (Title Link) 
+♣	addPassage(Button)
+♣	Analyze Passages (Button)
+♣	viewPassagesWithTag(Tag Buttons) 
+♣	deletePassage(Inline Button in TableView)
+♣	editPassage(Inline Button in TableView)
+o	Functional Requirements:
+♣	Display list of Passages
+o	Non Functional Requirements
+♣	Add UI preview of full passage without leaving page
+-	Case: View Passage
+o	Handled By: SimplePassageController
+o	Prerequisites
+♣	User is logged in
+♣	Valid passage id in URL parameters 
+o	Passages that haven’t yet been analyzed have no grade or suggestion data.
+o	Available Actions
+♣	editPassage(Inline Button in TableView)
+♣	deletePassage(Inline Button in TableView)
+♣	viewPassagesWithTag(Tag Buttons) 
+♣	Change Grade (Dropdown Menu)
+•	Assumption: Passage has been analyzed
+♣	Turn on Suggestions (Button)
+•	Assumption: Passage has been analyzed
+o	Functional Requirements:
+♣	Display Passage Information
+o	Non Functional Requirements
+♣	Add in UI for manually accepting words the system identifies as too difficult as alright for current grade.
+-	Case: Analyze Passages
+o	Handled by SimplePassageController, PassageAnalysis Controller, Parsing Controller, Mashape Controller, WordNetController and PhraseValidationController
+o	This analysis is performed asynchronously and in multiple steps
+o	 ParsingController uses the Stanford Core NLP parser to tokenize the words and sentences. 
+o	For every sentence the parser detects, a new Sentence object is persisted to the database.
+o	For every word
+♣	Create new Word object if word is not in database
+♣	Mashape Controller – fetches number of syllables if that information is not already stored.
+♣	 That word and number of syllables are then sent to the WordNetController to get all synonyms.
+♣	Synonyms with less syllables are persisted to the database in this Word Object’s suggestions list. 
+♣	Every Word added as a suggestion is sent to a controller that implements PhraseValidationController and that controller returns a list ordered by validity (valid in terms of how frequently each suggestion appears in search queries) to the SimplePassage Controller.
+o	Upon Completion the User sees a notification banner letting them know that all passages now have a grade level and suggestion data.
+o	Functional Requirements:
+♣	Complete Analysis Asynchronously without interrupting User’s continued interaction with site
+♣	Notify User of Completion
+o	Non Functional Requirements
+♣	Cache synonym and Suggestion data to improve performance
+-	Case: View Passages with Tag
+o	Handled By: SimplePassageController
+o	Shows only passages with a certain tag name (Tag names are unique) 
+o	Prerequisites
+♣	 User is logged in
+♣	A valid tag id is in the URL parameters
+o	Page shows a searchable table view of Passages objects
+o	Available Actions
+♣	viewPassage (Title Link) 
+♣	deletePassage(Inline Button in TableView)
+♣	editPassage(Button)
+o	Functional Requirements:
+♣	Display only Passages with certain Tag
+o	Non Functional Requirements
+♣	Specific Tag Iconography
+-	Case: Delete Passage
+o	Handled By: SimplePassageController
+o	Prerequisites
+♣	User is logged in
+♣	Valid passage id in URL parameters 
+o	On Success: Returns to Manage Passage page
+o	On Failure: Stays on same page and gives error message 
+o	Functional Requirements:
+♣	Cleanly delete entity from database
+o	Non Functional Requirements
+♣	Display delete progress for User 
+♣	Persist status indicator of delete operation while User browses rest of site 
+-	Case: Add Passage
+o	Handled By: SimplePassageController
+o	Prerequisites
+♣	User is logged in 
+o	Create Passage Form is displaying with fields for:
+♣	Title
+♣	PassageTag (There can be any number of Tags) 
+•	Name
+•	Type
+•	Detail
+♣	Text
+o	On Success: Returns to Manage Passage page
+o	On Failure: Stays on same page and gives error message 
+o	Functional Requirements:
+♣	Cleanly adds entity to database
+♣	Terms of Service reminding the user that we are not liable for copyright violations with regards to passages that they upload
+o	Non Functional Requirements
+♣	Build Custom Plain Text Editor for Submitting passages.
+-	Case: Edit Passage
+o	Handled By: SimplePassageController
+o	Create Passage form is prepopulated with stored data for this passage.
+o	If Suggestions have been turned on
+♣	A drop down menu will appear to adjust the grade level you are targeting
+♣	 hovering over a word brings up a list of the system’s best suggestions 
+o	Prerequisites
+♣	User is logged in
+♣	Valid passage id in URL parameters 
+o	On Success: Returns to Manage Passage page
+o	On Failure: Stays on same page and gives error message 
+o	Functional Requirements:
+♣	Plain Text Editing
+♣	Display Suggestions
+♣	Underline words that are too difficult
+o	Non Functional Requirements
+♣	Allow replacement of words with suggestions in real time
+♣	Custom on hover Suggestion UI 
+-	Case: Change Grade
+o	Handled By: SimplePassageController
+o	Prerequisites
+♣	User is logged in
+♣	Valid passage id in URL parameters
+♣	Current URL is View Passage page
+♣	Passages have been Analyzed
+♣	Suggestions have been turned on
+o	Reloads view with the appropriate words underlined for the new grade level
+o	Functional Requirements:
+♣	Display Suggestions
+♣	Underline words that are too difficult
+o	Non Functional Requirements
+♣	Display progress indicator for user while loading new Suggestions
+-	Case: Turn on Suggestions
+o	Handled By: SimplePassageController
+o	Prerequisites
+♣	User is logged in
+♣	Valid passage id in URL parameters
+♣	Current URL is View Passage page
+♣	Passages have been Analyzed
+o	Reloads view with the appropriate words underlined for the current grade level
+o	Functional Requirements:
+♣	Set to grade level to Kindergarten and reload the page with Suggestions
+o	Non Functional Requirements
+♣	Show error message if Passages haven’t been analyzed yet
+-	Case: Share Passage with outside person
+o	Outside person receives an email with an automatically generated account and password giving them access to only this passage and its suggestions.
+o	Prerequisites
+♣	User is logged in
+♣	Valid passage id in URL parameters
+♣	Current URL is View Passage page
+♣	Passages have been Analyzed
+o	Brings up share dialog asking for
+♣	Email Address
+♣	Read or Write Access
+o	Functional Requirements:
+♣	Allow Sharing
+♣	Allow only specified Access Level 
+
+
+
+
+Future Plans
+-	Develop a tool to allow converting EasyRead account to ReMind account at the User’s convenience. 
+-	Provide suggestions to algorithmically increase the reading level of a passage.  
+
+
+
+
+
+
+
+
+
+
