@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 //import forms.UserForm;
-// CODE FOR THIS CLASS TAKEN FROM ORIGINAL ReMind Repo 
+// CODE FOR THIS CLASS TAKEN FROM ORIGINAL ReMind Repo
 
 @Entity
 public class User extends Model {
