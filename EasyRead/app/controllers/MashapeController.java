@@ -68,9 +68,7 @@ public class MashapeController {
 							p.save();
 
 							nW.wordNetId = Long.valueOf(-1);
-							nW.hasPronunciation = false;
 							nW.ageOfAcquisition = 6;
-							nW.familiarity = 0;
 							nW.length = word.length();
 							nW.save();
 							return null;

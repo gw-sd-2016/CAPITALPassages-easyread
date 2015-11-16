@@ -20,16 +20,16 @@ import static play.data.Form.form;
 public class SimplePassageController extends Controller {
 
 	// New Passage Methods
-	public static Result createSimplePassage() throws JWNLException{
+	public Result createSimplePassage() throws JWNLException{
 		return ok(createSimplePassage.render(form(SimplePassageData.class)));
 	}
 
 	// QUESTION CREATION 
-	public static Result setNumQuestions(Long passageId){
+	public Result setNumQuestions(Long passageId){
 		return ok(setNumberOfQuestionsForPassage.render(form(SimplePassageNumQuestionsData.class),passageId));
 	}
 
-	public static Result setNumQuestions_submit()
+	public Result setNumQuestions_submit()
 	{
 
 		Form<SimplePassageNumQuestionsData> createSPForm = form(SimplePassageNumQuestionsData.class).bindFromRequest();
@@ -193,7 +193,7 @@ public class SimplePassageController extends Controller {
 
 
 
-	public static Result edit(Long passageId) {
+	public Result edit(Long passageId) {
 		SimplePassage passage = SimplePassage.byId(passageId);
 		if (passage == null) {
 			return redirect(routes.SimplePassageController.viewAllPassages());
@@ -205,7 +205,7 @@ public class SimplePassageController extends Controller {
 		return ok(editSimplePassage.render(form, passageId));
 	}
 
-	public static Result editQuestions(Long passageId) {
+	public Result editQuestions(Long passageId) {
 		SimplePassage passage = SimplePassage.byId(passageId);
 		if (passage == null) {
 			return redirect(routes.SimplePassageController.viewAllPassages());
@@ -235,7 +235,7 @@ public class SimplePassageController extends Controller {
 
 	}
 
-	public static Result editQuestions_submit(Long passageId)
+	public Result editQuestions_submit(Long passageId)
 	{
 
 		Form<SimplePassageNumQuestionsData> createSPForm = form(SimplePassageNumQuestionsData.class).bindFromRequest();
@@ -351,7 +351,7 @@ public class SimplePassageController extends Controller {
 
 
 
-	public static Result edit_submit(Long passageId) {
+	public Result edit_submit(Long passageId) {
 		SimplePassage passage = SimplePassage.byId(passageId);
 		if (passage == null) {
 			return redirect(routes.SimplePassageController.viewAllPassages());
@@ -385,12 +385,12 @@ public class SimplePassageController extends Controller {
 	}
 
 
-	public static String getFolderPath(){
+	public String getFolderPath(){
 		return "public/passages"; 
 	}
 
 
-	public static Result view(Long passageId, int grade) {
+	public Result view(Long passageId, int grade) {
 		User user = User.byId(session("userId"));
 		if (user == null) {
 			return ok(index.render(session("userFirstName")));
@@ -405,7 +405,7 @@ public class SimplePassageController extends Controller {
 		return ok(viewPassage.render(passage, User.byId(passage.instructorID),false));
 	}
 
-	public static Result viewS(Long passageId, int grade) {
+	public Result viewS(Long passageId, int grade) {
 		User user = User.byId(session("userId"));
 		if (user == null) {
 			return ok(index.render(session("userFirstName")));
@@ -422,7 +422,7 @@ public class SimplePassageController extends Controller {
 
 
 /*
-	public static Result viewPassageQuestions(Long passageId) {
+	public Result viewPassageQuestions(Long passageId) {
 		User user = User.byId(session("userId"));
 		if (user == null) {
 			return redirect(routes.UserController.index(request().uri()));
@@ -435,7 +435,7 @@ public class SimplePassageController extends Controller {
 */
 
 
-	public static Result createSimplePassage_submit()
+	public Result createSimplePassage_submit()
 	{
 		Form<SimplePassageData> createSPForm = form(SimplePassageData.class).bindFromRequest();
 
@@ -473,7 +473,7 @@ public class SimplePassageController extends Controller {
 	}
 
 
-	public static Result analyzePassages() throws JWNLException{
+	public Result analyzePassages() throws JWNLException{
 		for(SimplePassage p : SimplePassage.all()){
 			//if(p.sentences.size() <= 0){
 
@@ -509,7 +509,7 @@ public class SimplePassageController extends Controller {
 	}
 
 
-	public static Result viewAllPassages() {
+	public Result viewAllPassages() {
 		Long instId = Long.valueOf((session("userId")));
 		User inst = User.byId(instId);
 		List<SimplePassage> pList = SimplePassage.byInstructorId(instId);
@@ -517,7 +517,7 @@ public class SimplePassageController extends Controller {
 		return ok(viewAllPassages.render(pList,inst));
 	}
 
-	public static Result viewAllPassagesWithTag(String name) {
+	public Result viewAllPassagesWithTag(String name) {
 		Long instId = Long.valueOf((session("userId")));
 		User inst = User.byId(instId);
 		List<SimplePassage> pList = SimplePassage.byInstructorId(instId);
@@ -525,7 +525,7 @@ public class SimplePassageController extends Controller {
 		return ok(viewAllPassagesWithTag.render(pList,inst,name));
 	}
 
-	public static Result deletePassage(Long passageId) {
+	public Result deletePassage(Long passageId) {
 		SimplePassage a = SimplePassage.byId(passageId);
 
 		System.out.println("PASSAGEID: " + passageId);
@@ -567,7 +567,7 @@ public class SimplePassageController extends Controller {
 	}
 
 	// do we possible need to clean up response here?? are they unreachable
-	public static Result deletePassageQuestion(Long questionId) {
+	public Result deletePassageQuestion(Long questionId) {
 		PassageQuestion a = PassageQuestion.byId(questionId);
 
 		if(a == null){
@@ -583,7 +583,7 @@ public class SimplePassageController extends Controller {
 		return ok("true");
 	}
 
-	public static Result deletePassageQuestionChoice(Long choiceId) {
+	public Result deletePassageQuestionChoice(Long choiceId) {
 		PassageQuestionChoice a = PassageQuestionChoice.byId(choiceId);
 
 		if(a == null){
@@ -599,12 +599,12 @@ public class SimplePassageController extends Controller {
 		return ok("true");
 	}
 
-	public static Result answerPassageQuestions(Long passageId){
+	public Result answerPassageQuestions(Long passageId){
 		return ok(answerPassageQuestions.render(form(PassageQuestionAnswerData.class),passageId));
 	}
 
 
-	public static Result answerPassageQuestions_submit(Long passageId){
+	public Result answerPassageQuestions_submit(Long passageId){
 		SimplePassage passage = SimplePassage.byId(passageId);
 		if (passage == null) {
 			return redirect(routes.SimplePassageController.answerPassageQuestions(passageId));
@@ -673,7 +673,7 @@ public class SimplePassageController extends Controller {
 		return ok(viewPassageQuestionAnswers.render(passageId,inst));
 	}
 
-	public static Result viewPassageQuestionAnswers(Long passageId){
+	public Result viewPassageQuestionAnswers(Long passageId){
 		Long instId = Long.valueOf((session("userId")));
 		User inst = User.byId(instId);
 

@@ -4,8 +4,8 @@
 
 <!-- Code adapted from browseCourses file --> 
 
-	<link rel="stylesheet" type="text/css" href='@routes.Assets.at("css/jquery.dataTables.css")'>
-	<script type="text/javascript" src='@routes.Assets.at("js/jquery.dataTables.js")'></script>
+	<link rel="stylesheet" type="text/css" href='@routes.Assets.versioned("css/jquery.dataTables.css")'>
+	<script type="text/javascript" src='@routes.Assets.versioned("js/jquery.dataTables.js")'></script>
 
     <div>
 	    <ol class="breadcrumb">
@@ -157,7 +157,7 @@
 					    	window.location.reload();
 					    },
 					    error : function(err) {
-							//window.location = "@routes.MainController.error()";
+							//window.location = "";
 					    }
 					});
 		        } else {
@@ -178,7 +178,7 @@
 					    	window.location.reload();
 					    },
 					    error : function(err) {
-							//window.location = "@routes.MainController.error()";
+							//window.location = "";
 					    }
 					});
 		        } else {
