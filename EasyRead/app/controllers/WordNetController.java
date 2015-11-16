@@ -17,7 +17,7 @@ import java.util.Set;
 
 /**
  * A class to demonstrate the functionality of the library.
- *
+ * CODE FROM http://extjwnl.sourceforge.net
  * @author John Didion (jdidion@didion.net)
  * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
