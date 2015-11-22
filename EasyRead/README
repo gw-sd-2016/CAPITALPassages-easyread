@@ -1,4 +1,4 @@
 Instructions:
-- Requires typesafe activator installing to run
+- Requires typesafe activator installed to run
 - With activator installed, inside outermost directory "activator run"
 - navigate to localhost:9000
