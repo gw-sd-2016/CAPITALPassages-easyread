@@ -7,6 +7,7 @@ import com.avaje.ebean.SqlRow;
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
 import formdata.UserForm;
+import play.api.data.Form;
 import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.Required;
 import utilities.PasswordHash;
@@ -20,6 +21,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 //import forms.UserForm;
 // CODE FOR THIS CLASS TAKEN FROM ORIGINAL ReMind Repo
@@ -121,15 +123,17 @@ public class User extends Model {
         this.creatorId = creatorId;
     }
 
-    public User(UserForm userForm) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        this.email = userForm.email;
-        this.username = userForm.username;
-        this.password = PasswordHash.createHash(userForm.password);
-        System.out.println(this.password);
-        this.firstName = userForm.firstName;
-        this.lastName = userForm.lastName;
+    public User(play.data.Form<UserForm> userForm) throws InvalidKeySpecException, NoSuchAlgorithmException {
+
+        Map<String,String> formData = userForm.data();
+
+        this.email = formData.get("email");
+        this.username = formData.get("username");
+        this.password = PasswordHash.createHash(formData.get("password"));
+        this.firstName = formData.get("firstName");
+        this.lastName = formData.get("lastName");
         this.type = Role.INSTRUCTOR;
-        this.creatorId = userForm.creatorId;
+     //   this.creatorId = Long.valueOf(formData.get("creatorId"));
        // this.institution = User.byId(userForm.creatorId).institution;
     }
 

@@ -2,29 +2,21 @@
 
 @main("View All Passages") {
 
-<!-- Code adapted from browseCourses file --> 
-
-	<link rel="stylesheet" type="text/css" href='@routes.Assets.versioned("css/jquery.dataTables.css")'>
-	<script type="text/javascript" src='@routes.Assets.versioned("js/jquery.dataTables.js")'></script>
-
-    <div>
-	    <ol class="breadcrumb">
-  			<li><a href="/">Home</a></li>
-  			/
-  			<li class="active">View All Passages</li>
-		</ol>
+	<div>
     		<div>
-	            <a class="btn btn-primary" id="add" href="@routes.SimplePassageController.createSimplePassage()" style="margin-left:10px; margin-top:10px;margin-bottom: 20px;">
+	            <button type="button" class="btn btn-primary" id="add" href="@routes.SimplePassageController.createSimplePassage()" style="margin-left:10px; margin-top:10px;margin-bottom: 20px;">
 	                <i class="fa fa-plus"></i><i class="fa fa-group"></i>
 	                Add a new Passage
-	            </a>
+	            </button>
 
-	              <button type="button" class="btn btn-small btn-success has-spinner" id="analyzePassages"  style="width: 75px; margin-left:10px;">
-								            <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
-								            <i class="fa fa-flash"></i> Analyze
+
+
+	              <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages"  style="margin-left:10px;margin-top:10px;margin-bottom: 20px;">
+								            <span class="spinner"><i class="glyphicon glyphicon-spin fa-refresh"></i></span>
+								            <i class="glyphicon glyphicon-flash"></i> Analyze
+
 			 	</button>
-	              
-	        </div>
+			</div>
 
 	    <div id="students" class="box">
 
@@ -33,7 +25,7 @@
 	            <h5>View All Passages</h5>
 	        </div>
 
-	     
+			<form action="@routes.SimplePassageController.createSimplePassage_submit()" method="post" enctype="multipart/form-data">
 	      
 	        <div class="box-content box-table" style="padding: 10px;">
 	        	@if(passages.size == 0) {
@@ -93,9 +85,6 @@
 
 											<td>
 											@for(tag <- passage.tags){
-
-												
-
 												  <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px;">
 	                								<i class="fa fa-tag"> @tag.name</i>
 	                								
@@ -113,10 +102,6 @@
 	                                        <i class="fa fa-edit"></i> Edit
 	                                    </a>
 
-
-
-
-
 	                                  <!--  <button type="button" class="btn btn-small btn-danger has-spinner" id="deletePassage" name="@passage.id:|:@passage.title" style="width: 75px;">
 								            <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
 								            <i class="fa fa-trash"></i> Delete
@@ -130,8 +115,6 @@
 			            </tbody>
 			        </table>
 				}
-	        </div>
-	    </div>
     </div>
 
     <script type="text/javascript">

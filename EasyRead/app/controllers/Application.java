@@ -32,28 +32,35 @@ public class Application extends Controller {
         if (newUserForm.hasErrors()) {
             return badRequest(signup.render(newUserForm));
         } else {
-            User newUser = new User(newUserForm.get());
+            User newUser = new User(newUserForm);
             User.create(newUser);
         }
-        return ok(index.render(session("userFirstName")));
+        return ok(login.render(form(LoginForm.class)));
     }
 
     public Result login() throws NoSuchAlgorithmException, InvalidKeySpecException{
-
-        Form<LoginForm> loginForm = form(LoginForm.class).bindFromRequest();
-        return ok(login.render(loginForm));
+        return ok(login.render(form(LoginForm.class)));
     }
 
-    public Result login_submit() throws NoSuchAlgorithmException, InvalidKeySpecException{
 
+    public Result logout(){
+        session().clear();
+        return ok(index.render(null));
+    }
+
+
+
+
+    public Result login_submit() throws NoSuchAlgorithmException, InvalidKeySpecException{
         Form<LoginForm> loginForm = form(LoginForm.class).bindFromRequest();
 
+        LoginForm correctedForm = new LoginForm(loginForm.data().get("usernameOrEmail"),  loginForm.data().get("password"));
 
 
-        if (loginForm.hasErrors()) {
+        if (correctedForm.validate() != null) {
             return badRequest(login.render(loginForm));
         }else {
-            User loggedInUser = User.byLogin(loginForm.get().usernameOrEmail, loginForm.get().password);
+            User loggedInUser = User.byLogin(loginForm.data().get("usernameOrEmail"), loginForm.data().get("password"));
             session().clear();
 
             session("userId", loggedInUser.id.toString());
@@ -63,11 +70,11 @@ public class Application extends Controller {
     }
 
     public Result signup() throws NoSuchAlgorithmException, InvalidKeySpecException{
-        Form<UserForm> signupForm = form(UserForm.class).bindFromRequest();
-        return ok(signup.render(signupForm));
+        return ok(signup.render(form(UserForm.class)));
     }
-/*
-    public static Result javascriptRoutes() {
+
+    /*
+    public Result javascriptRoutes() {
         response().setContentType("text/javascript");
         return ok(
                 Routes.javascriptRouter("jsRoutes",
@@ -78,8 +85,8 @@ public class Application extends Controller {
                         routes.javascript.SimplePassageController.deletePassageQuestionChoice()
                 )
         );
-    }*/
-
+    }
+*/
     public static Result viewAllPassageTags(){
         return ok(viewAllPassageTags.render(PassageTag.all()));
     }

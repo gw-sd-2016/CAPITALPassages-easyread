@@ -26,19 +26,33 @@
 						<h4>Source</h4>
 						<input type="text" name="source" placeholder="Passage Source" value="@form("source").value">
 
-						
-						<label> 
-							<button type="button" class="btn btn-primary" onclick="addTag();">Add Tag</button>
-						</label>
-						<div class="tag" name="tag0">
-							<strong>Add a Tag to this Passage</strong>
-							<label>Ex: Reuters, World News, etc</label>
-							<input type="text" name="names[0]" placeholder="Tag Name" value="names[0]">
-							<label>Anything you want</label>
-							<input type="text" name="descriptions[0]" placeholder="Tag Description" value="descriptions[0]">
-							<label>Ex: Grade, Source, Etc</label>
-							<input type="text" name="types[0]" placeholder="Tag Type" value="types[0]">
-						</div>
+                    <!--
+                    <div style="padding-top:5px; padding-bottom:5px">
+                        <button type="submit" class="btn btn-primary" onclick="addTag()"><i class="glyphicon glyphicon-tag"></i>Add Tag</button>
+                    </div>
+                    -->
+
+                    <form class="form-inline">
+                        <div class="form-group">
+                            <br>
+                           <strong>Tag 1</strong>
+                            <div class="input-group">
+                                <input type="text" name="names[0]" placeholder="Tag Name" value="names[0]">
+
+                                <input type="text" name="descriptions[0]" placeholder="Tag Description" value="descriptions[0]">
+
+                                <input type="text" name="types[0]" placeholder="Tag Type" value="types[0]">
+
+
+                            </div>
+                        </div>
+
+                    </form>
+
+
+
+
+
 					
 
 						<h4>Passage Body</h4>
@@ -46,9 +60,7 @@
 						<textarea class="form-control" rows="3"name="passageText" qvalue="@form("passageText").value" style="width:90%"></textarea>
 
 
-						
 
-					</p>
 					<br>
 					<p>
 						<button type="submit" class="btn btn-success">
@@ -69,7 +81,8 @@
 		console.log('tag' + numTags);
 
 
-		var newTag ='<div class="tag" name="tag' + numTags + '"><strong>Add a Tag to this Passage</strong><label>Ex: Reuters, World News, etc</label><input type="text" name="names[' + numTags + ']" placeholder="Tag Name" value="names[' + numTags + ']"><label>Anything you want</label><input type="text" name="descriptions[' + numTags + ']" placeholder="Tag Description" value="descriptions[' + numTags + ']"><label>Ex: Grade, Source, Etc</label><input type="text" name="types[' + numTags + ']" placeholder="Tag Type" value="types[' + numTags + ']"></div>';
+		var newTag ='<div class="tag" name="tag' + numTags + '"> Tag' +
+                 numTags + '<input type="text" name="names[' + numTags + ']" placeholder="Tag Name" value="names[' + numTags + ']"><label>Anything you want</label><input type="text" name="descriptions[' + numTags + ']" placeholder="Tag Description" value="descriptions[' + numTags + ']"><label>Ex: Grade, Source, Etc</label><input type="text" name="types[' + numTags + ']" placeholder="Tag Type" value="types[' + numTags + ']"></div>';
 
 
 		var lastTag = document.getElementsByClassName('tag');

@@ -1,9 +1,8 @@
 @(passage: models.SimplePassage, instructor: models.User, suggestionsOn : Boolean) 
 
 @main("Viewing Passage") {
-<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+
 
 @if(flash.containsKey("success")) {
 <div class="alert alert-success">
@@ -11,43 +10,41 @@
 </div>
 }
 
-<div>
-	<ol class="breadcrumb">
-		<li><a href="/">Home</a></li>
-		/
-		<a href="/viewAllPassages">All Passages</a></li>
-		/
-	</ol>
-
-<div>
-	            <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passage.id" style="margin-bottom: 20px;">
-	                <i class="fa fa-plus"></i>
-	                Add new Questions
-	            </a>
-	            @if(passage.questions.size > 0) {
-
-	           	<a class="btn btn-primary" id="view" href="/viewPassageQuestions?passageId=@passage.id" style="margin-bottom: 20px;">
-	                <i class="fa fa-book"></i>
-	                View Passage Questions
-	            </a>
-	            }
-	        </div>
-<div>
 
 
-
-		<div class="holder" style="padding-bottom: 2cm;">
+		<div class="holder" style="padding-bottom: 4cm;">
 			<div class="pull-left">
+
+				<a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passage.id" style="margin-bottom: 20px;">
+					<i class="fa fa-plus"></i>
+					Add new Questions
+				</a>
+				@if(passage.questions.size > 0) {
+
+					<a class="btn btn-primary" id="view" href="/viewPassageQuestions?passageId=@passage.id" style="margin-bottom: 20px;">
+						<i class="fa fa-book"></i>
+						View Passage Questions
+					</a>
+				}
+
 				<a class="btn btn-primary" id="add" href="@routes.SimplePassageController.edit(passage.id)" style="margin-bottom: 20px;">
 					<i class="fa fa-edit"> Edit this Passage</i>
 				</a>
+
+				<a class="btn btn-primary" id="toggle" href="viewPassageWithSuggestions?passageId=@passage.id&grade=0" style="margin-bottom: 20px;">
+					<i class="fa fa-flash"></i>
+					Turn on Suggestions
+				</a>
+
+				<br>
+
+				<strong>Tagged as:</strong>
 
 					@for(tag <- passage.tags){
 
 					
 					  <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px;">
 						<i class="fa fa-tag"> @tag.name</i>
-						
 					</a>
 					}
 			</div>
@@ -82,38 +79,24 @@
 
 
 
-		<div class="container-fluid"> 
-			
-		
-		
+		<div class="container-fluid">
+            <div style="text-align:left;">
+                <strong> @passage.title </strong>
+                <strong> Added By: </strong> @instructor.firstName @instructor.lastName <br>
+                <strong> Grade Level:  </strong>
+                @if(passage.sentences.size > 0){
+                    @passage.grade
+                } else {
+                    Grade Level not available yet.
+                }
 
 
-			
-		
-		</td>
+                <br>
+                <strong> Source:  </strong> @passage.source <br><br>
 
 
-						<a class="btn btn-primary" id="toggle" href="viewPassageWithSuggestions?passageId=@passage.id&grade=0" style="margin-bottom: 20px;">
-	                <i class="fa fa-flash"></i>
-	                Turn on Suggestions
-	    </a>
+            </div>
 
-
-		<div>
-
-
-			<h1> @passage.title </h1> 
-			<strong> Added By: </strong> @instructor.firstName @instructor.lastName <br>
-			<strong> Grade Level:  </strong> 
-			@if(passage.sentences.size > 0){
-				@passage.grade
-			} else {
-				Grade Level not available yet.
-			}
-
-
-			 <br>
-			<strong> Source:  </strong> @passage.source <br><br> 
 
 					<!--	<textarea rows="25" disabled style="width: 90%; resize: none;overflow-y: scroll;">>@passage.text</textarea> -->
 
@@ -141,8 +124,8 @@
 			}
 			
 </div>
-</div>
-</div>
+
+
 <script>
 function alertSuggestions(){
 	alert("This word is too complicated for this grade level!");
@@ -176,7 +159,7 @@ $(document).ready(function(){
     });
 
 });
-</script
+</script>
 
 
 }

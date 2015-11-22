@@ -5,11 +5,12 @@
 # Home page
 GET     /                       controllers.Application.index()
 GET     /signup                 controllers.Application.signup()
-POST    /signup                 controllers.Application.signup_submit()
+POST    /signupSub              controllers.Application.signup_submit()
 GET     /login                  controllers.Application.login()
 POST    /login                  controllers.Application.login_submit()
 #GET    /viewAllPassageTags		controllers.Application.viewAllPassageTags()
-#GET     /javascriptRoutes     		controllers.Application.javascriptRoutes
+GET      /javascriptRoutes      controllers.Application.javascriptRoutes()
+GET     /logout                 controllers.Application.logout()
 
 
 
@@ -37,6 +38,4 @@ GET     /viewPassageWithSuggestions 	controllers.SimplePassageController.viewS(p
 
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
-
-
+GET  /assets/*file        controllers.Assets.at(path="/public", file)

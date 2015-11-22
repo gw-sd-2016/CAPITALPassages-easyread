@@ -31,22 +31,6 @@
 
             <div class="site-wrapper-inner">
 
-                <div class="cover-container">
-
-                    <div class="masthead clearfix">
-                        <div class="inner">
-                            <h3 class="masthead-brand">EasyRead</h3>
-                            <nav>
-                                <ul class="nav masthead-nav">
-                                    <li class="active"><a href="#">Home</a></li>
-                                   @if(firstName == null){
-                                       <li><a href="@routes.Application.login()">Log In</a></li>
-                                   }
-                                    <li><a href="mailto:mgoldiner@@gwu.edu">Contact</a></li>
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
 
                     <div class="inner cover">
                         <h1 class="cover-heading">Passage Simplification as easy as cut-and-paste</h1>
@@ -60,25 +44,20 @@
                                 Welcome Back, @firstName!
                             </p>
                             <p class="lead">
-                                <a href="@routes.Application.signup()" class="btn btn-lg btn-default">Manage Passages</a>
+                                <a href="@routes.SimplePassageController.viewAllPassages()" class="btn btn-lg btn-default">Manage Passages</a>
                             </p>
                         }
 
 
                     </div>
 
-                    <div class="mastfoot">
-                        <div class="inner">
-                            <p>Based on Cover template for <a href="http://getbootstrap.com">Bootstrap</a></p>
-                            <p>Project by: Malcolm Goldiner</p>
-                        </div>
-                    </div>
+
 
                 </div>
 
             </div>
 
-        </div>
+
 
             <!-- Bootstrap core JavaScript
     ================================================== -->

@@ -510,6 +510,13 @@ public class SimplePassageController extends Controller {
 
 
 	public Result viewAllPassages() {
+
+        try{
+            analyzePassages();
+        } catch(Exception e){
+            System.out.println("analysis failure");
+        }
+
 		Long instId = Long.valueOf((session("userId")));
 		User inst = User.byId(instId);
 		List<SimplePassage> pList = SimplePassage.byInstructorId(instId);
