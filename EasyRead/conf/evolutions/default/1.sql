@@ -84,16 +84,10 @@ create table passage_tag (
   constraint pk_passage_tag primary key (id))
 ;
 
-create table phrase (
-  id                        bigint auto_increment not null,
-  text                      varchar(255),
-  constraint pk_phrase primary key (id))
-;
-
 create table sentence (
   id                        bigint auto_increment not null,
   simple_passage_id         bigint not null,
-  text                      varchar(255),
+  text                      longtext,
   constraint pk_sentence primary key (id))
 ;
 
@@ -200,8 +194,6 @@ drop table passage_question_record;
 drop table passage_question_response;
 
 drop table passage_tag;
-
-drop table phrase;
 
 drop table sentence;
 

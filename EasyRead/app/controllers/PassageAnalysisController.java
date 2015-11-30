@@ -1,9 +1,6 @@
 package controllers;
 
-import models.POS;
-import models.SimplePassage;
-import models.Suggestion;
-import models.Word;
+import models.*;
 import net.sf.extjwnl.JWNLException;
 
 import java.util.ArrayList;
@@ -27,6 +24,16 @@ public class PassageAnalysisController {
 		else return grade;
 	}
 
+    public double averageAge(SimplePassage p){
+        double average = 0;
+        for(Sentence s : p.sentences){
+            for(Word w : s.words){
+                if(w.ageOfAcquisition < 7) average += 6;
+                else average += w.ageOfAcquisition;
+            }
+        }
+        return average/p.numWords;
+    }
 
 	public void determineGradeLevel(SimplePassage p){
 
@@ -36,39 +43,18 @@ public class PassageAnalysisController {
 
 		double FK  = calculateFKScore(p); 
 
-		if(p.text.split(" ").length < 100){
+		if(p.text.split(" ").length > 100){
 			numAlgorithms = 2;
 			p.grade = (int) Math.round((ARI + FK) / numAlgorithms);
 		} else{
+            /*
 			double CLScore = gradeResolution(calculateCLScore(p.text, p.numWords)); 
-			numAlgorithms = 3;
-			p.grade = (int) Math.round((CLScore + ARI + FK) / numAlgorithms);
+			numAlgorithms = 3;*/
+			p.grade = (int) convertToGrade(averageAge(p));
 		}
 
 		p.save();
 	}
-
-	/*
-	public int determineGradeLevel(String text){
-
-		int numAlgorithms; 
-		int grade = 0; 
-
-		double ARI = calculateARI(p);
-
-		double FK  = calculateFKScore(p); 
-
-		if(text.split(" ").length < 100){
-			numAlgorithms = 2;
-			grade = (int) Math.round((ARI + FK) / numAlgorithms);
-		} else{
-			double CLScore = gradeResolution(calculateCLScore(p.text, p.numWords)); 
-			numAlgorithms = 3;
-			grade = (int) Math.round((CLScore + ARI + FK) / numAlgorithms);
-		}
-
-		return grade;
-	}*/
 
 
 	public double calculateCLScore(String text, int numWords){

@@ -1,7 +1,7 @@
 package models;
 
 
-import com.google.gson.annotations.Expose;
+import com.avaje.ebean.annotation.Expose;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
 

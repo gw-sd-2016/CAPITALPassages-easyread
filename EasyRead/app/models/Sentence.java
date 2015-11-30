@@ -1,13 +1,10 @@
 package models;
 
-import com.google.gson.annotations.Expose;
+import com.avaje.ebean.annotation.Expose;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +21,7 @@ public class Sentence extends Model {
     
     @Required
     @Expose
+    @Lob
     public String text;
 
     
@@ -43,10 +41,11 @@ public class Sentence extends Model {
     }
     
 	public static List<Sentence> bySimplePassage(Long simplePassageId) {
-		return find.where()
-				.eq("simple_passage_id", simplePassageId)
-				.findList(); 
-	}
+        return find.where()
+                .eq("simple_passage_id", simplePassageId)
+                .findList();
+    }
+
     
     public static List<Sentence> all() {
         return find.where().findList();
@@ -57,7 +56,17 @@ public class Sentence extends Model {
         this.text = text;
         
         for(String w : this.text.split(" ")){
-        	//this.words.add(w);
+        	if(Word.byLemma(w) != null){
+                this.words.add(Word.byLemma(w));
+            } else {
+                Word n = new Word();
+                n.lemma = w;
+                n.disavowed = false;
+                n.ageOfAcquisition = -1;
+                n.numSyllables = 0;
+
+                this.words.add(n);
+            }
         }
 
     }

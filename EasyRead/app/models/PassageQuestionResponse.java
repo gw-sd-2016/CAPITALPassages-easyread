@@ -1,8 +1,8 @@
 package models;
 
 import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.avaje.ebean.annotation.Expose;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
-import com.google.gson.annotations.Expose;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
 

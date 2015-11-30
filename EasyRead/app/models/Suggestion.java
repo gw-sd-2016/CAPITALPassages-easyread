@@ -1,6 +1,6 @@
 package models;
 
-import com.google.gson.annotations.Expose;
+import com.avaje.ebean.annotation.Expose;
 import play.db.ebean.Model;
 
 import javax.persistence.Entity;
