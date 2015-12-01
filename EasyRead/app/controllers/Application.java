@@ -73,7 +73,7 @@ public class Application extends Controller {
         return ok(signup.render(form(UserForm.class)));
     }
 
-    /*
+
     public Result javascriptRoutes() {
         response().setContentType("text/javascript");
         return ok(
@@ -86,7 +86,7 @@ public class Application extends Controller {
                 )
         );
     }
-*/
+
     public static Result viewAllPassageTags(){
         return ok(viewAllPassageTags.render(PassageTag.all()));
     }

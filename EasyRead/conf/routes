@@ -9,7 +9,7 @@ POST    /signupSub              controllers.Application.signup_submit()
 GET     /login                  controllers.Application.login()
 POST    /login                  controllers.Application.login_submit()
 #GET    /viewAllPassageTags		controllers.Application.viewAllPassageTags()
-#GET      /javascriptRoutes      controllers.Application.javascriptRoutes()
+GET      /javascriptRoutes      controllers.Application.javascriptRoutes()
 GET     /logout                 controllers.Application.logout()
 
 
