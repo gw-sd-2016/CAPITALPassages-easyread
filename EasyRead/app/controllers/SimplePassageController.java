@@ -512,7 +512,7 @@ public class SimplePassageController extends Controller {
 	public Result viewAllPassages() {
 
         try{
-          //  analyzePassages();
+          analyzePassages();
         } catch(Exception e){
             System.out.println("analysis failure");
         }

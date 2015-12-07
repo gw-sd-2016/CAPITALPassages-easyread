@@ -41,15 +41,13 @@ public class PassageAnalysisController {
 
 		double ARI = calculateARI(p);
 
-		double FK  = calculateFKScore(p); 
+		double FK  = calculateFKScore(p);
+
+		double CL = gradeResolution(calculateCLScore(p.text, p.numWords));
 
 		if(p.text.split(" ").length > 100){
-			numAlgorithms = 2;
-			p.grade = (int) Math.round((ARI + FK) / numAlgorithms);
+			p.grade = (int) Math.round((ARI + FK + CL) / 3);
 		} else{
-            /*
-			double CLScore = gradeResolution(calculateCLScore(p.text, p.numWords)); 
-			numAlgorithms = 3;*/
 			p.grade = (int) convertToGrade(averageAge(p));
 		}
 
