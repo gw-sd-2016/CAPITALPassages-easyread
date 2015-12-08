@@ -26,13 +26,18 @@ public class PassageAnalysisController {
 
     public double averageAge(SimplePassage p){
         double average = 0;
+		int count = 0;
         for(Sentence s : p.sentences){
             for(Word w : s.words){
-                if(w.ageOfAcquisition < 7) average += 6;
-                else average += w.ageOfAcquisition;
+				if(!Word.isStopWord(w)){
+					if(w.ageOfAcquisition > 6){
+						average += w.ageOfAcquisition;
+						count++;
+					}
+				}
             }
         }
-        return average/p.numWords;
+        return average/count;
     }
 
 	public void determineGradeLevel(SimplePassage p){
