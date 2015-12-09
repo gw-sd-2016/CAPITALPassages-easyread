@@ -14,7 +14,8 @@ libraryDependencies ++= Seq(
 
 
 "org.apache.directory.studio" % "org.apache.commons.io" % "2.4",
-"edu.stanford.nlp" % "stanford-corenlp" % "3.5.2",
+  "edu.stanford.nlp" % "stanford-corenlp" % "3.4.1",
+  "edu.stanford.nlp" % "stanford-corenlp" % "3.4.1" classifier "models",
   "net.sf.extjwnl" % "extjwnl" % "1.9",
   "net.sf.extjwnl" % "extjwnl-data-wn31" % "1.2"
 )

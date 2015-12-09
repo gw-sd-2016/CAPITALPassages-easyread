@@ -19,6 +19,8 @@ import static play.data.Form.form;
 
 public class SimplePassageController extends Controller {
 
+	private ParsingController parsingController;
+
 	// New Passage Methods
 	public Result createSimplePassage() throws JWNLException{
 		return ok(createSimplePassage.render(form(SimplePassageData.class)));
@@ -493,7 +495,8 @@ public class SimplePassageController extends Controller {
 
 					}
 					if(sCounter == 10 || (i + 1) == sentences.length){
-						new ParsingController().parse(p,portion);
+						if(parsingController == null) parsingController = new ParsingController();
+						parsingController.parse(p,portion);
 						portion = "";
 						sCounter = 0;
 					}
@@ -510,12 +513,12 @@ public class SimplePassageController extends Controller {
 
 
 	public Result viewAllPassages() {
-
+/*
         try{
           analyzePassages();
         } catch(Exception e){
             System.out.println("analysis failure");
-        }
+        }*/
 
 		Long instId = Long.valueOf((session("userId")));
 		User inst = User.byId(instId);

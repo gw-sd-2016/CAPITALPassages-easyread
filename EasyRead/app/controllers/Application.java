@@ -78,11 +78,11 @@ public class Application extends Controller {
         response().setContentType("text/javascript");
         return ok(
                 Routes.javascriptRouter("jsRoutes",
+                        controllers.routes.javascript.SimplePassageController.analyzePassages(),
+                        controllers.routes.javascript.SimplePassageController.deletePassage()/*,
+                        controllers.routes.javascript.SimplePassageController.deletePassageQuestion()
+                        controllers.routes.javascript.SimplePassageController.deletePassageQuestionChoice()*/
 
-                        routes.javascript.SimplePassageController.deletePassage(),
-                        routes.javascript.SimplePassageController.analyzePassages(),
-                        routes.javascript.SimplePassageController.deletePassageQuestion(),
-                        routes.javascript.SimplePassageController.deletePassageQuestionChoice()
                 )
         );
     }

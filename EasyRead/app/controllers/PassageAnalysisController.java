@@ -131,7 +131,8 @@ public class PassageAnalysisController {
 
 		if(p != null && !p.name.toLowerCase().contains("proper noun")){
 			WordNetController c = new WordNetController();
-			
+
+			/*
 			
 			String threeGram = "";
 			String[] splitS = sentence.split(" ");
@@ -159,7 +160,7 @@ public class PassageAnalysisController {
 			}
 			
 			
-			
+			*/
 			
 			
 			
@@ -180,7 +181,7 @@ public class PassageAnalysisController {
 						&& Suggestion.byWord(word).size() == 0 
 						&& (r != null && r.numSyllables < w.numSyllables) || r == null){
 
-					int pos = threeGram.indexOf(w.lemma);
+					/*int pos = threeGram.indexOf(w.lemma);
 					
 					if(pos != -1) {
 						
@@ -199,7 +200,7 @@ public class PassageAnalysisController {
 						
 						
 						
-					}
+					}*/
 				
 					
 					

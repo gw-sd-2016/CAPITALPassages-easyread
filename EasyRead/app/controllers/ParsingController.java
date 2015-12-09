@@ -25,7 +25,7 @@ public class ParsingController {
     private void initPipeline(){
         Properties props = new Properties();
         // do we still need all these annotators
-        props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse,sentiment, dcoref ");
+        props.put("annotators", "tokenize, ssplit, pos, lemma");
         pipeline = new StanfordCoreNLP(props);
 
     }
@@ -82,7 +82,7 @@ public class ParsingController {
 					if(lemma.length() > 1 || Character.isLetter(lemma.charAt(0))){
 						if(originalSCount == 0) new MashapeController().getNumSyllablesForWord(lemma,passage);
 						passage.numWords++;
-						if(passage.grade < 0) a.generateSuggestionsForWord(new POS(pos),lemma, s.text, passage.id);
+						a.generateSuggestionsForWord(new POS(pos),lemma, s.text, passage.id);
 					}
 
 					// add in part of speech to make better suggestions

@@ -9,7 +9,7 @@ POST    /signupSub              controllers.Application.signup_submit()
 GET     /login                  controllers.Application.login()
 POST    /login                  controllers.Application.login_submit()
 #GET    /viewAllPassageTags		controllers.Application.viewAllPassageTags()
-GET      /javascriptRoutes      controllers.Application.javascriptRoutes()
+GET      /javascriptRoutes      @controllers.Application.javascriptRoutes()
 GET     /logout                 controllers.Application.logout()
 
 
@@ -26,7 +26,7 @@ GET     /setNumQ                    controllers.SimplePassageController.setNumQu
 POST    /setNumQ 					controllers.SimplePassageController.setNumQuestions_submit()
 #GET     /viewPassageQuestions		controllers.SimplePassageController.viewPassageQuestions(passageId : Long)
 GET     /viewAllPassagesWithTag     controllers.SimplePassageController.viewAllPassagesWithTag(name : String)
-GET     /analyzePassages			controllers.SimplePassageController.analyzePassages()
+GET     /analyzePassages			@controllers.SimplePassageController.analyzePassages()
 GET     /answerPassageQuestions		controllers.SimplePassageController.answerPassageQuestions(passageId : Long)
 POST    /answerPassageQuestions_submit 	controllers.SimplePassageController.answerPassageQuestions_submit(passageId : Long)
 GET     /viewPassageQuestionAnswers    controllers.SimplePassageController.viewPassageQuestionAnswers(passageId : Long)
@@ -39,3 +39,4 @@ GET     /viewPassageWithSuggestions 	controllers.SimplePassageController.viewS(p
 
 # Map static resources from the /public folder to the /assets URL path
 GET  /assets/*file        controllers.Assets.at(path="/public", file)
+GET     /assets/javascripts/routes          controllers.Application.javascriptRoutes()

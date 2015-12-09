@@ -97,7 +97,7 @@
 
 		@if(suggestionsOn){
 			@for(word <- passage.text.split(" ")){
-				@if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > passage.grade && !passage.getStopWords().contains(word) && (POS.byWord(word) == null  || POS.byWord(word) != null && POS.byWord(word).name.toLowerCase.indexOf("verb") != -1)){
+				@if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > passage.grade && !passage.getStopWords().contains(word) /*&& (POS.byWord(word) == null  || POS.byWord(word) != null && POS.byWord(word).name.toLowerCase.indexOf("verb") != -1)*/){
 					<u>@word</u>
 
 
