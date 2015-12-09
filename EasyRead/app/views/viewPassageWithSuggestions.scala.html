@@ -60,7 +60,10 @@
                             <span class="caret"></span></button>
                         <ul class="dropdown-menu" id="word-list">
                         @for(word <- passage.text.split(" ").toList.map(x => x.toLowerCase()).map( x => x.replaceAll("[^a-zA-Z ]", "")).distinct.sorted) {
-                            <li><a>@word</a></li>
+                            @if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > (Integer.valueOf(request().getQueryString("grade").toString) + 6) && !passage.getStopWords().contains(word)){
+                                <li><a>@word</a></li>
+                            }
+
                         }
                         </ul>
 
