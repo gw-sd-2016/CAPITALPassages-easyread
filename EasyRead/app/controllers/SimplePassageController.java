@@ -436,6 +436,10 @@ public class SimplePassageController extends Controller {
 	}
 */
 
+	public Result viewAllPassageTags(List<PassageTag> tags){
+		return ok(viewAllPassageTags.render(PassageTag.all()));
+	}
+
 
 	public Result createSimplePassage_submit()
 	{
@@ -453,7 +457,6 @@ public class SimplePassageController extends Controller {
 			PassageTag t = new PassageTag(createSPForm.get().names.get(0), createSPForm.get().descriptions.get(0),createSPForm.get().types.get(0));
 			;
 
-
 			if(PassageTag.byName(createSPForm.get().names.get(0)) == null){
 				t.save();
 				newPassage.tagId = t.id;
@@ -469,7 +472,6 @@ public class SimplePassageController extends Controller {
 
 		}
 
-
 		newPassage.save();
 		return redirect(routes.SimplePassageController.viewAllPassages());
 	}
@@ -477,12 +479,7 @@ public class SimplePassageController extends Controller {
 
 	public Result analyzePassages() throws JWNLException{
 		for(SimplePassage p : SimplePassage.all()){
-			//if(p.sentences.size() <= 0){
-
-
-
 				String[] sentences = p.text.split(" ");
-
 
 				String portion = "";
 
@@ -502,9 +499,7 @@ public class SimplePassageController extends Controller {
 					}
 				}
 
-				
 				p.save();
-				
 			}
 
 		flash("success", "Passage Analysis Completed.");
@@ -517,9 +512,9 @@ public class SimplePassageController extends Controller {
         if(thisWord != null){
             thisWord.ageOfAcquisition = grade + 6;
             thisWord.save();
-            return ok("true");
+            return redirect(request().uri());
         }
-        return ok("Failed");
+        return badRequest();
     }
 
 	public Result viewAllPassages() {

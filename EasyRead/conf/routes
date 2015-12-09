@@ -35,7 +35,8 @@ GET     /deletePassageQuestionChoice  controllers.SimplePassageController.delete
 GET     /editQuestions					controllers.SimplePassageController.editQuestions(passageId : Long)
 POST    /editQuestion_submit          controllers.SimplePassageController.editQuestions_submit(passageId : Long)
 GET     /viewPassageWithSuggestions 	controllers.SimplePassageController.viewS(passageId : Long, grade : Int)
-GET     /acceptWord                     controllers.SimplePassageController.acceptWord(word : String, grade : Int)
+GET     /acceptWord                     @controllers.SimplePassageController.acceptWord(word : String, grade : Int)
+#GET     /viewAllPassageTags             controllers.SimplePassageController.viewAllPassageTags(tags : util.List[PassageTag])
 
 
 # Map static resources from the /public folder to the /assets URL path

@@ -9,7 +9,8 @@ import java.util.HashSet;
 public class PassageAnalysisController {
 	
 	
-	private MicrosoftNGramsValidator validator = new MicrosoftNGramsValidator(); 
+	private MicrosoftNGramsValidator validator = new MicrosoftNGramsValidator();
+	private WordNetController c;
 	
 	
 	
@@ -43,18 +44,36 @@ public class PassageAnalysisController {
 
 	public void determineGradeLevel(SimplePassage p){
 
-		int numAlgorithms; 
+		int combined = 0;
+        int numAlgorithms = 0;
 
 		double ARI = calculateARI(p);
+        if(ARI > 0){
+            combined += ARI;
+            numAlgorithms++;
+        }
 
 		double FK  = calculateFKScore(p);
+        if(FK > 0){
+            combined += FK;
+            numAlgorithms++;
+        }
 
-		double CL = gradeResolution(calculateCLScore(p.text, p.numWords));
 
-		if(p.text.split(" ").length > 100 && FK > 0 && ARI > 0 && CL > 0){
-			p.grade = (int) Math.round((ARI + FK + CL) / 3);
+
+
+
+		if(p.text.split(" ").length > 100){
+
+            double CL = gradeResolution(calculateCLScore(p.text, p.numWords));
+            if(CL > 0){
+                combined += CL;
+                numAlgorithms++;
+            }
+
+            p.grade = (int) Math.round(combined / numAlgorithms);
 		} else{
-			p.grade = (int) convertToGrade(averageAge(p));
+            p.grade = (int) Math.round((combined + convertToGrade(averageAge(p))) / (numAlgorithms + 1));
 		}
 
         try{
@@ -133,92 +152,74 @@ public class PassageAnalysisController {
 		return score;
 	}
 
-	public void generateSuggestionsForWord(POS p, String word, String sentence, Long passageId) throws JWNLException{
+	public void generateSuggestionsForWord(POS p, String word, String sentence, Long passageId, String ogText) throws JWNLException{
 
 		if(p != null && !p.name.toLowerCase().contains("proper noun")){
-			WordNetController c = new WordNetController();
-
-			/*
-			
-			String threeGram = "";
-			String[] splitS = sentence.split(" ");
-			
-			String iPOS = "";
-			
-			
-			for(int i = 0; i < splitS.length; i++){
-				if(splitS[i].equals(word)){
-					if(i == splitS.length - 1){
-						if(i - 2 > 0){
-							threeGram += splitS[i - 2] + " ";
-							threeGram += splitS[i - 1] + " ";
-							threeGram += splitS[i]; 
-							iPOS = "end";
-						}
-					} else if(i - 1 >= 0 && i + 1 < splitS.length){
-						threeGram += splitS[i - 1] + " ";
-						threeGram += splitS[i] + " ";
-						threeGram += splitS[i + 1]; 
-						iPOS = "middle"; 
-					} else threeGram += splitS[i]; 
-					break; 
-				}
-			}
-			
-			
-			*/
-			
-			
-			
+			if (c == null) c = new WordNetController();
 
 			HashSet<String> suggestions = c.wordIDLookup(word, p.name);
-			
-			
-			
 
-			for(String root : suggestions){
-				//System.out.println(root);
-				Word w = Word.byLemma(word);
-				Word r = Word.byLemma(root);
-				if(!word.toLowerCase().equals(root.toLowerCase())
-						&& w != null
-                        && r != null){
+			Word w = Word.byLemma(word);
 
-					/*int pos = threeGram.indexOf(w.lemma);
-					
-					if(pos != -1) {
-						
-						
-						String ogGram = threeGram; 
-						
-						
-						
-						threeGram = threeGram.substring(0, pos) + root + threeGram.substring(pos + w.length); 
-						
-						System.out.println("comparing " + ogGram + " to " + threeGram);
-						
-						int ogFreq = validator.fetchFrequencies(ogGram); 
-						
-						int newFreq = validator.fetchFrequencies(threeGram);
-						
-						
-						
-					}*/
-				
+            if(Suggestion.byWord(ogText).size() == 0){
+                for(String root : suggestions){
+
+                    Word r = Word.byLemma(root);
+                    if(!word.toLowerCase().equals(root.toLowerCase())
+                            && w != null
+                            && r != null){
 
 
-                    /*
-                    w.suggetions.add(r);
-                    w.save();*/
+                        Suggestion s = new Suggestion();
+                        s.word = ogText;
 
-					
-					Suggestion s = new Suggestion(); 
-					s.word = word;
-					s.suggestedWord = root; 
-					s.simple_passage_id = passageId; 
-					s.save();
-				}
-			}
-		}	
+                        String threeGram = "";
+                        String[] splitS = sentence.split(" ");
+
+                        String iPOS = "";
+                        s.suggestedWord = root;
+                        threeGram = buildThreeGram(splitS, sentence, ogText, root);
+                        s.simple_passage_id = passageId;
+                        s.save();
+
+
+
+                        validator.fetchFrequencies(s, threeGram.toLowerCase());
+                    }
+                }
+            }
+        }
+
+
 	}
+
+    private String buildThreeGram(String[] splitS, String sentence, String ogText, String root){
+        String threeGram = "";
+        if(splitS.length <= 3) threeGram = sentence;
+        else{
+            for(int i = 0; i < splitS.length; i++){
+                if(splitS[i].toLowerCase().equals(ogText.toLowerCase())){
+                    if(i > 0 && (i + 1) < splitS.length){
+                        threeGram = splitS[i - 1] + " " + root + " " + splitS[i + 1];
+                        break;
+                    } else if(i > 0){
+                        if(i - 2 > 0){
+                            threeGram = splitS[i - 2] + " ";
+                        }
+                        threeGram += splitS[i - 1] + " " + root;
+                        break;
+                    } else if((i + 1) < splitS.length) {
+                        threeGram += root + " " + splitS[i + 1];
+                        if((i + 2) < splitS.length){
+                            threeGram += splitS[i + 2];
+                        }
+                        break;
+                    }
+                }
+            }
+
+
+        }
+        return threeGram;
+    }
 }

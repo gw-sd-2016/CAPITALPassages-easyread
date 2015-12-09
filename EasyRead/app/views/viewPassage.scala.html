@@ -48,32 +48,17 @@
 					</a>
 					}
 			</div>
-	
-		<div class="pull-right">
-			<h5>Choose The Grade Level this passage should be displayed at</h5> 
-			<div class="dropdown">
-				<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Grade
-					<span class="caret"></span></button>
-					<ul class="dropdown-menu">
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=0">K</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=1">1</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=2">2</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=3">3</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=4">4</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=5">5</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=6">6</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=7">7</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=8">8</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=9">9</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=10">10</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=11">11</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=12">12</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=13">College</a></li>
-					</ul>
-				</div>
-				
+
+
+
 		</div>
 
+
+
+	<div class="container-fluid">
+
+
+		<div>
 
 		</div>
 
@@ -84,11 +69,18 @@
                 <strong> @passage.title </strong>
                 <strong> Added By: </strong> @instructor.firstName @instructor.lastName <br>
                 <strong> Grade Level:  </strong>
-                @if(passage.sentences.size > 0){
-                    @passage.grade
-                } else {
-                    Grade Level not available yet.
-                }
+				@if(passage.grade == 0) {
+					K
+				}
+
+				@if(passage.grade >= 12){
+					College Level or Above
+				} else {
+
+					@if(passage.grade != 0 && passage.grade <= 12) {
+						@passage.grade
+					}
+				}
 
 
                 <br>
@@ -132,11 +124,6 @@ function alertSuggestions(){
 }
 
 $(document).ready(function(){
-
-	$(".dropdown").on("show.bs.dropdown", function(event){
-    var x = $(event.relatedTarget).text(); // Get the text of the element
-    alert(x);
-});
 
 	  function isEmpty( el ){
       return !$.trim(el.html())

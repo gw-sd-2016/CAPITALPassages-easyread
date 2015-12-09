@@ -25,7 +25,7 @@
 
 
 
-		<div class="holder" style="padding-bottom: 4cm;">
+
 			<div class="pull-left">
 				<a class="btn btn-primary" id="add" href="@routes.SimplePassageController.edit(passage.id)" style="margin-bottom: 20px;">
 					<i class="fa fa-edit"> Edit this Passage</i>
@@ -40,34 +40,76 @@
 					</a>
 					}
 			</div>
-	
-		<div class="pull-right">
-			<h5>Choose The Grade Level this passage should be displayed at</h5> 
-			<div class="dropdown">
-				<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Grade
-					<span class="caret"></span></button>
-					<ul class="dropdown-menu">
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=0">K</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=1">1</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=2">2</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=3">3</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=4">4</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=5">5</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=6">6</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=7">7</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=8">8</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=9">9</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=10">10</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=11">11</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=12">12</a></li>
-						<li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=13">College</a></li>
-					</ul>
-				</div>
+
+
+
+
+
+
+
+
+
+            <div class="pull-right">
+
+
+                <div class="btn-group">
+                    <h5>Manually Accept Words</h5>
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+
+                            <span class="caret"></span></button>
+                        <ul class="dropdown-menu" id="word-list">
+                        @for(word <- passage.text.split(" ").toList.map(x => x.toLowerCase()).map( x => x.replaceAll("[^a-zA-Z ]", "")).distinct.sorted) {
+                            <li><a>@word</a></li>
+                        }
+                        </ul>
+
+                    </div>
+                    <h5>Choose The Grade Level this passage should be displayed at</h5>
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+
+                            Grade
+
+                            @if(passage.grade == 0) {
+                                K
+                            }
+
+                            @if(passage.grade >= 12){
+                                College Level or Above
+                        } else {
+
+                        @if(passage.grade != 0 && passage.grade <= 12) {
+                            @passage.grade
+                        }
+                        }
+                            <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=0">K</a></li>
+                            <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=1">1</a></li>
+                            <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=2">2</a></li>
+                            <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=3">3</a></li>
+                            <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=4">4</a></li>
+                            <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=5">5</a></li>
+                            <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=6">6</a></li>
+                            <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=7">7</a></li>
+                            <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=8">8</a></li>
+                            <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=9">9</a></li>
+                            <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=10">10</a></li>
+                            <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=11">11</a></li>
+                            <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=12">12</a></li>
+                            <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=13">College</a></li>
+                        </ul>
+                    </div>
+
+
+                </div>
+
+
+            </div>
 				
 		</div>
 
-
-		</div>
 
 
 
@@ -81,14 +123,25 @@
 
 		<div>
 
-			<span class="label label-default" id="Suggestions">New</span>  
+			<span class="label label-default" id="Suggestions"></span>
 
 
 
 
 			<h1> @passage.title </h1> 
 			<strong> Added By: </strong> @instructor.firstName @instructor.lastName <br>
-			<strong> Displaying at Grade Level:  </strong> @passage.grade <br>
+			<strong> Displaying at Grade Level:  </strong>   @if(passage.grade == 0) {
+            K
+        }
+
+            @if(passage.grade >= 12){
+                College Level or Above
+            } else {
+
+                @if(passage.grade != 0 && passage.grade <= 12) {
+                    @passage.grade
+                }
+            }<br>
 			<strong> Source:  </strong> @passage.source <br><br> 
 
 					<!--	<textarea rows="25" disabled style="width: 90%; resize: none;overflow-y: scroll;">>@passage.text</textarea> -->
@@ -97,14 +150,15 @@
 
 		@if(suggestionsOn){
 			@for(word <- passage.text.split(" ")){
-				@if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > passage.grade && !passage.getStopWords().contains(word) /*&& (POS.byWord(word) == null  || POS.byWord(word) != null && POS.byWord(word).name.toLowerCase.indexOf("verb") != -1)*/){
+				@if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > (Integer.valueOf(request().getQueryString("grade").toString) + 6) && !passage.getStopWords().contains(word) /*&& (POS.byWord(word) == null  || POS.byWord(word) != null && POS.byWord(word).name.toLowerCase.indexOf("verb") != -1)*/){
 					<u>@word</u>
 
 
 					
 					@if(Suggestion.byWord(word).map(x => x.suggestedWord).distinct.size > 0){
 						<div style="display:none;" id="@word">We suggest:&nbsp
-						@for(w <- Suggestion.byWord(word).map(x => x.suggestedWord).distinct){
+                            <!-- http://stackoverflow.com/questions/18830813/how-can-i-remove-punctuation-from-input-text-in-java -->
+						@for(w <- Suggestion.byWord(word).sortWith(_.frequency > _.frequency).map(x => x.suggestedWord).distinct){
 							@w
 							@if(Suggestion.byWord(word).map(x => x.suggestedWord).distinct.last != w){
 								,&nbsp
@@ -126,75 +180,40 @@
 </div>
 </div>
 </div>
-<script>
-function alertSuggestions(){
-	alert("This word is too complicated for this grade level!");
-}
-$(document).ready(function(){
 
-	$(".dropdown").on("show.bs.dropdown", function(event){
-    var x = $(event.relatedTarget).text(); // Get the text of the element
-    alert(x);
-});
+    <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
 
-	  function isEmpty( el ){
-      return !$.trim(el.html())
-  }
+    <script>
+            function alertSuggestions(){
+                alert("This word is too complicated for this grade level!");
+            }
 
-    $('u;).mousedown(function(event) {
-        switch (event.which) {
-            case 1:
-                alert("This word is too complicated, but we don't have any suggestions for you yet.");
-                break;
-            case 3:
-                $(this).dialog({
-                    buttons: {
-                        "Yes": function() {
-                            alert("We'll Remember that!");
-                            jsRoutes.controllers.SimplePassageController.acceptWord(this, @passage.grade).ajax({
-                                success : function(data) {
-                                    window.location.reload();
-                                },
-                                error : function(err) {
-                                    //window.location = "";
-                                }
-                            });
-                        },
-                        "No":  function() {alert('No problem, here are our suggeestions');},
-                        "Cancel":  function() {
-                            alert('you chose cancel');
-                            dialog.dialog('close');
+            //http://www.creativejuiz.fr/blog/en/javascript-en/read-url-get-parameters-with-javascript
+            function $_GET(param) {
+                var vars = {};
+                window.location.href.replace(
+                        /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+                        function( m, key, value ) { // callback
+                            vars[key] = value !== undefined ? value : '';
                         }
-                    }
-                });
-                break;
-            default:
-                alert('You have a strange Mouse!');
-                break;
+                );
 
-                document.getElementById("Suggestions").innerHTML = document.getElementById(string).innerText;
-        }
-    });
+                if ( param ) {
+                    return vars[param] ? vars[param] : null;
+                }
+                return vars;
+            }
 
-    $("u").click(function(){
-       	var string = $(this).html();
+            $(document).ready(function(){
 
-
-       	if(document.getElementById(string) == null){
-       		alert("This word is too complicated, but we don't have any suggestions for you yet.");
-       	} else {
-
-            //$('<div>').dialog({modal: true})
-            myalert("Stuff","here");
-
-
-
-
-          /*  var dialog = $('<p>Do you want to accept this word at the current grade level?</p>').dialog({
-                buttons: {
-                    "Yes": function() {
-                        alert("We'll Remember that!");
-                        jsRoutes.controllers.SimplePassageController.acceptWord(this, @passage.grade).ajax({
+                //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
+                // locate your element and add the Click Event Listener
+                document.getElementById("word-list").addEventListener("click",function(e) {
+                    // e.target is our targetted element.
+                    // try doing console.log(e.target.nodeName), it will result LI
+                    if(e.target /*&& e.target.nodeName == "LI"*/) {
+                        console.log(e.target.id + " was clicked");
+                        jsRoutes.controllers.SimplePassageController.acceptWord(e.target.innerHTML,$_GET('grade')).ajax({
                             success : function(data) {
                                 window.location.reload();
                             },
@@ -202,46 +221,42 @@ $(document).ready(function(){
                                 //window.location = "";
                             }
                         });
-                    },
-                    "No":  function() {alert('No problem, here are our suggeestions');},
-                    "Cancel":  function() {
-                        alert('you chose cancel');
-                        dialog.dialog('close');
+
+
+
                     }
+                });
+
+
+
+
+                function isEmpty( el ){
+                    return !$.trim(el.html())
                 }
+
+                $("u").click(function(){
+                    var string = $(this).html();
+
+
+                    if(document.getElementById(string) == null){
+                        alert("This word is too complicated, but we don't have any suggestions for you yet.");
+                    }
+
+
+
+
+                    //$("#" + string).show();
+
+                    document.getElementById("Suggestions").innerHTML = document.getElementById(string).innerText;
+
+
+                });
+
             });
-            dialog.show();*/
-        }
 
 
+    </script>
 
-
-
-
-    	//$("#" + string).show();
-
-
-
-
-    });
-
-    function myalert(title, text) {
-        var div = $('<div>').html(text).dialog({
-            title: title,
-            modal: true,
-            close: function() {
-                $(this).dialog('destroy').remove();
-            },
-            buttons: [{
-                text: "Ok",
-                click: function() {
-                    $(this).dialog("close");
-                }}]
-        })
-    };
-
-});
-</script>
 
 
 }

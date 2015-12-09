@@ -123,5 +123,13 @@ public class SimplePassage extends Model {
 	public static SimplePassage create(SimplePassage passage) {
 		passage.save();
 		return passage;
-	}	
+	}
+
+	public static void acceptWord(String word, int grade){
+		Word thisWord = Word.byLemma(word);
+		if(thisWord != null){
+			thisWord.ageOfAcquisition = grade + 6;
+			thisWord.save();
+		}
+	}
 }

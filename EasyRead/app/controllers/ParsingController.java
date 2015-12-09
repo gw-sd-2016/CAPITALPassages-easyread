@@ -82,27 +82,21 @@ public class ParsingController {
 					String lemma = token.getString(LemmaAnnotation.class);
 					// System.out.println("LEMMA : " + lemma);
 
+					POS p = new POS(pos);
+
 					if(lemma.length() > 1 || Character.isLetter(lemma.charAt(0))){
 						if(originalSCount == 0) new MashapeController().getNumSyllablesForWord(lemma,passage);
 						passage.numWords++;
-						a.generateSuggestionsForWord(new POS(pos),lemma, s.text, passage.id);
+						a.generateSuggestionsForWord(p,lemma, s.text, passage.id, token.originalText());
 					}
 
 					Word thisWord = Word.byLemma(lemma);
 
 
                     if(thisWord != null && thisWord.partsOfSpeech != null){
-                        thisWord.partsOfSpeech.add(new POS(pos));
+                        thisWord.partsOfSpeech.add(p);
                         thisWord.save();
                     }
-
-
-
-
-
-
-					// add in part of speech to make better suggestions
-					//if(originalSCount == 0) s.pos.add(new POS(pos));
 				}
 			}
 

@@ -1,8 +1,11 @@
 package controllers;
 
+import models.Suggestion;
+
 public interface PhraseValidator {
 	
-	public int fetchFrequencies(String p); 
+
+	public void fetchFrequencies(Suggestion s, String p);
 	
 	
 

@@ -110,6 +110,7 @@ create table suggestion (
   word                      varchar(255),
   suggested_word            varchar(255),
   simple_passage_id         bigint,
+  frequency                 double,
   constraint pk_suggestion primary key (id))
 ;
 

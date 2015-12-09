@@ -1,6 +1,7 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import models.Suggestion;
 import play.libs.F;
 import play.libs.ws.WS;
 import play.libs.ws.WSRequest;
@@ -14,14 +15,18 @@ public class MicrosoftNGramsValidator implements PhraseValidator {
 	public final String catalog = "bing-body";
 	public final String version = "2013-12";
 	public final String order = "3";
+
+	private Suggestion currentSuggestion;
 	
 	public String generateURL(String p){
 		return "http://weblm.research.microsoft.com/rest.svc/" + catalog + "/" + version + "/" + order + "/" + "cp?u=" + TOKEN + "&p=" + p + "&gen=" + p.split(" ").length + "&format=json";
 	}
-	
+
+
+
 
 	@Override
-	public int fetchFrequencies(String p) {
+	public void fetchFrequencies(Suggestion s, String p) {
 		// TODO Auto-generated method stub
 		
 	
@@ -42,9 +47,11 @@ public class MicrosoftNGramsValidator implements PhraseValidator {
 					//	System.out.println(response.getBody());
 						JsonNode res = response.asJson();
 						System.out.println(p + " " + res);
-						return null;
+                        double result = Double.valueOf(res.asDouble());
+						s.frequency = Math.pow(10,result);
+						s.save();
+                        return null;
 					}
 				});
-		return 0;
 	}
 }

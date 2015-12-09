@@ -25,7 +25,10 @@ public class Suggestion extends Model {
     public String suggestedWord; 
     
     @Expose
-    public Long simple_passage_id; 
+    public Long simple_passage_id;
+
+    @Expose
+    public double frequency;
     
     public static Finder<String,Suggestion> find = new Finder<String,Suggestion>(String.class, Suggestion.class);
 
@@ -36,7 +39,8 @@ public class Suggestion extends Model {
 	public static Suggestion byId(Long id) {
 		return find.where().eq("id", id).findUnique();
 	}
-	public static List<Suggestion> byWord(String word) {
+
+    public static List<Suggestion> byWord(String word) {
 		return find.where().eq("word", word).findList();
 	}
     
