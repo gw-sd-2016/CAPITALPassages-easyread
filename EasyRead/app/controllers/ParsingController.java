@@ -11,8 +11,11 @@ import edu.stanford.nlp.util.CoreMap;
 import models.POS;
 import models.Sentence;
 import models.SimplePassage;
+import models.Word;
 import net.sf.extjwnl.JWNLException;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 
@@ -85,16 +88,31 @@ public class ParsingController {
 						a.generateSuggestionsForWord(new POS(pos),lemma, s.text, passage.id);
 					}
 
+					Word thisWord = Word.byLemma(lemma);
+
+
+                    if(thisWord != null && thisWord.partsOfSpeech != null){
+                        thisWord.partsOfSpeech.add(new POS(pos));
+                        thisWord.save();
+                    }
+
+
+
+
+
+
 					// add in part of speech to make better suggestions
-					if(originalSCount == 0) s.pos.add(new POS(pos));
+					//if(originalSCount == 0) s.pos.add(new POS(pos));
 				}
 			}
+
+            a.determineGradeLevel(passage);
             try{
                 passage.save();
             } catch (Exception e){
                System.out.println("Couldn't Save");
             }
 
-			a.determineGradeLevel(passage);
+
 	}
 }

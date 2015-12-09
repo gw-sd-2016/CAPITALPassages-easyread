@@ -74,12 +74,14 @@ public class Application extends Controller {
     }
 
 
+
     public Result javascriptRoutes() {
         response().setContentType("text/javascript");
         return ok(
                 Routes.javascriptRouter("jsRoutes",
                         controllers.routes.javascript.SimplePassageController.analyzePassages(),
-                        controllers.routes.javascript.SimplePassageController.deletePassage()/*,
+                        controllers.routes.javascript.SimplePassageController.deletePassage(),
+                        controllers.routes.javascript.SimplePassageController.acceptWord()/*,
                         controllers.routes.javascript.SimplePassageController.deletePassageQuestion()
                         controllers.routes.javascript.SimplePassageController.deletePassageQuestionChoice()*/
 

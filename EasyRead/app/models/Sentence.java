@@ -28,9 +28,9 @@ public class Sentence extends Model {
     @Required
     public List<Word> words = new ArrayList<Word>();
     
-    // need to remove -- now with words
+  /*  // need to remove -- now with words
     @OneToMany(cascade = CascadeType.ALL)
-    public List<POS> pos = new ArrayList<POS>();
+    public List<POS> pos = new ArrayList<POS>();*/
 
 
     

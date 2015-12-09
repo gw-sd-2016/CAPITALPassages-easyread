@@ -512,13 +512,17 @@ public class SimplePassageController extends Controller {
 	}
 
 
+    public Result acceptWord(String word, int grade){
+        Word thisWord = Word.byLemma(word);
+        if(thisWord != null){
+            thisWord.ageOfAcquisition = grade + 6;
+            thisWord.save();
+            return ok("true");
+        }
+        return ok("Failed");
+    }
+
 	public Result viewAllPassages() {
-/*
-        try{
-          analyzePassages();
-        } catch(Exception e){
-            System.out.println("analysis failure");
-        }*/
 
 		Long instId = Long.valueOf((session("userId")));
 		User inst = User.byId(instId);

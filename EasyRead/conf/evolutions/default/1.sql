@@ -5,7 +5,7 @@
 
 create table pos (
   id                        bigint auto_increment not null,
-  sentence_id               bigint not null,
+  word_id                   bigint not null,
   name                      varchar(255),
   constraint pk_pos primary key (id))
 ;
@@ -150,8 +150,8 @@ create table simple_passage_passage_tag (
   passage_tag_id                 bigint not null,
   constraint pk_simple_passage_passage_tag primary key (simple_passage_id, passage_tag_id))
 ;
-alter table pos add constraint fk_pos_sentence_1 foreign key (sentence_id) references sentence (id) on delete restrict on update restrict;
-create index ix_pos_sentence_1 on pos (sentence_id);
+alter table pos add constraint fk_pos_word_1 foreign key (word_id) references word (id) on delete restrict on update restrict;
+create index ix_pos_word_1 on pos (word_id);
 alter table passage_question add constraint fk_passage_question_simple_passage_2 foreign key (simple_passage_id) references simple_passage (id) on delete restrict on update restrict;
 create index ix_passage_question_simple_passage_2 on passage_question (simple_passage_id);
 alter table passage_question_choice add constraint fk_passage_question_choice_passage_question_3 foreign key (passage_question_id) references passage_question (id) on delete restrict on update restrict;

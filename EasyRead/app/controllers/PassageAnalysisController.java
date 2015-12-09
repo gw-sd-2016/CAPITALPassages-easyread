@@ -28,12 +28,13 @@ public class PassageAnalysisController {
         double average = 0;
 		int count = 0;
         for(Sentence s : p.sentences){
-            for(Word w : s.words){
-				if(!Word.isStopWord(w)){
-					if(w.ageOfAcquisition > 6){
+            for(String x : s.text.split(" ")){
+                Word w = Word.byLemma(x);
+				if(w != null && !Word.isStopWord(w)){
+
 						average += w.ageOfAcquisition;
 						count++;
-					}
+
 				}
             }
         }
@@ -50,13 +51,18 @@ public class PassageAnalysisController {
 
 		double CL = gradeResolution(calculateCLScore(p.text, p.numWords));
 
-		if(p.text.split(" ").length > 100){
+		if(p.text.split(" ").length > 100 && FK > 0 && ARI > 0 && CL > 0){
 			p.grade = (int) Math.round((ARI + FK + CL) / 3);
 		} else{
 			p.grade = (int) convertToGrade(averageAge(p));
 		}
 
-		p.save();
+        try{
+            p.save();
+        } catch(Exception e){
+
+        }
+
 	}
 
 
@@ -174,12 +180,9 @@ public class PassageAnalysisController {
 				//System.out.println(root);
 				Word w = Word.byLemma(word);
 				Word r = Word.byLemma(root);
-				if(!word.equals(root) 
-						&& w!= null && w.ageOfAcquisition != 1 
-						&& POS.byWord(w.lemma) != null 
-						&& POS.byWord(w.lemma).name.indexOf("noun") == -1 
-						&& Suggestion.byWord(word).size() == 0 
-						&& (r != null && r.numSyllables < w.numSyllables) || r == null){
+				if(!word.toLowerCase().equals(root.toLowerCase())
+						&& w != null
+                        && r != null){
 
 					/*int pos = threeGram.indexOf(w.lemma);
 					
@@ -202,7 +205,12 @@ public class PassageAnalysisController {
 						
 					}*/
 				
-					
+
+
+                    /*
+                    w.suggetions.add(r);
+                    w.save();*/
+
 					
 					Suggestion s = new Suggestion(); 
 					s.word = word;

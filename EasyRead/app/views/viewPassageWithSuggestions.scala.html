@@ -102,11 +102,14 @@
 
 
 					
-					@if(Suggestion.byWord(word).size > 0){
+					@if(Suggestion.byWord(word).map(x => x.suggestedWord).distinct.size > 0){
 						<div style="display:none;" id="@word">We suggest:&nbsp
-						@for(w <- Suggestion.byWord(word)){
+						@for(w <- Suggestion.byWord(word).map(x => x.suggestedWord).distinct){
+							@w
+							@if(Suggestion.byWord(word).map(x => x.suggestedWord).distinct.last != w){
+								,&nbsp
+							}
 
-							@w.suggestedWord,&nbsp
 						}
 						<br>
 					 </div>
@@ -137,24 +140,105 @@ $(document).ready(function(){
 	  function isEmpty( el ){
       return !$.trim(el.html())
   }
- 
-    $("u").click(function(){
-       	var string = $(this).html(); 
 
-       	
+    $('u;).mousedown(function(event) {
+        switch (event.which) {
+            case 1:
+                alert("This word is too complicated, but we don't have any suggestions for you yet.");
+                break;
+            case 3:
+                $(this).dialog({
+                    buttons: {
+                        "Yes": function() {
+                            alert("We'll Remember that!");
+                            jsRoutes.controllers.SimplePassageController.acceptWord(this, @passage.grade).ajax({
+                                success : function(data) {
+                                    window.location.reload();
+                                },
+                                error : function(err) {
+                                    //window.location = "";
+                                }
+                            });
+                        },
+                        "No":  function() {alert('No problem, here are our suggeestions');},
+                        "Cancel":  function() {
+                            alert('you chose cancel');
+                            dialog.dialog('close');
+                        }
+                    }
+                });
+                break;
+            default:
+                alert('You have a strange Mouse!');
+                break;
+
+                document.getElementById("Suggestions").innerHTML = document.getElementById(string).innerText;
+        }
+    });
+
+    $("u").click(function(){
+       	var string = $(this).html();
+
+
        	if(document.getElementById(string) == null){
        		alert("This word is too complicated, but we don't have any suggestions for you yet.");
-       	}
+       	} else {
+
+            //$('<div>').dialog({modal: true})
+            myalert("Stuff","here");
+
+
+
+
+          /*  var dialog = $('<p>Do you want to accept this word at the current grade level?</p>').dialog({
+                buttons: {
+                    "Yes": function() {
+                        alert("We'll Remember that!");
+                        jsRoutes.controllers.SimplePassageController.acceptWord(this, @passage.grade).ajax({
+                            success : function(data) {
+                                window.location.reload();
+                            },
+                            error : function(err) {
+                                //window.location = "";
+                            }
+                        });
+                    },
+                    "No":  function() {alert('No problem, here are our suggeestions');},
+                    "Cancel":  function() {
+                        alert('you chose cancel');
+                        dialog.dialog('close');
+                    }
+                }
+            });
+            dialog.show();*/
+        }
+
+
 
 
 
 
     	//$("#" + string).show();
 
-    	document.getElementById("Suggestions").innerHTML = document.getElementById(string).innerText;
+
 
 
     });
+
+    function myalert(title, text) {
+        var div = $('<div>').html(text).dialog({
+            title: title,
+            modal: true,
+            close: function() {
+                $(this).dialog('destroy').remove();
+            },
+            buttons: [{
+                text: "Ok",
+                click: function() {
+                    $(this).dialog("close");
+                }}]
+        })
+    };
 
 });
 </script>
