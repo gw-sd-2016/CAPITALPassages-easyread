@@ -1,45 +1,45 @@
-@(passage: models.SimplePassage, instructor: models.User, suggestionsOn : Boolean) 
+@(passage: models.SimplePassage, instructor: models.User, suggestionsOn : Boolean)
 
-@main("Viewing Passage") {
-
-
-@if(flash.containsKey("success")) {
-<div class="alert alert-success">
-	<h2>Done!</h2> @flash.get("success")
-</div>
-}
-
-	            <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passage.id" style="margin-bottom: 20px;">
-	                <i class="fa fa-plus"></i>
-	                Add new Questions
-	            </a>
-	            @if(passage.questions.size > 0) {
-
-	           	<a class="btn btn-primary" id="view" href="/viewPassageQuestions?passageId=@passage.id" style="margin-bottom: 20px;">
-	                <i class="fa fa-book"></i>
-	                View Passage Questions
-	            </a>
-	            }
-
-<div>
+    @main("Viewing Passage") {
 
 
+        @if(flash.containsKey("success")) {
+            <div class="alert alert-success">
+                <h2>Done!</h2> @flash.get("success")
+            </div>
+        }
+
+        <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passage.id" style="margin-bottom: 20px;">
+            <i class="fa fa-plus"></i>
+            Add new Questions
+        </a>
+        @if(passage.questions.size > 0) {
+
+            <a class="btn btn-primary" id="view" href="/viewPassageQuestions?passageId=@passage.id" style="margin-bottom: 20px;">
+                <i class="fa fa-book"></i>
+                View Passage Questions
+            </a>
+        }
+
+        <div>
 
 
-			<div class="pull-left">
-				<a class="btn btn-primary" id="add" href="@routes.SimplePassageController.edit(passage.id)" style="margin-bottom: 20px;">
-					<i class="fa fa-edit"> Edit this Passage</i>
-				</a>
 
-					@for(tag <- passage.tags){
 
-					
-					  <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px;">
-						<i class="fa fa-tag"> @tag.name</i>
-						
-					</a>
-					}
-			</div>
+            <div class="pull-left">
+                <a class="btn btn-primary" id="add" href="@routes.SimplePassageController.edit(passage.id)" style="margin-bottom: 20px;">
+                    <i class="fa fa-edit"> Edit this Passage</i>
+                </a>
+
+                @for(tag <- passage.tags){
+
+
+                    <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px;">
+                        <i class="fa fa-tag"> @tag.name</i>
+
+                    </a>
+                }
+            </div>
 
 
 
@@ -110,156 +110,153 @@
 
 
             </div>
-				
-		</div>
+
+        </div>
 
 
 
 
-		<div class="container-fluid">
+        <div class="container-fluid">
 
-						<a class="btn btn-primary" id="toggle" href="view?passageId=@passage.id&grade=0" style="margin-bottom: 20px;">
-	                <i class="fa fa-flash"></i>
-	                Turn off Suggestions
-	    </a>
-
-
-		<div>
-
-			<span class="label label-default" id="Suggestions"></span>
+            <a class="btn btn-primary" id="toggle" href="view?passageId=@passage.id&grade=0" style="margin-bottom: 20px;">
+                <i class="fa fa-flash"></i>
+                Turn off Suggestions
+            </a>
 
 
+            <div>
 
-
-			<h1> @passage.title </h1> 
-			<strong> Added By: </strong> @instructor.firstName @instructor.lastName <br>
-			<strong> Displaying at Grade Level:  </strong>   @if(passage.grade == 0) {
-            K
-        }
-
-            @if(passage.grade >= 12){
-                College Level or Above
-            } else {
-
-                @if(passage.grade != 0 && passage.grade <= 12) {
-                    @passage.grade
-                }
-            }<br>
-			<strong> Source:  </strong> @passage.source <br><br> 
-
-					<!--	<textarea rows="25" disabled style="width: 90%; resize: none;overflow-y: scroll;">>@passage.text</textarea> -->
+                <span class="label label-default" id="Suggestions"></span>
 
 
 
-		@if(suggestionsOn){
-			@for(word <- passage.text.split(" ")){
-				@if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > (Integer.valueOf(request().getQueryString("grade").toString) + 6) && !passage.getStopWords().contains(word) /*&& (POS.byWord(word) == null  || POS.byWord(word) != null && POS.byWord(word).name.toLowerCase.indexOf("verb") != -1)*/){
-					<u>@word</u>
 
-
-					
-					@if(Suggestion.byWord(word).map(x => x.suggestedWord).distinct.size > 0){
-						<div style="display:none;" id="@word">We suggest:&nbsp
-                            <!-- http://stackoverflow.com/questions/18830813/how-can-i-remove-punctuation-from-input-text-in-java -->
-						@for(w <- Suggestion.byWord(word).sortWith(_.frequency > _.frequency).map(x => x.suggestedWord).distinct){
-							@w
-							@if(Suggestion.byWord(word).map(x => x.suggestedWord).distinct.last != w){
-								,&nbsp
-							}
-
-						}
-						<br>
-					 </div>
-					}
-				} else {
-					@word
-				}
-				&nbsp
-			}
-			} else {
-				@passage.text
-			}
-			
-</div>
-</div>
-</div>
-
-    <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
-
-    <script>
-            function alertSuggestions(){
-                alert("This word is too complicated for this grade level!");
+                <h1> @passage.title </h1>
+                <strong> Added By: </strong> @instructor.firstName @instructor.lastName <br>
+                <strong> Displaying at Grade Level:  </strong>   @if(passage.grade == 0) {
+                K
             }
 
-            //http://www.creativejuiz.fr/blog/en/javascript-en/read-url-get-parameters-with-javascript
-            function $_GET(param) {
-                var vars = {};
-                window.location.href.replace(
-                        /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
-                        function( m, key, value ) { // callback
-                            vars[key] = value !== undefined ? value : '';
-                        }
-                );
+                @if(passage.grade >= 12){
+                    College Level or Above
+                } else {
 
-                if ( param ) {
-                    return vars[param] ? vars[param] : null;
-                }
-                return vars;
-            }
+                    @if(passage.grade != 0 && passage.grade <= 12) {
+                        @passage.grade
+                    }
+                }<br>
+                <strong> Source:  </strong> @passage.source <br><br>
 
-            $(document).ready(function(){
 
-                //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
-                // locate your element and add the Click Event Listener
-                document.getElementById("word-list").addEventListener("click",function(e) {
-                    // e.target is our targetted element.
-                    // try doing console.log(e.target.nodeName), it will result LI
-                    if(e.target /*&& e.target.nodeName == "LI"*/) {
-                        console.log(e.target.id + " was clicked");
-                        jsRoutes.controllers.SimplePassageController.acceptWord(e.target.innerHTML,$_GET('grade')).ajax({
-                            success : function(data) {
-                                window.location.reload();
-                            },
-                            error : function(err) {
-                                //window.location = "";
+                @if(suggestionsOn){
+                    @for(word <- passage.text.split(" ")){
+                        @if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > (Integer.valueOf(request().getQueryString("grade").toString) + 6) && !passage.getStopWords().contains(word) /*&& (POS.byWord(word) == null  || POS.byWord(word) != null && POS.byWord(word).name.toLowerCase.indexOf("verb") != -1)*/){
+                            <u>@word</u>
+
+
+
+                            @if(Suggestion.byWord(word).map(x => x.suggestedWord).distinct.size > 0){
+                                <div style="display:none;" id="@word">We suggest:&nbsp
+                                    <!-- http://stackoverflow.com/questions/18830813/how-can-i-remove-punctuation-from-input-text-in-java -->
+                                    @for(w <- Suggestion.byWord(word).sortWith(_.frequency > _.frequency).map(x => x.suggestedWord).distinct){
+                                        @w
+                                        @if(Suggestion.byWord(word).map(x => x.suggestedWord).distinct.last != w){
+                                            ,&nbsp
+                                }
+
+                                }
+                                    <br>
+                                </div>
                             }
-                        });
-
-
-
+                        } else {
+                            @word
+                        }
+                        &nbsp
                     }
-                });
-
-
-
-
-                function isEmpty( el ){
-                    return !$.trim(el.html())
+                } else {
+                    @passage.text
                 }
 
-                $("u").click(function(){
-                    var string = $(this).html();
+            </div>
+        </div>
 
 
-                    if(document.getElementById(string) == null){
-                        alert("This word is too complicated, but we don't have any suggestions for you yet.");
+        <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+
+        <script>
+                function alertSuggestions(){
+                    alert("This word is too complicated for this grade level!");
+                }
+
+                //http://www.creativejuiz.fr/blog/en/javascript-en/read-url-get-parameters-with-javascript
+                function $_GET(param) {
+                    var vars = {};
+                    window.location.href.replace(
+                            /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+                            function( m, key, value ) { // callback
+                                vars[key] = value !== undefined ? value : '';
+                            }
+                    );
+
+                    if ( param ) {
+                        return vars[param] ? vars[param] : null;
+                    }
+                    return vars;
+                }
+
+                $(document).ready(function(){
+
+                    //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
+                    // locate your element and add the Click Event Listener
+                    document.getElementById("word-list").addEventListener("click",function(e) {
+                        // e.target is our targetted element.
+                        // try doing console.log(e.target.nodeName), it will result LI
+                        if(e.target /*&& e.target.nodeName == "LI"*/) {
+                            console.log(e.target.id + " was clicked");
+                            jsRoutes.controllers.SimplePassageController.acceptWord(e.target.innerHTML,$_GET('grade')).ajax({
+                                success : function(data) {
+                                    window.location.reload();
+                                },
+                                error : function(err) {
+                                    //window.location = "";
+                                }
+                            });
+
+
+
+                        }
+                    });
+
+
+
+
+                    function isEmpty( el ){
+                        return !$.trim(el.html())
                     }
 
+                    $("u").click(function(){
+                        var string = $(this).html();
+
+
+                        if(document.getElementById(string) == null){
+                            alert("This word is too complicated, but we don't have any suggestions for you yet.");
+                        }
 
 
 
-                    //$("#" + string).show();
 
-                    document.getElementById("Suggestions").innerHTML = document.getElementById(string).innerText;
+                        //$("#" + string).show();
 
+                        document.getElementById("Suggestions").innerHTML = document.getElementById(string).innerText;
+
+
+                    });
 
                 });
 
-            });
 
-
-    </script>
+        </script>
 
 
 
-}
+    }
