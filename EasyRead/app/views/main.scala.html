@@ -15,6 +15,20 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
 
 
+        <style>
+            /* https://getbootstrap.com/examples/sticky-footer/ */
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            /* Set the fixed height of the footer here */
+            height: 60px;
+            background-color: #f5f5f5;
+        }
+
+        </style>
+
+
 
     <!-- CODE FROM BOOTSTRAP -->
         <nav class="navbar navbar-inverse" style="background-color: transparent;">
@@ -47,14 +61,17 @@
 
     </head>
     <body style="padding-left: 10px; padding-right: 10px">
-        @content
+        <div class="container">
+            @content
+        </div>
+
     </body>
 
 
-    <footer>
-
-        <p>Based on templates from Bootstrap <a href="http://getbootstrap.com">Bootstrap</a></p>
-        <p>Project by: Malcolm Goldiner</p>
-
+    <footer class="footer">
+        <div class="container">
+            <p class="text-muted">Based on templates from Bootstrap <a href="http://getbootstrap.com">Bootstrap</a></p>
+            <p class="text-muted">Project by: Malcolm Goldiner</p>
+        </div>
     </footer>
 </html>

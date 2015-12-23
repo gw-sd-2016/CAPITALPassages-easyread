@@ -9,7 +9,7 @@ import java.util.HashSet;
 public class PassageAnalysisController {
 	
 	
-	private MicrosoftNGramsValidator validator = new MicrosoftNGramsValidator();
+	private PhraseValidator validator = new MicrosoftNGramsValidator();
 	private WordNetController c;
 	
 	

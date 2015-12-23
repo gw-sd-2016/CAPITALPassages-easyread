@@ -1,4 +1,4 @@
-use database ezread;
+use ezread;
 -- MySQL dump 10.13  Distrib 5.7.9, for osx10.9 (x86_64)
 --
 -- Host: localhost    Database: ezread
