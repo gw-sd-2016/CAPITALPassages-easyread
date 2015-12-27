@@ -1,6 +1,34 @@
 @(passage: models.SimplePassage, instructor: models.User, suggestionsOn : Boolean)
 
+
+
     @main("Viewing Passage") {
+
+    <style type="text/css">
+        /*This entire example and the sliders are from  https://github.com/eduardomb/jquery-panelslider */
+        .panel {
+        display: none;
+        width: 220px;
+        padding: 20px;
+        background-color: #333;
+        color: #fff;
+        box-shadow: inset 0 0 5px 5px #222;
+        }
+    </style>
+
+
+            <!-- Left panel -->
+        <div id="left-panel" class="panel">
+            <h2>Left panel</h2>
+            <p>Click anywhere outside panel to close it.</p>
+        </div>
+
+            <!-- Right panel -->
+        <div id="right-panel" class="panel">
+            <h2>Right panel</h2>
+            <p>Clicking outside this panel wont close it because <code>clickClose = false</code></p>
+            <button id="close-panel-bt">Close</button>
+        </div>
 
 
         @if(flash.containsKey("success")) {
@@ -9,27 +37,38 @@
             </div>
         }
 
-        <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passage.id" style="margin-bottom: 20px;">
-            <i class="fa fa-plus"></i>
-            Add new Questions
-        </a>
-        @if(passage.questions.size > 0) {
 
-            <a class="btn btn-primary" id="view" href="/viewPassageQuestions?passageId=@passage.id" style="margin-bottom: 20px;">
-                <i class="fa fa-book"></i>
-                View Passage Questions
-            </a>
-        }
-
-        <div>
 
 
 
 
             <div class="pull-left">
-                <a class="btn btn-primary" id="add" href="@routes.SimplePassageController.edit(passage.id)" style="margin-bottom: 20px;">
-                    <i class="fa fa-edit"> Edit this Passage</i>
-                </a>
+
+                <div class="btn-group">
+
+                    <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passage.id" style="margin-bottom: 20px;">
+                        <i class="fa fa-plus"></i>
+                        Add new Questions
+                    </a>
+                    @if(passage.questions.size > 0) {
+
+                        <a class="btn btn-primary" id="view" href="/viewPassageQuestions?passageId=@passage.id" style="margin-bottom: 20px;">
+                            <i class="fa fa-book"></i>
+                            View Passage Questions
+                        </a>
+                    }
+
+                    <a id="left-panel-link" class="btn btn-primary" href="#left-panel" style="margin-bottom: 20px;">
+                        <i class="fa fa-edit"> Left Panel</i>
+                    </a>
+
+                    <a class="btn btn-primary" id="add" href="@routes.SimplePassageController.edit(passage.id)" style="margin-bottom: 20px;">
+                        <i class="fa fa-edit"> Edit this Passage</i>
+                    </a>
+
+
+
+
 
                 @for(tag <- passage.tags){
 
@@ -39,6 +78,15 @@
 
                     </a>
                 }
+
+                    <a class="btn btn-primary" id="toggle" href="view?passageId=@passage.id&grade=0" style="margin-bottom: 20px;">
+                        <i class="fa fa-flash"></i>
+                        Turn off Suggestions
+                    </a>
+
+
+
+                </div>
             </div>
 
 
@@ -111,17 +159,13 @@
 
             </div>
 
-        </div>
+
 
 
 
 
         <div class="container-fluid">
 
-            <a class="btn btn-primary" id="toggle" href="view?passageId=@passage.id&grade=0" style="margin-bottom: 20px;">
-                <i class="fa fa-flash"></i>
-                Turn off Suggestions
-            </a>
 
 
             <div>
@@ -159,26 +203,33 @@
                                 <div style="display:none;" id="@word">We suggest:&nbsp
                                     <!-- http://stackoverflow.com/questions/18830813/how-can-i-remove-punctuation-from-input-text-in-java -->
                                     @for(w <- Suggestion.byWord(word).sortWith(_.frequency > _.frequency).map(x => x.suggestedWord).distinct){
-                                        @w
-                                        @if(Suggestion.byWord(word).map(x => x.suggestedWord).distinct.last != w){
-                                            ,&nbsp
-                                }
+
 
                                 }
                                     <br>
                                 </div>
                             }
-                        } else {
-                            @word
+                            } else {
+                                @word
+                            }
+                            &nbsp
                         }
-                        &nbsp
-                    }
                 } else {
                     @passage.text
                 }
 
             </div>
         </div>
+
+    <script src="/assets/js/jquery.panelslider.min.js"></script>
+    <script>
+            $('#left-panel-link').panelslider();
+            $('#right-panel-link').panelslider({side: 'right', clickClose: false, duration: 200 });
+
+            $('#close-panel-bt').click(function() {
+                $.panelslider.close();
+            });
+    </script>
 
 
         <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
