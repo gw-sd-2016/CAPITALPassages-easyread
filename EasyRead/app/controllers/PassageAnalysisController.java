@@ -167,30 +167,44 @@ public class PassageAnalysisController {
                     Word r = Word.byLemma(root);
                     if(!word.toLowerCase().equals(root.toLowerCase())
                             && w != null
-                            && r != null){
+                            && r != null
+							&& !isProperNoun(w)){
+
+						// if it's capitalize let's assume it's a proper noun and ignore it as long as it is not the first word in a sentence
+						if(!(w.lemma.substring(0, 1).toUpperCase() + w.lemma.substring(1, w.length)).equals(w.lemma)
+                                && !w.lemma.equals(sentence.split(" ")[0])
+                                ){
+							Suggestion s = new Suggestion();
+							s.word = ogText;
+
+							String threeGram = "";
+							String[] splitS = sentence.split(" ");
+
+							String iPOS = "";
+							s.suggestedWord = root;
+							threeGram = buildThreeGram(splitS, sentence, ogText, root);
+							s.simple_passage_id = passageId;
+							s.save();
 
 
-                        Suggestion s = new Suggestion();
-                        s.word = ogText;
 
-                        String threeGram = "";
-                        String[] splitS = sentence.split(" ");
-
-                        String iPOS = "";
-                        s.suggestedWord = root;
-                        threeGram = buildThreeGram(splitS, sentence, ogText, root);
-                        s.simple_passage_id = passageId;
-                        s.save();
-
-
-
-                        validator.fetchFrequencies(s, threeGram.toLowerCase());
+							validator.fetchFrequencies(s, threeGram.toLowerCase());
+						}
                     }
                 }
             }
         }
 
 
+	}
+
+
+	private boolean isProperNoun(Word w){
+
+		for(POS p : w.partsOfSpeech){
+			if(p.name.indexOf("Proper Noun") != -1) return true;
+		}
+		return false;
 	}
 
     private String buildThreeGram(String[] splitS, String sentence, String ogText, String root){

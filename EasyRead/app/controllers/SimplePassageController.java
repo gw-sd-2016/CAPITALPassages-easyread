@@ -512,7 +512,7 @@ public class SimplePassageController extends Controller {
         if(thisWord != null){
             thisWord.ageOfAcquisition = grade + 6;
             thisWord.save();
-            return redirect(request().uri());
+            return ok();
         }
         return badRequest();
     }

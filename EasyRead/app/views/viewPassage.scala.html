@@ -15,38 +15,46 @@
 	<div class="holder" style="padding-bottom: 4cm;">
 		<div class="pull-left">
 
-			<a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passage.id" style="margin-bottom: 20px;">
-				<i class="fa fa-plus"></i>
-				Add new Questions
-			</a>
-			@if(passage.questions.size > 0) {
+			<div class="btn-group">
 
-				<a class="btn btn-primary" id="view" href="/viewPassageQuestions?passageId=@passage.id" style="margin-bottom: 20px;">
-					<i class="fa fa-book"></i>
-					View Passage Questions
+				<a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passage.id" style="margin-bottom: 20px;">
+					<i class="fa fa-plus"></i>
+					Add new Questions
 				</a>
-			}
+				@if(passage.questions.size > 0) {
 
-			<a class="btn btn-primary" id="add" href="@routes.SimplePassageController.edit(passage.id)" style="margin-bottom: 20px;">
-				<i class="fa fa-edit"> Edit this Passage</i>
-			</a>
+					<a class="btn btn-primary" id="view" href="/viewPassageQuestions?passageId=@passage.id" style="margin-bottom: 20px;">
+						<i class="fa fa-book"></i>
+						View Passage Questions
+					</a>
+				}
 
-			<a class="btn btn-primary" id="toggle" href="viewPassageWithSuggestions?passageId=@passage.id&grade=0" style="margin-bottom: 20px;">
-				<i class="fa fa-flash"></i>
-				Turn on Suggestions
-			</a>
-
-			<br>
-
-			<strong>Tagged as:</strong>
-
-			@for(tag <- passage.tags){
-
-
-				<a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px;">
-					<i class="fa fa-tag"> @tag.name</i>
+				<a class="btn btn-primary" id="add" href="@routes.SimplePassageController.edit(passage.id)" style="margin-bottom: 20px;">
+					<i class="fa fa-edit"> Edit this Passage</i>
 				</a>
-			}
+
+				<a class="btn btn-primary" id="toggle" href="viewPassageWithSuggestions?passageId=@passage.id&grade=0" style="margin-bottom: 20px;">
+					<i class="fa fa-flash"></i>
+					Turn on Suggestions
+				</a>
+
+				<br>
+
+				<strong>Tagged as:</strong>
+
+				@for(tag <- passage.tags){
+
+
+					<a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px;">
+						<i class="fa fa-tag"> @tag.name</i>
+					</a>
+				}
+
+			</div>
+
+
+
+
 		</div>
 	</div>
 
