@@ -516,6 +516,23 @@ public class SimplePassageController extends Controller {
         }
         return badRequest();
     }
+    
+    public Result replaceWord(Long passageId, String word, String replacement){
+        SimplePassage p = SimplePassage.byId(passageId);
+    
+        try{
+            p.text = p.text.replace(word, replacement);
+            p.save();
+            return ok();
+        } catch(Exception e){
+            return badRequest();
+        }
+    }
+    
+    
+    
+    
+    
 
 	public Result viewAllPassages() {
 

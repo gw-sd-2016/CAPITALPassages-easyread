@@ -36,6 +36,7 @@ GET     /editQuestions					controllers.SimplePassageController.editQuestions(pas
 POST    /editQuestion_submit          controllers.SimplePassageController.editQuestions_submit(passageId : Long)
 GET     /viewPassageWithSuggestions 	controllers.SimplePassageController.viewS(passageId : Long, grade : Int)
 GET     /acceptWord                     @controllers.SimplePassageController.acceptWord(word : String, grade : Int)
+GET     /replaceWord					@controllers.SimplePassageController.replaceWord(passageId : Long, word : String, replacement : String)
 #GET     /viewAllPassageTags             controllers.SimplePassageController.viewAllPassageTags(tags : util.List[PassageTag])
 
 

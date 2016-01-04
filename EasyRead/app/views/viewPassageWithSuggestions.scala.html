@@ -232,13 +232,22 @@ function alertSuggestions(){
                 });
             }
 
+               function replaceWord(word, replacement){
+                jsRoutes.controllers.SimplePassageController.replaceWord(@passage.id, word, replacement).ajax({
+                    success : function(data) {
+                        //window.location.reload();
+                    },
+                    error : function(err) {
+                        //window.location = "";
+                    },
+                    complete : function() {
+                        window.location.reload();
+                    }
+                });
+            }
+
 
             $(document).ready(function(){
-
-
-
-
-
 
                 //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
                 // locate your element and add the Click Event Listener
@@ -246,6 +255,8 @@ function alertSuggestions(){
                 function isEmpty( el ){
                     return !$.trim(el.html())
                 }
+
+                
 
 
 
@@ -284,7 +295,7 @@ function alertSuggestions(){
                         var ran = false;
                         for(var i = 1; i < synonymnList.length; i++){
                             ran = true; 
-                            synonymnDiv += i + ". <h3>" + synonymnList[i] + "</h3><br>";
+                            synonymnDiv += i + ". <span onclick='replaceWord(\"" + string + "\", \"" + synonymnList[i] + "\");' style='background-color: gray;'><h3>" + synonymnList[i] + "</h3></span><br>";
                         }
 
                         if(!ran){

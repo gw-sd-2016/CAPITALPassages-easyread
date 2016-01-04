@@ -81,7 +81,8 @@ public class Application extends Controller {
                 Routes.javascriptRouter("jsRoutes",
                         controllers.routes.javascript.SimplePassageController.analyzePassages(),
                         controllers.routes.javascript.SimplePassageController.deletePassage(),
-                        controllers.routes.javascript.SimplePassageController.acceptWord()/*,
+                        controllers.routes.javascript.SimplePassageController.acceptWord(),
+                        controllers.routes.javascript.SimplePassageController.replaceWord()/*,
                         controllers.routes.javascript.SimplePassageController.deletePassageQuestion()
                         controllers.routes.javascript.SimplePassageController.deletePassageQuestionChoice()*/
 
