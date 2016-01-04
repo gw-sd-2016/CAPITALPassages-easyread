@@ -28,7 +28,7 @@
 
 
 <a id="left-panel-link" class="btn btn-primary" href="#left-panel" style="display: none;">
-    <i class="fa fa-edit"> Left Panel</i>
+    <i class="glyphicon glyphicon-edit"> Left Panel</i>
 </a>
 
 
@@ -39,18 +39,19 @@
         <div class="btn-group">
 
             <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passage.id" style="margin-bottom: 20px;">
-                <i class="fa fa-plus"></i>
+                <i class="glyphicon glyphicon-plus"></i>
                 Add new Questions
             </a>
             @if(passage.questions.size > 0) {
 
             <a class="btn btn-primary" id="view" href="/viewPassageQuestions?passageId=@passage.id" style="margin-bottom: 20px;">
-                <i class="fa fa-book"></i>
+                <i class="glyphicon glyphicon-book"></i>
                 View Passage Questions
             </a>
         }
         <a class="btn btn-primary" id="add" href="@routes.SimplePassageController.edit(passage.id)" style="margin-bottom: 20px;">
-            <i class="fa fa-edit"> Edit this Passage</i>
+            <i class="glyphicon glyphicon-edit"></i>
+            Edit this Passage
         </a>
 
 
@@ -61,13 +62,13 @@
 
 
         <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px;">
-            <i class="fa fa-tag"> @tag.name</i>
+            <i class="glyphicon glyphicon-tag"> @tag.name</i>
 
         </a>
     }
 
     <a class="btn btn-primary" id="toggle" href="view?passageId=@passage.id&grade=0" style="margin-bottom: 20px;">
-        <i class="fa fa-flash"></i>
+        <i class="glyphicon glyphicon-flash"></i>
         Turn off Suggestions
     </a>
 

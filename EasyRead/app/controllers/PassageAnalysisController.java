@@ -170,10 +170,9 @@ public class PassageAnalysisController {
                             && r != null
 							&& !isProperNoun(w)){
 
-						// if it's capitalize let's assume it's a proper noun and ignore it as long as it is not the first word in a sentence
+						// if it's capitalized let's assume it's a proper noun and ignore it as long as it is not the first word in a sentence
 						if(!(w.lemma.substring(0, 1).toUpperCase() + w.lemma.substring(1, w.length)).equals(w.lemma)
-                                && !w.lemma.equals(sentence.split(" ")[0])
-                                ){
+                                && !w.lemma.equals(sentence.split(" ")[0])){
 							Suggestion s = new Suggestion();
 							s.word = ogText;
 

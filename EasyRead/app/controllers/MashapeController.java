@@ -76,6 +76,47 @@ public class MashapeController {
 					});
 		}
 	}
+    
+    public void getFrequencyInformation(String word, SimplePassage p) {
+        
+        
+       
+        
+            String url = "https://wordsapiv1.p.mashape.com/words/" + word + "/frequency";
+            //System.out.println(url);
+            WS.url(url).setHeader("X-Mashape-Key", "0qln9a1q5Hmsh7DpS3ttXRqx4nGCp1dmYowjsna9AhhZ2xMAbi").get().map(
+                                                                                                                   new F.Function<WSResponse, Object>() {
+                                                                                                                       public Result apply(WSResponse response) {
+                                                                                                                           //System.out.println("response:" + response.asJson());
+                                                                                                                           JsonNode res = response.asJson();
+                                                                                                                           System.out.println("response: " + res);
+                                                                                                                           
+                                                                                                                           System.out.println("num:" + res.findValue("syllables").findValue("count"));
+                                                                                                                           
+                                                                                                                           Word nW = new Word(); 
+                                                                                                                           
+                                                                                                                           nW.lemma = word; 
+                                                                                                                           
+                                                                                                                           nW.numSyllables = res.findValue("syllables").findValue("count").asInt();
+                                                                                                                           
+                                                                                                                           //int frequency = res.findValue("frequency");
+                                                                                                                           
+                                                                                                                           //SimplePassage thisPassage = SimplePassage.byId(p.id);
+                                                                                                                           
+                                                                                                                           p.numSyllables += nW.numSyllables;
+                                                                                                                           
+                                                                                                                           p.save();
+                                                                                                                           
+                                                                                                                           nW.wordNetId = Long.valueOf(-1);
+                                                                                                                           nW.ageOfAcquisition = 6;
+                                                                                                                           nW.length = word.length();
+                                                                                                                           nW.save();
+                                                                                                                           return null;
+                                                                                                                       }
+                                                                                                                   });
+        
+    }
+
 	
 	
 	public F.Promise<Integer> getSyllableInformation(String word) {

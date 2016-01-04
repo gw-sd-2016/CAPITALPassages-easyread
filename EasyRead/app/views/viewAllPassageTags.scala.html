@@ -20,12 +20,12 @@
 	 <div style="margin-left: 15px;"> 
 	 	@for(tag <- tags){
 
-	 		<div style="margin-bottom:10px"> <strong><i class="fa fa-tag fa-2x">@tag.getType()</i></strong> </div>
+	 		<div style="margin-bottom:10px"> <strong><i class="glyphicon glyphicon-tag fa-2x">@tag.getType()</i></strong> </div>
 	 		<div>
 	 		
 
 	 		<a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px;">
-	            <i class="fa fa-tag">@tag.name</i>
+	            <i class="glyphicon glyphicon-tag">@tag.name</i>
 	        </a>
 
 	        <br>
