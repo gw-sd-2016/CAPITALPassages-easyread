@@ -4,218 +4,203 @@
 
 @main("Viewing Passage") {
 
-    <style type="text/css">
-    /*This entire example and the sliders are from  https://github.com/eduardomb/jquery-panelslider */
-    .panel {
+<style type="text/css">
+/*This entire example and the sliders are from  https://github.com/eduardomb/jquery-panelslider */
+.panel {
     display: none;
     width:auto;
     padding: 20px;
     background-color: #333;
     color: #fff;
     box-shadow: inset 0 0 5px 5px #222;
+}
+</style>
+
+
+<!-- Left panel -->
+<div id="left-panel" class="panel" style="overflow-y:scroll"></div>
+
+@if(flash.containsKey("success")) {
+<div class="alert alert-success">
+    <h2>Done!</h2> @flash.get("success")
+</div>
+}
+
+
+<a id="left-panel-link" class="btn btn-primary" href="#left-panel" style="display: none;">
+    <i class="fa fa-edit"> Left Panel</i>
+</a>
+
+
+<div class="container">
+
+    <div class="pull-left">
+
+        <div class="btn-group">
+
+            <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passage.id" style="margin-bottom: 20px;">
+                <i class="fa fa-plus"></i>
+                Add new Questions
+            </a>
+            @if(passage.questions.size > 0) {
+
+            <a class="btn btn-primary" id="view" href="/viewPassageQuestions?passageId=@passage.id" style="margin-bottom: 20px;">
+                <i class="fa fa-book"></i>
+                View Passage Questions
+            </a>
+        }
+        <a class="btn btn-primary" id="add" href="@routes.SimplePassageController.edit(passage.id)" style="margin-bottom: 20px;">
+            <i class="fa fa-edit"> Edit this Passage</i>
+        </a>
+
+
+
+
+
+        @for(tag <- passage.tags){
+
+
+        <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px;">
+            <i class="fa fa-tag"> @tag.name</i>
+
+        </a>
     }
-    </style>
 
-
-        <!-- Left panel -->
-    <div id="left-panel" class="panel">
-        <p>Click anywhere outside panel to close it.</p>
-    </div>
-
-        <!-- Right panel -->
-    <div id="right-panel" class="panel">
-        <p>Clicking outside this panel wont close it because <code>clickClose = false</code></p>
-        <button id="close-panel-bt">Close</button>
-    </div>
-
-
-    @if(flash.containsKey("success")) {
-        <div class="alert alert-success">
-            <h2>Done!</h2> @flash.get("success")
-        </div>
-    }
+    <a class="btn btn-primary" id="toggle" href="view?passageId=@passage.id&grade=0" style="margin-bottom: 20px;">
+        <i class="fa fa-flash"></i>
+        Turn off Suggestions
+    </a>
 
 
 
-    <div class="container">
+</div>
+</div>
 
-        <div class="pull-left">
-
-            <div class="btn-group">
-
-                <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passage.id" style="margin-bottom: 20px;">
-                    <i class="fa fa-plus"></i>
-                    Add new Questions
-                </a>
-                @if(passage.questions.size > 0) {
-
-                    <a class="btn btn-primary" id="view" href="/viewPassageQuestions?passageId=@passage.id" style="margin-bottom: 20px;">
-                        <i class="fa fa-book"></i>
-                        View Passage Questions
-                    </a>
-                }
-
-                <a id="left-panel-link" class="btn btn-primary" href="#left-panel" style="margin-bottom: 20px;">
-                    <i class="fa fa-edit"> Left Panel</i>
-                </a>
-
-                <a class="btn btn-primary" id="add" href="@routes.SimplePassageController.edit(passage.id)" style="margin-bottom: 20px;">
-                    <i class="fa fa-edit"> Edit this Passage</i>
-                </a>
+<div class="pull-right">
 
 
+    <div class="btn-group">
+        <h5>Choose The Grade Level this passage should be displayed at</h5>
+        <div class="dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
 
+                Grade
 
-
-                @for(tag <- passage.tags){
-
-
-                    <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px;">
-                        <i class="fa fa-tag"> @tag.name</i>
-
-                    </a>
-                }
-
-                <a class="btn btn-primary" id="toggle" href="view?passageId=@passage.id&grade=0" style="margin-bottom: 20px;">
-                    <i class="fa fa-flash"></i>
-                    Turn off Suggestions
-                </a>
-
-
-
-            </div>
-        </div>
-
-        <div class="pull-right">
-
-
-            <div class="btn-group">
-                <h5>Choose The Grade Level this passage should be displayed at</h5>
-                <div class="dropdown">
-                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-
-                        Grade
-
-                        @if(passage.grade == 0) {
-                            K
-                        }
-
-                        @if(passage.grade >= 12){
-                            College Level or Above
-                    } else {
-
-                    @if(passage.grade != 0 && passage.grade <= 12) {
-                        @passage.grade
-                    }
-                    }
-                        <span class="caret"></span></button>
-                    <ul class="dropdown-menu">
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=0">K</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=1">1</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=2">2</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=3">3</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=4">4</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=5">5</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=6">6</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=7">7</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=8">8</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=9">9</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=10">10</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=11">11</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=12">12</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=13">College</a></li>
-                    </ul>
-                </div>
-
-
-            </div>
-
-
-        </div>
-
-
-
-    </div>
-
-
-
-
-
-
-
-    <div class="container-fluid">
-
-
-
-        <div>
-
-            <span class="label label-default" id="Suggestions"></span>
-
-
-
-
-            <div class="container">
-                <h1> @passage.title </h1>
-
-                <strong> Added By: </strong> @instructor.firstName @instructor.lastName <br>
-                <strong> Displaying at Grade Level:  </strong>   @if(passage.grade == 0) {
+                @if(passage.grade == 0) {
                 K
             }
 
-                @if(passage.grade >= 12){
-                    College Level or Above
-                } else {
-
-                    @if(passage.grade != 0 && passage.grade <= 12) {
-                        @passage.grade
-                    }
-                }<br>
-                <strong> Source:  </strong> @passage.source <br><br>
-            </div>
-
-            @if(suggestionsOn){
-                @for(word <- passage.text.split(" ")){
-                    @if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > (Integer.valueOf(request().getQueryString("grade").toString) + 6) && !passage.getStopWords().contains(word) /*&& (POS.byWord(word) == null  || POS.byWord(word) != null && POS.byWord(word).name.toLowerCase.indexOf("verb") != -1)*/){
-                        <u>@word</u>
-
-
-
-                        @if(Suggestion.byWord(word).map(x => x.suggestedWord).distinct.size > 0){
-                                <!-- http://stackoverflow.com/questions/18830813/how-can-i-remove-punctuation-from-input-text-in-java -->
-                            <div style="display:none;" id="@word">
-                                @for(w <- Suggestion.byWord(word).sortWith(_.frequency > _.frequency).map(x => x.suggestedWord).distinct){@w&nbsp}
-                                <br>
-                            </div>
-                        }
-                    } else {
-                        @word
-                    }
-                    &nbsp
-                }
-            } else {
-                @passage.text
-            }
-
-        </div>
-    </div>
-
-    <script src="/assets/js/jquery.panelslider.min.js"></script>
-    <script>
-            $('#left-panel-link').panelslider();
-            $('#right-panel-link').panelslider({side: 'right', clickClose: false, duration: 200 });
-
-            $('#close-panel-bt').click(function() {
-                $.panelslider.close();
-            });
-    </script>
+            @if(passage.grade >= 12){
+            College Level or Above
+        } else {
+        @if(passage.grade != 0 && passage.grade <= 12) {
+        @passage.grade
+    }
+}
+<span class="caret"></span></button>
+<ul class="dropdown-menu">
+    <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=0">K</a></li>
+    <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=1">1</a></li>
+    <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=2">2</a></li>
+    <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=3">3</a></li>
+    <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=4">4</a></li>
+    <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=5">5</a></li>
+    <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=6">6</a></li>
+    <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=7">7</a></li>
+    <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=8">8</a></li>
+    <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=9">9</a></li>
+    <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=10">10</a></li>
+    <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=11">11</a></li>
+    <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=12">12</a></li>
+    <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=13">College</a></li>
+</ul>
+</div>
 
 
-    <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+</div>
 
-    <script>
-            function alertSuggestions(){
-                alert("This word is too complicated for this grade level!");
-            }
+
+</div>
+
+
+
+</div>
+
+
+
+<div class="container-fluid">
+
+
+
+    <div>
+
+        <span class="label label-default" id="Suggestions"></span>
+
+
+
+
+        <div class="container">
+            <h1> @passage.title </h1>
+
+            <strong> Added By: </strong> @instructor.firstName @instructor.lastName <br>
+            <strong> Displaying at Grade Level:  </strong>   @if(passage.grade == 0) {
+            K
+        }
+
+        @if(passage.grade >= 12){
+        College Level or Above
+    } else {
+
+    @if(passage.grade != 0 && passage.grade <= 12) {
+    @passage.grade
+}
+}<br>
+<strong> Source:  </strong> @passage.source <br><br>
+</div>
+
+@if(suggestionsOn){
+@for(word <- passage.text.split(" ")){
+@if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > (Integer.valueOf(request().getQueryString("grade").toString) + 6) && !passage.getStopWords().contains(word) /*&& (POS.byWord(word) == null  || POS.byWord(word) != null && POS.byWord(word).name.toLowerCase.indexOf("verb") != -1)*/){
+<u>@word</u>
+
+
+
+@if(Suggestion.byWord(word).map(x => x.suggestedWord).distinct.size > 0){
+<!-- http://stackoverflow.com/questions/18830813/how-can-i-remove-punctuation-from-input-text-in-java -->
+<div style="display:none;" id="@word">
+    @for(w <- Suggestion.byWord(word).sortWith(_.frequency > _.frequency).map(x => x.suggestedWord).distinct){@w&nbsp}
+    <br>
+</div>
+}
+} else {
+@word
+}
+&nbsp
+}
+} else {
+@passage.text
+}
+
+</div>
+</div>
+
+<script src="/assets/js/jquery.panelslider.min.js"></script>
+<script>
+$('#left-panel-link').panelslider({side: 'left', clickClose: false, duration: 200 });
+$('#right-panel-link').panelslider({side: 'right', clickClose: false, duration: 200 });
+
+$('#close-panel-bt').click(function() {
+    $.panelslider.close();
+});
+</script>
+
+
+<script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+
+<script>
+function alertSuggestions(){
+    alert("This word is too complicated for this grade level!");
+}
 
             //http://www.creativejuiz.fr/blog/en/javascript-en/read-url-get-parameters-with-javascript
             function $_GET(param) {
@@ -225,7 +210,7 @@
                         function( m, key, value ) { // callback
                             vars[key] = value !== undefined ? value : '';
                         }
-                );
+                        );
 
                 if ( param ) {
                     return vars[param] ? vars[param] : null;
@@ -257,27 +242,6 @@
 
                 //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
                 // locate your element and add the Click Event Listener
-                document.getElementById("word-list").addEventListener("click",function(e) {
-                    // e.target is our targetted element.
-                    // try doing console.log(e.target.nodeName), it will result LI
-                    if(e.target /*&& e.target.nodeName == "LI"*/) {
-                        console.log(e.target.id + " was clicked");
-                        jsRoutes.controllers.SimplePassageController.acceptWord(e.target.innerHTML,$_GET('grade')).ajax({
-                            success : function(data) {
-                                window.location.reload();
-                            },
-                            error : function(err) {
-                                //window.location = "";
-                            }
-                        });
-
-
-
-                    }
-                });
-
-
-
 
                 function isEmpty( el ){
                     return !$.trim(el.html())
@@ -290,44 +254,56 @@
 
 
 
-
-                    if(document.getElementById("left-panel").innerHTML.length > 0)   $.panelslider.close();
-
-
-                    $("#left-panel-link").click();
-
                     var leftPanel = document.getElementById("left-panel");
 
 
+                    if(window.getComputedStyle(leftPanel).display === 'none'){
+                        console.log("doing this");
+
+                        $("#left-panel-link").click();
+
+                    } 
+
+
+
+
+
+                    var upperDiv = '<div id="title"><h1>' + string + '</h1></div>';
+                    var approvalDiv = "<div id='accept'><button class='btn btn-primary' onclick='acceptWord(" + string + ");'>This is okay!</button></div><br>";
+
+                    var synonymnDiv = "<div class='container-fluid'> <div id='list'>";
+
                     if(document.getElementById(string) == null){
-                        leftPanel.innerHTML = "This word is too complicated, but we don't have any suggestions for you yet.";
+                        synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
                     } else {
-
-                        var upperDiv = '<div id="title"><h1>' + string + '</h1></div>';
-                        var approvalDiv = "<div id='accept'><button class='btn btn-primary' onclick='acceptWord(" + string + ");'>This is okay!</button></div><br>";
-
                         //http://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
                         //http://stackoverflow.com/questions/22036576/why-does-the-javascript-string-whitespace-character-nbsp-not-match
                         var synonymnList = document.getElementById(string).innerText.trim("/\r?\n|\r/g").split(String.fromCharCode(160));
 
 
-                        var synonymnDiv = "<div id='list'>";
-
+                        var ran = false;
                         for(var i = 1; i < synonymnList.length; i++){
+                            ran = true; 
                             synonymnDiv += i + ". <h3>" + synonymnList[i] + "</h3><br>";
                         }
 
-                        synonymnDiv += "</div>";
+                        if(!ran){
+                             synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
+                        }
 
-                        leftPanel.innerHTML = upperDiv + approvalDiv + synonymnDiv;
+
                     }
+
+                    synonymnDiv += "</div></div><br><button id='close-panel-bt' class='btn btn-primary' onclick='$.panelslider.close();'>Close Planel</button>";
+
+                    leftPanel.innerHTML = upperDiv + approvalDiv + synonymnDiv;
 
                 });
 
-            });
+});
 
 
-    </script>
+</script>
 
 
 
