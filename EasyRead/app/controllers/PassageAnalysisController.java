@@ -10,6 +10,7 @@ public class PassageAnalysisController {
 	
 	
 	private PhraseValidator validator = new MicrosoftNGramsValidator();
+	private PhraseValidator secondaryValidator = new MashapeController();
 	private WordNetController c;
 	
 	
@@ -187,7 +188,8 @@ public class PassageAnalysisController {
 
 
 
-							validator.fetchFrequencies(s, threeGram.toLowerCase());
+							//validator.fetchFrequencies(s, threeGram.toLowerCase());
+							secondaryValidator.fetchFrequencies(s, root);
 						}
                     }
                 }

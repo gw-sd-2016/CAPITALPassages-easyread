@@ -2,20 +2,21 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import models.SimplePassage;
+import models.Suggestion;
 import models.Word;
 import play.libs.F;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
 import play.mvc.Result;
 
-public class MashapeController {
+public class MashapeController implements PhraseValidator {
 	
 	
 
 	public void getNumSyllablesForWord(String word, SimplePassage p) {
 		p.num_characters += word.length();
 		if(Word.byLemma(word) == null){
-			System.out.println("requesting: " + word);
+			//System.out.println("requesting: " + word);
 			if(word.length() > 1) getSyllableInformation(word, p);
 		} else {
 			p.numSyllables += Word.byLemma(word).numSyllables;
@@ -31,7 +32,7 @@ public class MashapeController {
 			
 			numCharacters += w.length();
 			if(Word.byLemma(w) == null){
-				System.out.println("requesting: " + word);
+				//System.out.println("requesting: " + word);
 				if(w.length() > 1) numSyllables += getSyllableInformation(w).get(0);
 			} else {
 				numSyllables += Word.byLemma(word).numSyllables;
@@ -51,9 +52,9 @@ public class MashapeController {
 						public Result apply(WSResponse response) {
 							//System.out.println("response:" + response.asJson());
 							JsonNode res = response.asJson();
-							System.out.println("response: " + res);
+						//	System.out.println("response: " + res);
 
-							System.out.println("num:" + res.findValue("syllables").findValue("count"));
+							//System.out.println("num:" + res.findValue("syllables").findValue("count"));
 
 							Word nW = new Word(); 
 
@@ -76,46 +77,7 @@ public class MashapeController {
 					});
 		}
 	}
-    
-    public void getFrequencyInformation(String word, SimplePassage p) {
-        
-        
-       
-        
-            String url = "https://wordsapiv1.p.mashape.com/words/" + word + "/frequency";
-            //System.out.println(url);
-            WS.url(url).setHeader("X-Mashape-Key", "0qln9a1q5Hmsh7DpS3ttXRqx4nGCp1dmYowjsna9AhhZ2xMAbi").get().map(
-                                                                                                                   new F.Function<WSResponse, Object>() {
-                                                                                                                       public Result apply(WSResponse response) {
-                                                                                                                           //System.out.println("response:" + response.asJson());
-                                                                                                                           JsonNode res = response.asJson();
-                                                                                                                           System.out.println("response: " + res);
-                                                                                                                           
-                                                                                                                           System.out.println("num:" + res.findValue("syllables").findValue("count"));
-                                                                                                                           
-                                                                                                                           Word nW = new Word(); 
-                                                                                                                           
-                                                                                                                           nW.lemma = word; 
-                                                                                                                           
-                                                                                                                           nW.numSyllables = res.findValue("syllables").findValue("count").asInt();
-                                                                                                                           
-                                                                                                                           //int frequency = res.findValue("frequency");
-                                                                                                                           
-                                                                                                                           //SimplePassage thisPassage = SimplePassage.byId(p.id);
-                                                                                                                           
-                                                                                                                           p.numSyllables += nW.numSyllables;
-                                                                                                                           
-                                                                                                                           p.save();
-                                                                                                                           
-                                                                                                                           nW.wordNetId = Long.valueOf(-1);
-                                                                                                                           nW.ageOfAcquisition = 6;
-                                                                                                                           nW.length = word.length();
-                                                                                                                           nW.save();
-                                                                                                                           return null;
-                                                                                                                       }
-                                                                                                                   });
-        
-    }
+
 
 	
 	
@@ -131,9 +93,9 @@ public class MashapeController {
 						public Integer apply(WSResponse response) {
 							//System.out.println("response:" + response.asJson());
 							JsonNode res = response.asJson();
-							System.out.println("response: " + res);
+						//	System.out.println("response: " + res);
 
-							System.out.println("num:" + res.findValue("syllables").findValue("count"));
+						//	System.out.println("num:" + res.findValue("syllables").findValue("count"));
 
 							Word nW = new Word(); 
 
@@ -152,4 +114,27 @@ public class MashapeController {
 		
 	}
 
+	@Override
+	public void fetchFrequencies(Suggestion s, String p) {
+
+
+		String url = "https://wordsapiv1.p.mashape.com/words/" + p + "/frequency";
+		//System.out.println(url);
+		WS.url(url).setHeader("X-Mashape-Key", "0qln9a1q5Hmsh7DpS3ttXRqx4nGCp1dmYowjsna9AhhZ2xMAbi").get().map(
+				new F.Function<WSResponse, Object>() {
+					public Result apply(WSResponse response) {
+						//System.out.println("response:" + response.asJson());
+						JsonNode res = response.asJson().get("frequency").get("perMillion");
+						System.out.println("response: " + res);
+
+
+
+						//System.out.println("num:" + res.findValue("syllables").findValue("count"));
+
+						s.frequency = res.asDouble();
+						s.save();
+						return null;
+					}
+				});
+	}
 }
