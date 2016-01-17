@@ -16,10 +16,14 @@ public class MicrosoftNGramsValidator implements PhraseValidator {
 	public final String version = "2013-12";
 	public final String order = "3";
 
+	private final String model = "body";
+	private final String key = "c992ac297e68484690b92c791a0c7ea7";
+	private final String contentType = "application/JSON";
+
 	private Suggestion currentSuggestion;
 	
 	public String generateURL(String p){
-		return "http://weblm.research.microsoft.com/rest.svc/" + catalog + "/" + version + "/" + order + "/" + "cp?u=" + TOKEN + "&p=" + p + "&gen=" + p.split(" ").length + "&format=json";
+		return "https://api.projectoxford.ai/text/weblm/v1.0/calculateJointProbability/" + catalog + "/" + version + "/" + order + "/" + "cp?u=" + TOKEN + "&p=" + p + "&gen=" + p.split(" ").length + "&format=json";
 	}
 
 
@@ -31,14 +35,19 @@ public class MicrosoftNGramsValidator implements PhraseValidator {
 		
 	
 		
-		WSRequest holder = WS.url("http://weblm.research.microsoft.com/rest.svc/" + catalog + "/" + version + "/" + order + "/" + "cp");
+		WSRequest holder = WS.url("https://api.projectoxford.ai/text/weblm/v1.0/calculateJointProbability");
 		
 		
-		holder.setQueryParameter("u", TOKEN);
-		holder.setQueryParameter("p", p);
-		holder.setQueryParameter("gen", String.valueOf(p.split(" ").length));
-		holder.setQueryParameter("format", "json");
-		
+		holder.setQueryParameter("model", model);
+		holder.setQueryParameter("order", order);
+
+        holder.setHeader("Content-Type", contentType);
+        holder.setHeader("Ocp-Apim-Subscription-Key", key);
+
+
+        String body = "{\n\"queries\"\n[\n\"this\",\n\"is\"\n]\n}";
+
+        holder.setBody(body);
 		
 		holder.get().map(
 				new F.Function<WSResponse, Result>() {

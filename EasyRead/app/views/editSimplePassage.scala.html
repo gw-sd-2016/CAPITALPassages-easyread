@@ -2,56 +2,237 @@
 
 @main("Edit a  Passage") {
 
+
+
+    <style type="text/css">
+    /*This entire example and the sliders are from  https://github.com/eduardomb/jquery-panelslider */
+    .panel {
+    display: none;
+    width:auto;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    box-shadow: inset 0 0 5px 5px #222;
+    }
+    </style>
+
+    <div id="left-panel" class="panel" style="overflow-y:scroll"></div>
+
+    <a id="left-panel-link" class="btn btn-primary" href="#left-panel" style="display: none;">
+        <i class="glyphicon glyphicon-edit"> Left Panel</i>
+    </a>
+
+
+
     @helper.form(routes.SimplePassageController.edit_submit(passageId)) {
 
-		<div>
-			<div class="box">
-			    <div class="box-header">
-			    	<i class="icon-plus"></i>
-			        <i class="icon-user icon-large"></i>
-			        <h5>Edit an existing Passage</h5>
-			    </div>
-			    <div class="box-content box-table" style="padding: 10px;">
-				    @if(form.hasGlobalErrors) {
-					    <div class="alert alert-danger">
-					        	 @form.globalError.message
-					       
-					    </div>
-					}
-					<p>
-						<h4>Title</h4>
-						<input type="text" name="passageTitle" placeholder="Passage Title" value="@form("passageTitle").value">
-						
-						<h4>Source</h4>
-						<input type="text" name="source" placeholder="Passage Source" value="@form("source").value">
+            <!-- Left panel -->
 
 
-						<h4>Passage Body</h4>
-						<textarea cols="100" rows="5" name="passageText" qvalue="@form("passageText").value">
-							@form("passageText").value
-						</textarea>
 
-					</p>
-					
-		
-					<p>
-						
+        <div>
+            <div class="box">
+                <div class="box-header">
+                    <i class="icon-plus"></i>
+                    <i class="icon-user icon-large"></i>
+                    <h5>Edit an existing Passage</h5>
+                </div>
+                <div class="box-content box-table" style="padding: 10px;">
+                    @if(form.hasGlobalErrors) {
+                        <div class="alert alert-danger">
+                        @form.globalError.message
 
-						
-						
+                        </div>
+                    }
+                    <p>
+                <h4>Title</h4>
+                    <input type="text" name="passageTitle" placeholder="Passage Title" value="@form("passageTitle").value">
 
-						
-					
-					</p>
-					<br>
-					<p>
-						<button type="submit" class="btn btn-success">
-							<i class="btn-icon-only icon-check"></i> Submit
-						</button>
-					</p>
-			    </div>
-			</div>
-		</div>
-	}
+                    <h4>Source</h4>
+                    <input type="text" name="source" placeholder="Passage Source" value="@form("source").value">
+
+
+                    <h4>Passage Body</h4>
+                        <!-- http://quilljs.com/docs/quickstart/ -->
+                        <!-- Create the editor container -->
+                    <div id="editor">
+                        <div>@SimplePassage.byId(passageId).text</div>
+
+                        <div><br></div>
+                    </div>
+                    <p>
+                    </p>
+                    <br>
+                    <p>
+
+                    </p>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                <i class="btn-icon-only icon-check"></i> Submit
+            </button>
+        </div>
+    }
+    <script src="/assets/js/jquery.panelslider.min.js"></script>
+    <script>
+            $('#left-panel-link').panelslider({side: 'left', clickClose: false, duration: 200 });
+            $('#right-panel-link').panelslider({side: 'right', clickClose: false, duration: 200 });
+
+            $('#close-panel-bt').click(function() {
+                $.panelslider.close();
+                document.body.style.display = 'none';
+                document.body.style.display = '';
+            });
+    </script>
+
+
+    <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+
+        <!-- Include the Quill library -->
+    <script src="//cdn.quilljs.com/0.20.1/quill.js"></script>
+
+        <!-- Initialize Quill editor -->
+    <script>
+            var quill = new Quill('#editor');
+
+
+
+            //http://www.creativejuiz.fr/blog/en/javascript-en/read-url-get-parameters-with-javascript
+            function $_GET(param) {
+                var vars = {};
+                window.location.href.replace(
+                        /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+                        function( m, key, value ) { // callback
+                            vars[key] = value !== undefined ? value : '';
+                        }
+                );
+
+                if ( param ) {
+                    return vars[param] ? vars[param] : null;
+                }
+                return vars;
+            }
+
+            function acceptWord(word){
+                jsRoutes.controllers.SimplePassageController.acceptWord(word.id,$_GET('grade')).ajax({
+                    success : function(data) {
+                        //window.location.reload();
+                    },
+                    error : function(err) {
+                        //window.location = "";
+                    },
+                    complete : function() {
+                        window.location.reload();
+                    }
+                });
+            }
+
+            function replaceWord(word, replacement){
+                jsRoutes.controllers.SimplePassageController.replaceWord(@passageId, word, replacement).ajax({
+                    success : function(data) {
+                        //window.location.reload();
+                    },
+                    error : function(err) {
+                        //window.location = "";
+                    },
+                    complete : function() {
+                        window.location.reload();
+                    }
+                });
+            }
+
+
+            function underlineSpecificWords(words){
+
+                var text = quill.getText();
+
+                for(var i = 0; i < words.length; i++){
+                    var currentText = text;
+                    var word = words[i];
+                    var index = text.indexOf(word);
+
+                    while(index != -1){
+                        console.log(index);
+                        var offset = text.length - currentText.length;
+                        quill.formatText(index + offset, index + offset + word.length, 'underline', true);
+                        currentText = currentText.substring(index + word.length);
+                        index = currentText.indexOf(word);
+                    }
+                }
+            }
+
+
+            $( document ).ready(function() {
+                underlineSpecificWords(["Coach"]);
+
+
+
+
+
+                //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
+                // locate your element and add the Click Event Listener
+
+                function isEmpty( el ){
+                    return !$.trim(el.html())
+                }
+
+
+
+
+
+                $("u").click(function(){
+                    var string = $(this).html();
+
+
+
+                    var leftPanel = document.getElementById("left-panel");
+
+
+                    if(window.getComputedStyle(leftPanel).display === 'none'){
+                        console.log("doing this");
+
+                        $("#left-panel-link").click();
+
+                    }
+
+
+
+
+
+                    var upperDiv = '<div id="title"><h1>' + string + '</h1></div>';
+                    var approvalDiv = "<div id='accept'><button class='btn btn-primary' onclick='acceptWord(" + string + ");'>This is okay!</button></div><br>";
+
+                    var synonymnDiv = "<div class='container-fluid'> <div id='list'>";
+
+                    if(document.getElementById(string) == null){
+                        synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
+                    } else {
+                        //http://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
+                        //http://stackoverflow.com/questions/22036576/why-does-the-javascript-string-whitespace-character-nbsp-not-match
+                        var synonymnList = document.getElementById(string).innerText.trim("/\r?\n|\r/g").split(String.fromCharCode(160));
+
+
+                        var ran = false;
+                        for(var i = 1; i < synonymnList.length; i++){
+                            ran = true;
+                            synonymnDiv += i + ". <span onclick='replaceWord(\"" + string + "\", \"" + synonymnList[i] + "\");' style='background-color: gray;'><h3>" + synonymnList[i] + "</h3></span><br>";
+                        }
+
+                        if(!ran){
+                            synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
+                        }
+
+
+                    }
+
+                    synonymnDiv += "</div></div><br><button id='close-panel-bt' class='btn btn-primary' onclick='$.panelslider.close();'>Close Planel</button>";
+
+                    leftPanel.innerHTML = upperDiv + approvalDiv + synonymnDiv;
+
+                });
+
+            });
+    </script>
 
 }
