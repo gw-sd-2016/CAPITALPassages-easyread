@@ -20,6 +20,7 @@ POST    /createSimplePassage        controllers.SimplePassageController.createSi
 GET     /viewAllPassages			controllers.SimplePassageController.viewAllPassages()
 GET     /editSimplePassage          controllers.SimplePassageController.edit(passageId : Long)
 POST    /editSimplePassage_submit	controllers.SimplePassageController.edit_submit(passageId : Long)
+GET     /editPassageAtGrade          controllers.SimplePassageController.editPassage(passageId : Long, grade : Int)
 POST	/deletePassage				controllers.SimplePassageController.deletePassage(passageId: Long)
 GET     /view						controllers.SimplePassageController.view(passageId : Long, grade : Int)
 GET     /setNumQ                    controllers.SimplePassageController.setNumQuestions(passageId : Long)

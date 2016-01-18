@@ -8,7 +8,9 @@
 /*This entire example and the sliders are from  https://github.com/eduardomb/jquery-panelslider */
 .panel {
     display: none;
-    width:auto;
+    width: 20%;
+    overflow-y: scroll;
+    overflow-x:scroll;
     padding: 20px;
     background-color: #333;
     color: #fff;
@@ -300,7 +302,7 @@ function alertSuggestions(){
                         }
 
                         if(!ran){
-                             synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
+                             synonymnDiv += "This word is too complicated, <br> but we don't have any <br> suggestions for you yet.";
                         }
 
 

@@ -373,10 +373,7 @@ public class SimplePassageController extends Controller {
 
 		passage.title = data.passageTitle;
 
-		for(Sentence s : passage.sentences){
-			s.delete(" ");
 
-		}
 		passage.sentences = null; 
 
 
@@ -390,6 +387,20 @@ public class SimplePassageController extends Controller {
 	public String getFolderPath(){
 		return "public/passages"; 
 	}
+
+
+	public Result editPassage(Long passageId, int grade){
+		SimplePassage passage = SimplePassage.byId(passageId);
+		if (passage == null) {
+			return redirect(routes.SimplePassageController.viewAllPassages());
+		}
+
+		SimplePassageData data = new SimplePassageData(passage.text, passage.title,1,"category",passage.source);
+		Form<SimplePassageData> form = Form.form(SimplePassageData.class);
+		form = form.fill(data);
+		return ok(editSimplePassageAtGrade.render(form, passageId, grade));
+	}
+
 
 
 	public Result view(Long passageId, int grade) {

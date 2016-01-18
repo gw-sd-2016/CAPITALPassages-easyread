@@ -1,5 +1,5 @@
 
-@(form: Form[formdata.SimplePassageData], passageId: Long)
+@(form: Form[formdata.SimplePassageData], passageId: Long, grade: Int)
 
 
 @import play.api.libs.json.Json
@@ -23,52 +23,6 @@
     </style>
 
     <div id="left-panel" class="panel"></div>
-
-
-
-    <div class="pull-right">
-
-
-    <div class="btn-group">
-        <h5>Choose The Grade Level this passage should be edited at</h5>
-        <div class="dropdown">
-            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-
-                Grade
-
-                @if(SimplePassage.byId(passageId) == 0) {
-                    K
-                }
-
-                @if(SimplePassage.byId(passageId).grade >= 12){
-                    College Level or Above
-            } else {
-            @if(SimplePassage.byId(passageId).grade != 0 && SimplePassage.byId(passageId).grade <= 12) {
-                @SimplePassage.byId(passageId).grade
-            }
-            }
-                <span class="caret"></span></button>
-            <ul class="dropdown-menu">
-                <li><a href="editPassageAtGrade?passageId=@passageId&grade=0">K</a></li>
-                <li><a href="editPassageAtGrade?passageId=@passageId&grade=1">1</a></li>
-                <li><a href="editPassageAtGrade?passageId=@passageId&grade=2">2</a></li>
-                <li><a href="editPassageAtGrade?passageId=@passageId&grade=3">3</a></li>
-                <li><a href="editPassageAtGrade?passageId=@passageId&grade=4">4</a></li>
-                <li><a href="editPassageAtGrade?passageId=@passageId&grade=5">5</a></li>
-                <li><a href="editPassageAtGrade?passageId=@passageId&grade=6">6</a></li>
-                <li><a href="editPassageAtGrade?passageId=@passageId&grade=7">7</a></li>
-                <li><a href="editPassageAtGrade?passageId=@passageId&grade=8">8</a></li>
-                <li><a href="editPassageAtGrade?passageId=@passageId&grade=9">9</a></li>
-                <li><a href="editPassageAtGrade?passageId=@passageId&grade=10">10</a></li>
-                <li><a href="editPassageAtGrade?passageId=@passageId&grade=11">11</a></li>
-                <li><a href="editPassageAtGrade?passageId=@passageId&grade=12">12</a></li>
-                <li><a href="editPassageAtGrade?passageId=@passageId&grade=13">College</a></li>
-            </ul>
-        </div>
-
-
-    </div>
-
 
     <a id="left-panel-link" class="btn btn-primary" href="#left-panel" style="display: none;">
         <i class="glyphicon glyphicon-edit"> Left Panel</i>
@@ -98,11 +52,54 @@
                     }
                     <p>
 
+                        <strong>This page shows Suggestions to make this passage readable for a @if(grade == 0) { Kindergarten } @if(grade >= 12){ College Level } else { Grade @grade } reader</strong>
 
-                        <strong>This page shows Suggestions to make this passage readable for a @if(SimplePassage.byId(passageId).grade == 0) { Kindergarten } @if(SimplePassage.byId(passageId).grade >= 12){ College Level } else { Grade @SimplePassage.byId(passageId).grade } reader</strong>
+
+                        <div class="pull-right">
 
 
-                <h4>Title</h4>
+                            <div class="btn-group">
+                                <h5>Choose The Grade Level this passage should be edited at</h5>
+                                <div class="dropdown">
+                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+
+                                        Grade
+
+                                        @if(SimplePassage.byId(passageId) == 0) {
+                                            K
+                                        }
+
+                                        @if(SimplePassage.byId(passageId).grade >= 12){
+                                            College Level or Above
+                                    } else {
+                                    @if(SimplePassage.byId(passageId).grade != 0 && SimplePassage.byId(passageId).grade <= 12) {
+                                        @SimplePassage.byId(passageId).grade
+                                    }
+                                    }
+                                        <span class="caret"></span></button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=0">K</a></li>
+                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=1">1</a></li>
+                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=2">2</a></li>
+                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=3">3</a></li>
+                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=4">4</a></li>
+                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=5">5</a></li>
+                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=6">6</a></li>
+                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=7">7</a></li>
+                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=8">8</a></li>
+                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=9">9</a></li>
+                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=10">10</a></li>
+                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=11">11</a></li>
+                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=12">12</a></li>
+                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=13">College</a></li>
+                                    </ul>
+                                </div>
+
+
+                            </div>
+
+
+                            <h4>Title</h4>
                     <input type="text" name="passageTitle" placeholder="Passage Title" value="@form("passageTitle").value">
 
                     <h4>Source</h4>
@@ -188,7 +185,7 @@
             }
 
             function acceptWord(word){
-                jsRoutes.controllers.SimplePassageController.acceptWord(word.id,$_GET('grade')).ajax({
+                jsRoutes.controllers.SimplePassageController.acceptWord(word.id, @grade).ajax({
                     success : function(data) {
                         //window.location.reload();
                     },
@@ -247,7 +244,7 @@
             $( document ).ready(function() {
 
                 // http://stackoverflow.com/questions/24309803/playframework-jsvalue-in-html-template
-                underlineSpecificWords(@Html(Json.stringify(Json.toJson(SimplePassage.byId(passageId).text.split(" ").toList.distinct.filter(p => (Word.byLemma(p) != null && Word.byLemma(p).ageOfAcquisition > (SimplePassage.byId(passageId).grade + 6) && !SimplePassage.byId(passageId).getStopWords().contains(p)))))));
+                underlineSpecificWords(@Html(Json.stringify(Json.toJson(SimplePassage.byId(passageId).text.split(" ").toList.distinct.filter(p => (Word.byLemma(p) != null && Word.byLemma(p).ageOfAcquisition > grade + 6) && !SimplePassage.byId(passageId).getStopWords().contains(p))))));
 
 
                 //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
