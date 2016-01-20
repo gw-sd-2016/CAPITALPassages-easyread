@@ -518,6 +518,7 @@ public class SimplePassageController extends Controller {
         if(thisWord != null){
             thisWord.ageOfAcquisition = grade + 6;
             thisWord.save();
+			flash("success", "We'll remember that word is okay!");
             return ok();
         }
         return badRequest();
@@ -529,6 +530,7 @@ public class SimplePassageController extends Controller {
         try{
             p.text = p.text.replace(word, replacement);
             p.save();
+			flash("success", "We replaced that word for you!");
             return ok();
         } catch(Exception e){
             return badRequest();

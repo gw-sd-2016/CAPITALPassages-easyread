@@ -30,6 +30,22 @@
 
 
 
+    <div>
+    @for(word <- SimplePassage.byId(passageId).text.split(" ")){
+        @if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > (grade + 6) && !SimplePassage.byId(passageId).getStopWords().contains(word)){
+            @if(Suggestion.byWord(word).map(x => x.suggestedWord).distinct.size > 0){
+                    <!-- http://stackoverflow.com/questions/18830813/how-can-i-remove-punctuation-from-input-text-in-java -->
+                <div style="display:none;" id="@word">
+                    @for(w <- Suggestion.byWord(word).sortWith(_.frequency > _.frequency).map(x => x.suggestedWord).distinct){@w&nbsp}
+                    <br>
+                </div>
+            }
+        }
+    }
+
+    </div>
+
+
     @helper.form(routes.SimplePassageController.edit_submit(passageId)) {
 
             <!-- Left panel -->
@@ -52,7 +68,7 @@
                     }
                     <p>
 
-                        <strong>This page shows Suggestions to make this passage readable for a @if(grade == 0) { Kindergarten } @if(grade >= 12){ College Level } else { Grade @grade } reader</strong>
+                        <strong>This page shows Suggestions to make this passage readable for a @if(grade == 0) { Kindergarten } @if(grade >= 12){ College Level } else { @if(grade > 0) { Grade @grade }} reader</strong>
 
 
                         <div class="pull-right">
@@ -253,9 +269,6 @@
                 function isEmpty( el ){
                     return !$.trim(el.html())
                 }
-
-
-
 
 
                 $("u").click(function(){

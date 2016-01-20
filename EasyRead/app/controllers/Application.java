@@ -5,6 +5,7 @@ import formdata.UserForm;
 import models.PassageTag;
 import models.Suggestion;
 import models.User;
+import net.sf.extjwnl.JWNLException;
 import play.Routes;
 import play.data.Form;
 import play.mvc.Controller;
@@ -22,7 +23,7 @@ import static play.data.Form.form;
 
 public class Application extends Controller {
 
-    public Result index() {
+    public Result index() throws JWNLException {
         return ok(index.render(session("userFirstName")));
     }
 

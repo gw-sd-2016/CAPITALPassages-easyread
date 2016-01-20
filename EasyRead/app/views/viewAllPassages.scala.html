@@ -2,6 +2,12 @@
 
 @main("View All Passages") {
 
+	@if(flash.containsKey("success")) {
+		<div class="alert alert-success">
+			<h2>Done!</h2> @flash.get("success")
+		</div>
+	}
+
 	<div>
     		<div>
 

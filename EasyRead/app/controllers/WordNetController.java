@@ -10,10 +10,14 @@ import net.sf.extjwnl.data.relationship.RelationshipFinder;
 import net.sf.extjwnl.data.relationship.RelationshipList;
 import net.sf.extjwnl.dictionary.Dictionary;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import simplenlg.framework.*;
+import simplenlg.lexicon.*;
+import simplenlg.realiser.english.*;
+import simplenlg.phrasespec.*;
+import simplenlg.features.*;
+
+
+import java.util.*;
 
 /**
  * A class to demonstrate the functionality of the library.
@@ -86,6 +90,105 @@ public class WordNetController {
 				for(Word wordNetWord : dictionary.getSynsetAt(realPOS, offset).getWords()){
 					//System.out.println(wordNetWord.getLemma());
 					syn.add(wordNetWord.getLemma());
+
+
+
+				}
+
+			}
+		}
+
+
+
+		return syn;
+	}
+
+	public HashSet<String> synonymnLookup(String word, String pos) throws JWNLException{
+		//correct POS
+
+
+		// https://code.google.com/p/simplenlg/wiki/Section6
+		//http://stackoverflow.com/questions/9520501/how-do-you-get-the-past-tense-of-a-verb
+
+		POS realPOS;
+
+		pos = pos.toLowerCase();
+
+
+		ArrayList<Object> features = new ArrayList<Object>();
+
+		if(pos.contains("verb")) {
+			realPOS = POS.VERB;
+
+			SPhraseSpec p = new NLGFactory().createClause();
+			//p.setSubject("Mary");
+			p.setVerb(word);
+			//p.setObject("the monkey");
+
+
+			if(pos.contains("past")){
+				p.setFeature(Feature.TENSE, Tense.PAST);
+			}
+
+
+			Object c = p.getFeature(Feature.PROGRESSIVE);
+
+			Object d = p.getFeature(Feature.TENSE);
+
+
+			if(word.charAt(word.length() - 1) != 's'){
+				p.setFeature(Feature.NUMBER, NumberAgreement.SINGULAR);
+			} else {
+				p.setFeature(Feature.NUMBER, NumberAgreement.PLURAL);
+			}
+
+			Object e = p.getFeature(Feature.NUMBER);
+
+			Object f = p.getFeature(Feature.PERSON);
+
+			Object g = p.getFeature(Feature.FORM);
+
+			features.add(c);
+			features.add(d);
+			features.add(e);
+			features.add(f);
+			features.add(g);
+		}
+		else if(pos.contains("adverb")) realPOS = POS.ADVERB;
+		else if(pos.contains("adjecive")) realPOS = POS.ADJECTIVE;
+		else realPOS = POS.NOUN;
+
+		IndexWordSet newWord = this.dictionary.lookupAllIndexWords(word);
+
+		HashSet<String> syn = new HashSet<String>();
+
+
+		IndexWord w = newWord.getIndexWord(realPOS);
+
+
+		Lexicon lexicon = Lexicon.getDefaultLexicon();
+
+		if(w != null){
+			for(long offset : w.getSynsetOffsets()){
+				for(Word wordNetWord : dictionary.getSynsetAt(realPOS, offset).getWords()){
+					WordElement wor = lexicon.getWord(wordNetWord.getLemma(), LexicalCategory.VERB);
+					InflectedWordElement infl = new InflectedWordElement(wor);
+
+					if(features.size() > 0){
+						infl.setFeature(Feature.PROGRESSIVE, features.get(0));
+						infl.setFeature(Feature.TENSE, features.get(1));
+						infl.setFeature(Feature.NUMBER, features.get(2));
+						infl.setFeature(Feature.PERSON, features.get(3));
+						infl.setFeature(Feature.FORM, features.get(4));
+					}
+
+					Realiser realiser = new Realiser(lexicon);
+					String correct = realiser.realise(infl).getRealisation();
+					System.out.println(correct);
+
+					if(!correct.equals(word)) syn.add(correct);
+
+
 				}
 
 			}

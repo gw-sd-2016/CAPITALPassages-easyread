@@ -26,6 +26,7 @@ public class Sentence extends Model {
 
     
     @Required
+    @OneToMany(cascade = CascadeType.ALL)
     public List<Word> words = new ArrayList<Word>();
     
   /*  // need to remove -- now with words
@@ -54,7 +55,8 @@ public class Sentence extends Model {
     
     public Sentence(String text, int orderIndex){
         this.text = text;
-        
+
+        /*
         for(String w : this.text.split(" ")){
         	if(Word.byLemma(w) != null){
                 this.words.add(Word.byLemma(w));
@@ -68,7 +70,7 @@ public class Sentence extends Model {
                 this.words.add(n);
             }
         }
-
+        */
     }
     
     

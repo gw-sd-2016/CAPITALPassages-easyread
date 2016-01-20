@@ -79,8 +79,9 @@ public class ParsingController {
 					// this is the POi.S tag of the token
 					String pos = token.get(PartOfSpeechAnnotation.class);
 
-					String lemma = token.getString(LemmaAnnotation.class);
+					String lemma = token.originalText();
 					// System.out.println("LEMMA : " + lemma);
+
 
 					POS p = new POS(pos);
 
@@ -96,6 +97,11 @@ public class ParsingController {
                     if(thisWord != null && thisWord.partsOfSpeech != null){
                         thisWord.partsOfSpeech.add(p);
                         thisWord.save();
+
+						if(passage.sentences.get(passage.sentences.size() - 1).words == null){
+							passage.sentences.get(passage.sentences.size() - 1).words = new ArrayList<Word>();
+							passage.sentences.get(passage.sentences.size() - 1).words.add(thisWord);
+						}
                     }
 				}
 			}

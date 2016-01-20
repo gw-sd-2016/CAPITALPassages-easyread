@@ -11,6 +11,7 @@ public class PassageAnalysisController {
 	
 	private PhraseValidator validator = new MicrosoftNGramsValidator();
 	private PhraseValidator secondaryValidator = new MashapeController();
+	private PhraseValidator tertiaryValidator = new GoogleNGramsValidator();
 	private WordNetController c;
 	
 	
@@ -40,7 +41,9 @@ public class PassageAnalysisController {
 				}
             }
         }
-        return average/count;
+
+
+        return (count > 0) ? average / count : 0;
     }
 
 	public void determineGradeLevel(SimplePassage p){
@@ -60,10 +63,6 @@ public class PassageAnalysisController {
             numAlgorithms++;
         }
 
-
-
-
-
 		if(p.text.split(" ").length > 100){
 
             double CL = gradeResolution(calculateCLScore(p.text, p.numWords));
@@ -72,7 +71,8 @@ public class PassageAnalysisController {
                 numAlgorithms++;
             }
 
-            p.grade = Math.round(combined / numAlgorithms);
+			if(numAlgorithms > 0) p.grade = Math.round(combined / numAlgorithms);
+			else p.grade = 0;
 		} else{
             p.grade = (int) Math.round((combined + convertToGrade(averageAge(p))) / (numAlgorithms + 1));
 		}
@@ -153,12 +153,28 @@ public class PassageAnalysisController {
 		return score;
 	}
 
+// at least 30 sentences
+	public double calculateSMOGIndex(SimplePassage p){
+		double words = p.numWords;
+		double sentences = p.sentences.size();
+
+		double polysyllables = 0;
+
+		for(Sentence s : p.sentences){
+			for(Word w : s.words){
+				if(w.numSyllables > 2) polysyllables++;
+			}
+		}
+
+		return 1.0430 * Math.sqrt(polysyllables * (30/sentences)) + 3.1291;
+	}
+
 	public void generateSuggestionsForWord(POS p, String word, String sentence, Long passageId, String ogText) throws JWNLException{
 
 		if(p != null && !p.name.toLowerCase().contains("proper noun")){
 			if (c == null) c = new WordNetController();
 
-			HashSet<String> suggestions = c.wordIDLookup(word, p.name);
+			HashSet<String> suggestions = c.synonymnLookup(word, p.name);
 
 			Word w = Word.byLemma(word);
 
@@ -189,7 +205,7 @@ public class PassageAnalysisController {
 
 
 							//validator.fetchFrequencies(s, threeGram.toLowerCase());
-							secondaryValidator.fetchFrequencies(s, root);
+							tertiaryValidator.fetchFrequencies(s, root);
 						}
                     }
                 }
