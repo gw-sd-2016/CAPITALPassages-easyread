@@ -14,11 +14,23 @@ import java.util.ArrayList;
  */
 public class GoogleNGramsValidator implements PhraseValidator {
 
-    String url = "https://books.google.com/ngrams/graph?content=snakes+are+poisonous&year_start=2000&year_end=2004&corpus=15&smoothing=3&share=&direct_url=t1%3B%2CINSERT%3B%2Cc0";
+    String url = "https://books.google.com/ngrams/graph?content=FIRST&year_start=2000&year_end=2004&corpus=15&smoothing=3&share=&direct_url=t1%3B%2CINSERT%3B%2Cc0";
 
 
 
     public void fetchFrequencies(Suggestion s, String p){
+
+        String insert = "";
+
+        for(String substring : p.split(" ")){
+            insert += substring + "+";
+        }
+
+        insert = insert.substring(0, insert.length() - 1);
+
+        url = url.replace("FIRST", insert);
+
+
         p = p.replace(" ", "%20");
 
 

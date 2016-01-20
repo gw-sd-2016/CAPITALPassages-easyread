@@ -536,11 +536,6 @@ public class SimplePassageController extends Controller {
             return badRequest();
         }
     }
-    
-    
-    
-    
-    
 
 	public Result viewAllPassages() {
 

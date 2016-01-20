@@ -1,8 +1,6 @@
 package formdata;
 
 
-import models.User;
-
 public class UserForm {
     private static final String EMAIL_PATTERN =
             "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"

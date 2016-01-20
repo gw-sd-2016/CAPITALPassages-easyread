@@ -1,21 +1,21 @@
 package controllers;
 
 import net.sf.extjwnl.JWNLException;
-import net.sf.extjwnl.data.*;
-import net.sf.extjwnl.data.list.PointerTargetNodeList;
-import net.sf.extjwnl.data.list.PointerTargetTree;
-import net.sf.extjwnl.data.relationship.AsymmetricRelationship;
-import net.sf.extjwnl.data.relationship.Relationship;
-import net.sf.extjwnl.data.relationship.RelationshipFinder;
-import net.sf.extjwnl.data.relationship.RelationshipList;
+import net.sf.extjwnl.data.IndexWord;
+import net.sf.extjwnl.data.IndexWordSet;
+import net.sf.extjwnl.data.POS;
+import net.sf.extjwnl.data.Word;
 import net.sf.extjwnl.dictionary.Dictionary;
-
-import simplenlg.framework.*;
-import simplenlg.lexicon.*;
-import simplenlg.realiser.english.*;
-import simplenlg.phrasespec.*;
-import simplenlg.features.*;
-
+import simplenlg.features.Feature;
+import simplenlg.features.NumberAgreement;
+import simplenlg.features.Tense;
+import simplenlg.framework.InflectedWordElement;
+import simplenlg.framework.LexicalCategory;
+import simplenlg.framework.NLGFactory;
+import simplenlg.framework.WordElement;
+import simplenlg.lexicon.Lexicon;
+import simplenlg.phrasespec.SPhraseSpec;
+import simplenlg.realiser.english.Realiser;
 
 import java.util.*;
 

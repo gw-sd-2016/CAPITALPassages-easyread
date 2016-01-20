@@ -3,7 +3,6 @@ package controllers;
 import formdata.LoginForm;
 import formdata.UserForm;
 import models.PassageTag;
-import models.Suggestion;
 import models.User;
 import net.sf.extjwnl.JWNLException;
 import play.Routes;
@@ -44,20 +43,15 @@ public class Application extends Controller {
         return ok(login.render(form(LoginForm.class)));
     }
 
-
     public Result logout(){
         session().clear();
         return ok(index.render(null));
     }
 
-
-
-
     public Result login_submit() throws NoSuchAlgorithmException, InvalidKeySpecException{
         Form<LoginForm> loginForm = form(LoginForm.class).bindFromRequest();
 
         LoginForm correctedForm = new LoginForm(loginForm.data().get("usernameOrEmail"),  loginForm.data().get("password"));
-
 
         if (correctedForm.validate() != null) {
             return badRequest(login.render(loginForm));

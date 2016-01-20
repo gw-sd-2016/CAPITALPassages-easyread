@@ -7,7 +7,6 @@ import com.avaje.ebean.SqlRow;
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
 import formdata.UserForm;
-import play.api.data.Form;
 import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.Required;
 import utilities.PasswordHash;
