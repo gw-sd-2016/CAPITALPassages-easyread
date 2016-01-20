@@ -173,7 +173,7 @@
 
         // Prevent namespace event from triggering twice
         modal.on('open.fndtn.reveal', function(e) {
-          if (e.namespace !== 'fndtn.reveal') return;
+          if (e.namespace !== 'fndtn.reveal')
         });
 
         modal.on('open.fndtn.reveal').trigger('open.fndtn.reveal');

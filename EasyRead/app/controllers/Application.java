@@ -3,6 +3,7 @@ package controllers;
 import formdata.LoginForm;
 import formdata.UserForm;
 import models.PassageTag;
+import models.Suggestion;
 import models.User;
 import play.Routes;
 import play.data.Form;

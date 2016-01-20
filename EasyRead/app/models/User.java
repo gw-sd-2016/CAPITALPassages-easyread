@@ -34,7 +34,7 @@ public class User extends Model {
     /********************************
      ENUMERATOR: For each User type
      ********************************/
-    public static enum Role {
+    public enum Role {
         SUPERADMIN,
         ADMIN,
         INSTRUCTOR,
@@ -171,10 +171,7 @@ public class User extends Model {
 
     //check if a user is in the database (i.e. the entity is not null)
     public static boolean exists(User user) {
-        if (user != null) {
-            return true;
-        }
-        return false;
+        return user != null;
     }
 
     //check if a user has the proper permissions to view a page
@@ -461,7 +458,7 @@ public class User extends Model {
             int l = nameInstructions.length();
 
             for (int i = 0; i < l; i++) { char x = nameInstructions.charAt(0); switch (x) { case 'v': name += getRandomElementFrom(vocals); break; case 'c': name += getRandomElementFrom(startConsonants); break; case 'd': name += getRandomElementFrom(endConsonants); break; } nameInstructions = nameInstructions.substring(1); } return name; } private String firstCharUppercase(String name) { return Character.toString(name.charAt(0)).toUpperCase() + name.substring(1); } private String getRandomElementFrom(List<String> v) {
-            return (String) v.get(randomInt(0, v.size() - 1));
+            return v.get(randomInt(0, v.size() - 1));
         }
     }
 

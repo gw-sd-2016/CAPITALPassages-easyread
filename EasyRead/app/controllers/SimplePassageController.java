@@ -93,9 +93,7 @@ public class SimplePassageController extends Controller {
 					w.correct = true; 
 					q.correctAnswer = createSPForm.get().choices.get(i).get(c);
 				} else{
-					if(createSPForm.get().correctAnswers.size() == 0 && createSPForm.get().choices.get(i).size() == 1){
-						w.correct = true; 
-					}else w.correct = false; 
+					w.correct = createSPForm.get().correctAnswers.size() == 0 && createSPForm.get().choices.get(i).size() == 1;
 				}
 				w.active = true; 
 				w.position = c;
@@ -313,9 +311,7 @@ public class SimplePassageController extends Controller {
 				if(createSPForm.get().correctAnswers.size() > 0 && createSPForm.get().correctAnswers.get(i).equals(String.valueOf(c))){
 					w.correct = true; 
 				} else{
-					if(createSPForm.get().correctAnswers.size() == 0 && createSPForm.get().choices.get(i).size() == 1){
-						w.correct = true; 
-					}else w.correct = false; 
+					w.correct = createSPForm.get().correctAnswers.size() == 0 && createSPForm.get().choices.get(i).size() == 1;
 				}
 				w.active = true; 
 				w.position = c;
@@ -466,7 +462,6 @@ public class SimplePassageController extends Controller {
 		if(createSPForm.get().descriptions.size() > 0 && createSPForm.get().types.size() > 0 && createSPForm.get().names.size() > 0){
 
 			PassageTag t = new PassageTag(createSPForm.get().names.get(0), createSPForm.get().descriptions.get(0),createSPForm.get().types.get(0));
-			;
 
 			if(PassageTag.byName(createSPForm.get().names.get(0)) == null){
 				t.save();

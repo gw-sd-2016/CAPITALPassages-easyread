@@ -147,7 +147,7 @@ public class Word extends Model {
 	/********************************
 	 ENUMERATOR: For each User type
 	 ********************************/
-	public static enum Role {
+	public enum Role {
 		SUPERADMIN,
 		ADMIN,
 		INSTRUCTOR,

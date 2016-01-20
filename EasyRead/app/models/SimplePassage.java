@@ -67,7 +67,7 @@ public class SimplePassage extends Model {
 
 
 	public List<String> getStopWords(){
-		return this.stopWords;
+		return stopWords;
 	}
 
 

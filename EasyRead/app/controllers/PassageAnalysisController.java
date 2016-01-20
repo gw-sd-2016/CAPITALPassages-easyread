@@ -72,7 +72,7 @@ public class PassageAnalysisController {
                 numAlgorithms++;
             }
 
-            p.grade = (int) Math.round(combined / numAlgorithms);
+            p.grade = Math.round(combined / numAlgorithms);
 		} else{
             p.grade = (int) Math.round((combined + convertToGrade(averageAge(p))) / (numAlgorithms + 1));
 		}
