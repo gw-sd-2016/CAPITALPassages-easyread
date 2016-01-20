@@ -133,7 +133,7 @@ create table user (
 
 create table word (
   id                        bigint auto_increment not null,
-  word_id                   bigint not null,
+  sentence_id               bigint not null,
   word_net_id               bigint,
   lemma                     varchar(255),
   length                    integer,
@@ -167,8 +167,8 @@ alter table passage_question_response add constraint fk_passage_question_respons
 create index ix_passage_question_response_submitter_7 on passage_question_response (submitter_id);
 alter table sentence add constraint fk_sentence_simple_passage_8 foreign key (simple_passage_id) references simple_passage (id) on delete restrict on update restrict;
 create index ix_sentence_simple_passage_8 on sentence (simple_passage_id);
-alter table word add constraint fk_word_word_9 foreign key (word_id) references word (id) on delete restrict on update restrict;
-create index ix_word_word_9 on word (word_id);
+alter table word add constraint fk_word_sentence_9 foreign key (sentence_id) references sentence (id) on delete restrict on update restrict;
+create index ix_word_sentence_9 on word (sentence_id);
 
 
 

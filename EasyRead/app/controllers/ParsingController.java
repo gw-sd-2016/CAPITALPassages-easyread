@@ -86,9 +86,12 @@ public class ParsingController {
 					POS p = new POS(pos);
 
 					if(lemma.length() > 1 || Character.isLetter(lemma.charAt(0))){
-						if(originalSCount == 0) new MashapeController().getNumSyllablesForWord(lemma,passage);
-						passage.numWords++;
-						a.generateSuggestionsForWord(p,lemma, s.text, passage.id, token.originalText());
+						if(originalSCount == 0) {
+							new MashapeController().getNumSyllablesForWord(lemma,passage);
+							passage.numWords++;
+							a.generateSuggestionsForWord(p,lemma, s.text, passage.id, token.originalText());
+						}
+
 					}
 
 					Word thisWord = Word.byLemma(lemma);
@@ -106,7 +109,7 @@ public class ParsingController {
 				}
 			}
 
-            a.determineGradeLevel(passage);
+			if(originalSCount == 0) a.determineGradeLevel(passage);
             try{
                 passage.save();
             } catch (Exception e){

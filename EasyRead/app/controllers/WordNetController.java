@@ -131,6 +131,13 @@ public class WordNetController {
 			}
 
 
+			if(word.contains("ing")){
+				p.setFeature(Feature.PROGRESSIVE, true);
+			} else {
+				p.setFeature(Feature.PROGRESSIVE, false);
+			}
+
+
 			Object c = p.getFeature(Feature.PROGRESSIVE);
 
 			Object d = p.getFeature(Feature.TENSE);
@@ -142,17 +149,17 @@ public class WordNetController {
 				p.setFeature(Feature.NUMBER, NumberAgreement.PLURAL);
 			}
 
-			Object e = p.getFeature(Feature.NUMBER);
+			/*Object e = p.getFeature(Feature.NUMBER);
 
 			Object f = p.getFeature(Feature.PERSON);
 
-			Object g = p.getFeature(Feature.FORM);
+			Object g = p.getFeature(Feature.FORM);*/
 
 			features.add(c);
 			features.add(d);
-			features.add(e);
+			/*features.add(e);
 			features.add(f);
-			features.add(g);
+			features.add(g);*/
 		}
 		else if(pos.contains("adverb")) realPOS = POS.ADVERB;
 		else if(pos.contains("adjecive")) realPOS = POS.ADJECTIVE;
@@ -177,9 +184,9 @@ public class WordNetController {
 					if(features.size() > 0){
 						infl.setFeature(Feature.PROGRESSIVE, features.get(0));
 						infl.setFeature(Feature.TENSE, features.get(1));
-						infl.setFeature(Feature.NUMBER, features.get(2));
-						infl.setFeature(Feature.PERSON, features.get(3));
-						infl.setFeature(Feature.FORM, features.get(4));
+						/*infl.setFeature(Feature.NUMBER, features.get(2));
+						infl.setFeature(Feature.PERSON, features.get(2));
+						infl.setFeature(Feature.FORM, features.get(3));*/
 					}
 
 					Realiser realiser = new Realiser(lexicon);
