@@ -32,9 +32,8 @@ public class PassageAnalysisController {
 		int count = 0;
         for(Sentence s : p.sentences){
             for(String x : s.text.split(" ")){
-                Word w = Word.byLemma(x);
+                Word w = Word.byRawString(x);
 				if(w != null && !Word.isStopWord(w)){
-
 						average += w.ageOfAcquisition;
 						count++;
 
@@ -160,11 +159,11 @@ public class PassageAnalysisController {
 
 		double polysyllables = 0;
 
-		for(Sentence s : p.sentences){
+		/*for(Sentence s : p.sentences){
 			for(Word w : s.words){
 				if(w.numSyllables > 2) polysyllables++;
 			}
-		}
+		}*/
 
 		return 1.0430 * Math.sqrt(polysyllables * (30/sentences)) + 3.1291;
 	}
@@ -174,11 +173,15 @@ public class PassageAnalysisController {
 		if(p != null && !p.name.toLowerCase().contains("proper noun")){
 			if (c == null) c = new WordNetController();
 
-			HashSet<String> suggestions = c.synonymnLookup(word, p.name);
-
 			Word w = Word.byLemma(word);
 
-            if(Suggestion.byWord(ogText).size() == 0){
+
+            if(Suggestion.byWord(word).size() == 0){
+
+				HashSet<String> suggestions = c.synonymnLookup(word, p.name);
+
+
+
                 for(String root : suggestions){
 
                     Word r = Word.byLemma(root);

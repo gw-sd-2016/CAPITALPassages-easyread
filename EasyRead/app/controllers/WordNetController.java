@@ -121,9 +121,9 @@ public class WordNetController {
 			realPOS = POS.VERB;
 
 			SPhraseSpec p = new NLGFactory().createClause();
-			//p.setSubject("Mary");
-			p.setVerb(word);
-			//p.setObject("the monkey");
+			p.setSubject("Mary");
+			p.setVerb("is " + word);
+			p.setObject("the monkey");
 
 
 			if(pos.contains("past")){
@@ -183,7 +183,7 @@ public class WordNetController {
 
 					if(features.size() > 0){
 						infl.setFeature(Feature.PROGRESSIVE, features.get(0));
-						infl.setFeature(Feature.TENSE, features.get(1));
+						//infl.setFeature(Feature.TENSE, features.get(1));
 						/*infl.setFeature(Feature.NUMBER, features.get(2));
 						infl.setFeature(Feature.PERSON, features.get(2));
 						infl.setFeature(Feature.FORM, features.get(3));*/

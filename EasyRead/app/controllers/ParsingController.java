@@ -67,11 +67,13 @@ public class ParsingController {
 			long startingSentenceID = 0;
 			for(Sentence s : Sentence.all()) if(s.id > startingSentenceID) startingSentenceID = s.id;
 
+			int sentenceNum = 0;
 			for(CoreMap sentence: sentences) {
 				Sentence s = new Sentence(sentence.toString(), i);
 				if(startingSentenceID > 0) startingSentenceID++;
 				i++;
 				if(originalSCount == 0) passage.sentences.add(s);
+
 
 				for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
 					// this is the POi.S tag of the token
@@ -84,11 +86,11 @@ public class ParsingController {
 					POS p = new POS(pos);
 
 					if(lemma.length() > 1 || Character.isLetter(lemma.charAt(0))){
-						if(originalSCount == 0) {
+						/*if(originalSCount == 0) {*/
 							new MashapeController().getNumSyllablesForWord(lemma,passage);
 							passage.numWords++;
 							a.generateSuggestionsForWord(p,lemma, s.text, passage.id, token.originalText());
-						}
+						//}
 
 					}
 
@@ -97,14 +99,14 @@ public class ParsingController {
 
                     if(thisWord != null && thisWord.partsOfSpeech != null){
                         thisWord.partsOfSpeech.add(p);
-                        thisWord.save();
 
-						if(passage.sentences.get(passage.sentences.size() - 1).words == null){
-							passage.sentences.get(passage.sentences.size() - 1).words = new ArrayList<Word>();
-							passage.sentences.get(passage.sentences.size() - 1).words.add(thisWord);
-						}
+
+						thisWord.save();
+
+						//}
                     }
 				}
+				sentenceNum++;
 			}
 
 			if(originalSCount == 0) a.determineGradeLevel(passage);

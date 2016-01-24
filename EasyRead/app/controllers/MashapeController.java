@@ -68,7 +68,6 @@ public class MashapeController implements PhraseValidator {
 
 							p.save();
 
-							nW.wordNetId = Long.valueOf(-1);
 							nW.ageOfAcquisition = 6;
 							nW.length = word.length();
 							nW.save();

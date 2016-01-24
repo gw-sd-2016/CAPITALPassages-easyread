@@ -134,7 +134,6 @@ create table user (
 create table word (
   id                        bigint auto_increment not null,
   word_id                   bigint not null,
-  word_net_id               bigint,
   lemma                     varchar(255),
   length                    integer,
   num_syllables             integer,

@@ -6,7 +6,9 @@ import play.db.ebean.Model;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -24,15 +26,6 @@ public class Sentence extends Model {
     @Lob
     public String text;
 
-    
-    @Required
-    @OneToMany(cascade = CascadeType.ALL)
-    public List<Word> words = new ArrayList<Word>();
-    
-  /*  // need to remove -- now with words
-    @OneToMany(cascade = CascadeType.ALL)
-    public List<POS> pos = new ArrayList<POS>();*/
-
 
     
    public static Finder<String,Sentence> find = new Finder<String,Sentence>(String.class, Sentence.class);
@@ -46,6 +39,8 @@ public class Sentence extends Model {
                 .eq("simple_passage_id", simplePassageId)
                 .findList();
     }
+
+    public static Sentence byText(String text) { return find.where().eq("text", text).findUnique(); }
 
     
     public static List<Sentence> all() {

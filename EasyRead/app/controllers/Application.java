@@ -3,6 +3,7 @@ package controllers;
 import formdata.LoginForm;
 import formdata.UserForm;
 import models.PassageTag;
+import models.SimplePassage;
 import models.User;
 import net.sf.extjwnl.JWNLException;
 import play.Routes;
@@ -23,6 +24,18 @@ import static play.data.Form.form;
 public class Application extends Controller {
 
     public Result index() throws JWNLException {
+
+        /*
+        WordNetController testing = new WordNetController();
+
+        testing.synonymnLookup("passing", "verb");*/
+
+
+        for(SimplePassage p : SimplePassage.all()){
+           // int count = p.sentences.get(0).words.size();
+        }
+
+
         return ok(index.render(session("userFirstName")));
     }
 
