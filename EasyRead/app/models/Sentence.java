@@ -6,49 +6,51 @@ import play.db.ebean.Model;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 @Entity
 public class Sentence extends Model {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     // Fields
     @Id
     @Expose
     public Long id;
-    
+
     @Required
     @Expose
     @Lob
     public String text;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    public List<Word> words = new ArrayList<Word>();
 
-    
-   public static Finder<String,Sentence> find = new Finder<String,Sentence>(String.class, Sentence.class);
-    
+
+    public static Finder<String, Sentence> find = new Finder<String, Sentence>(String.class, Sentence.class);
+
     public static Sentence byId(Long id) {
         return find.where().eq("id", id).findUnique();
     }
-    
-	public static List<Sentence> bySimplePassage(Long simplePassageId) {
+
+    public static List<Sentence> bySimplePassage(Long simplePassageId) {
         return find.where()
                 .eq("simple_passage_id", simplePassageId)
                 .findList();
     }
 
-    public static Sentence byText(String text) { return find.where().eq("text", text).findUnique(); }
+    public static Sentence byText(String text) {
+        return find.where().eq("text", text).findUnique();
+    }
 
-    
+
     public static List<Sentence> all() {
         return find.where().findList();
     }
 
-    
-    public Sentence(String text, int orderIndex){
+
+    public Sentence(String text, int orderIndex) {
         this.text = text;
 
         /*
@@ -67,13 +69,11 @@ public class Sentence extends Model {
         }
         */
     }
-    
-    
-    
-    
+
+
     public static Sentence create(Sentence s) {
         s.save();
         return s;
-    
+
     }
 }

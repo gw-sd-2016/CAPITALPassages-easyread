@@ -27,14 +27,16 @@
 
     <!-- jQuery and jQuery UI are required dependencies. -->
     <!-- Although we use jQuery 1.4 here, it's tested with the latest too (1.8.3 as of writing this.) -->
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js" type="text/javascript"
+            charset="utf-8"></script>
 
     <!-- The real deal -->
     <script src="js/tag-it.js" type="text/javascript" charset="utf-8"></script>
 
     <script>
-        $(function(){
+        $(function () {
             var sampleTags = ['c++', 'java', 'php', 'coldfusion', 'javascript', 'asp', 'ruby', 'python', 'c', 'scala', 'groovy', 'haskell', 'perl', 'erlang', 'apl', 'cobol', 'go', 'lua'];
 
             //-------------------------------
@@ -73,32 +75,32 @@
             //-------------------------------
             var eventTags = $('#eventTags');
 
-            var addEvent = function(text) {
+            var addEvent = function (text) {
                 $('#events_container').append(text + '<br>');
             };
 
             eventTags.tagit({
                 availableTags: sampleTags,
-                beforeTagAdded: function(evt, ui) {
+                beforeTagAdded: function (evt, ui) {
                     if (!ui.duringInitialization) {
                         addEvent('beforeTagAdded: ' + eventTags.tagit('tagLabel', ui.tag));
                     }
                 },
-                afterTagAdded: function(evt, ui) {
+                afterTagAdded: function (evt, ui) {
                     if (!ui.duringInitialization) {
                         addEvent('afterTagAdded: ' + eventTags.tagit('tagLabel', ui.tag));
                     }
                 },
-                beforeTagRemoved: function(evt, ui) {
+                beforeTagRemoved: function (evt, ui) {
                     addEvent('beforeTagRemoved: ' + eventTags.tagit('tagLabel', ui.tag));
                 },
-                afterTagRemoved: function(evt, ui) {
+                afterTagRemoved: function (evt, ui) {
                     addEvent('afterTagRemoved: ' + eventTags.tagit('tagLabel', ui.tag));
                 },
-                onTagClicked: function(evt, ui) {
+                onTagClicked: function (evt, ui) {
                     addEvent('onTagClicked: ' + eventTags.tagit('tagLabel', ui.tag));
                 },
-                onTagExists: function(evt, ui) {
+                onTagExists: function (evt, ui) {
                     addEvent('onTagExists: ' + eventTags.tagit('tagLabel', ui.existingTag));
                 }
             });
@@ -132,24 +134,26 @@
                 availableTags: sampleTags,
                 removeConfirmation: true
             });
-            
+
         });
     </script>
 
 </head>
 <body>
 
-<a href="http://github.com/aehlke/tag-it"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub" /></a>
+<a href="http://github.com/aehlke/tag-it"><img style="position: absolute; top: 0; right: 0; border: 0;"
+                                               src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png"
+                                               alt="Fork me on GitHub"/></a>
 
-<div id="wrapper"> 
-    <div id="header"> 
-        <h2>Tag-it! Usage Examples</h2> 
-        
+<div id="wrapper">
+    <div id="header">
+        <h2>Tag-it! Usage Examples</h2>
+
         <ul id="nav">
             <li><a href="http://aehlke.github.com/tag-it">&laquo; back to widget home</a></li>
         </ul>
     </div>
-    
+
     <div id="content">
         <p>These demo various features of Tag-it. View the source to see how each works.</p>
 
@@ -157,7 +161,8 @@
         <h3>Minimal</h3>
         <form>
             <p>
-                Vanilla example &mdash; the absolute minimum amount of code required, no configuration. No autocomplete, either. See the other examples for that.
+                Vanilla example &mdash; the absolute minimum amount of code required, no configuration. No autocomplete,
+                either. See the other examples for that.
             </p>
             <ul id="myTags"></ul>
             <input type="submit" value="Submit">
@@ -167,13 +172,18 @@
         <h3>Single Input Field</h3>
         <form>
             <p>
-                Example using a single input form field to hold all the tag values, instead of one per tag (see settings.singleField).
-                This method is particularly useful if you have a form with one input field for comma-delimited tags that you want to trivially "upgrade" to this fancy jQuery UI widget.
-                This configuration will also degrade nicely as well for browsers without JS &mdash; the default behavior is to have one input per tag, which does not degrade as well as one comma-delimited input.
+                Example using a single input form field to hold all the tag values, instead of one per tag (see
+                settings.singleField).
+                This method is particularly useful if you have a form with one input field for comma-delimited tags that
+                you want to trivially "upgrade" to this fancy jQuery UI widget.
+                This configuration will also degrade nicely as well for browsers without JS &mdash; the default behavior
+                is to have one input per tag, which does not degrade as well as one comma-delimited input.
             </p>
             <p>
-                Normally this input field will be hidden &mdash; we leave it visible here so you can see how it is manipulated by the widget:
-                <input name="tags" id="mySingleField" value="Apple, Orange" disabled="true"> <!-- only disabled for demonstration purposes -->
+                Normally this input field will be hidden &mdash; we leave it visible here so you can see how it is
+                manipulated by the widget:
+                <input name="tags" id="mySingleField" value="Apple, Orange" disabled="true">
+                <!-- only disabled for demonstration purposes -->
             </p>
             <ul id="singleFieldTags"></ul>
             <input type="submit" value="Submit">
@@ -183,15 +193,19 @@
         <h3><a name="graceful-degredation"></a>Single Input Field (2)</h3>
         <form>
             <p>
-                If you instantiate Tag-it on an INPUT element, it will default to being singleField, with that INPUT element as the singleFieldNode. This is the simplest way to have a gracefully-degrading tag widget.
+                If you instantiate Tag-it on an INPUT element, it will default to being singleField, with that INPUT
+                element as the singleFieldNode. This is the simplest way to have a gracefully-degrading tag widget.
             </p>
             <input name="tags" id="singleFieldTags2" value="Apple, Orange">
         </form>
 
         <hr>
         <h3>Spaces Allowed Without Quotes</h3>
-        <p>You can already do multiword tags with spaces in them by default, but those must be wrapped in quotes. This option lets you use spaces without requiring the user to quote the input.</p>
-        <p>There are normally 5 ways to insert a tag after inputting some text: space, comma, enter, selecting an autocomplete option, or defocusing the widget. With the "allowSpaces" option set to true, space no longer inserts a tag, it just adds a space to the current tag input.</p>
+        <p>You can already do multiword tags with spaces in them by default, but those must be wrapped in quotes. This
+            option lets you use spaces without requiring the user to quote the input.</p>
+        <p>There are normally 5 ways to insert a tag after inputting some text: space, comma, enter, selecting an
+            autocomplete option, or defocusing the widget. With the "allowSpaces" option set to true, space no longer
+            inserts a tag, it just adds a space to the current tag input.</p>
         <form>
             <p></p>
             <ul id="allowSpacesTags"></ul>
@@ -225,7 +239,8 @@
 
         <h3>Events</h3>
         <form>
-            <p>Example of tag events. Try adding or removing a tag, adding a duplicate tag, or clicking on a tag's label.</p>
+            <p>Example of tag events. Try adding or removing a tag, adding a duplicate tag, or clicking on a tag's
+                label.</p>
             <ul id="eventTags">
                 <li>Click my label</li>
                 <li>Remove me</li>
@@ -239,8 +254,12 @@
         <form>
             <p>Demos the available widget methods. Click the links below the widget to try them.</p>
             <ul id="methodTags"></ul>
-            <p><a href="#" onclick="var inp=prompt('Enter a tag value to test the createTag method.');$('#methodTags').tagit('createTag', inp);return false;">Create tag</a></p>
-            <p><a href="#" onclick="var inp=prompt('Enter a tag value to test the removeTagByName method.');$('#methodTags').tagit('removeTagByName', inp);return false;">Remove tag by name</a></p>
+            <p><a href="#"
+                  onclick="var inp=prompt('Enter a tag value to test the createTag method.');$('#methodTags').tagit('createTag', inp);return false;">Create
+                tag</a></p>
+            <p><a href="#"
+                  onclick="var inp=prompt('Enter a tag value to test the removeTagByName method.');$('#methodTags').tagit('removeTagByName', inp);return false;">Remove
+                tag by name</a></p>
             <p><a href="#" onclick="$('#methodTags').tagit('removeAll');return false;">Clear tags</a></p>
         </form>
 
@@ -259,14 +278,18 @@
     </div>
 
 
-    <div id="footer"> 
+    <div id="footer">
         <div class="left">
-            <p>Built with <a href="http://jquery.com/" target="_blank">jQuery</a> and <a href="http://jqueryui.com/" target="_blank">jQuery UI</a>.</p>
-            <p>Originally created by <a href="http://levycarneiro.com/">Levy Carneiro Jr</a>. Currently maintained by <a href="http://github.com/aehlke">Alex Ehlke</a>.</p>
+            <p>Built with <a href="http://jquery.com/" target="_blank">jQuery</a> and <a href="http://jqueryui.com/"
+                                                                                         target="_blank">jQuery UI</a>.
+            </p>
+            <p>Originally created by <a href="http://levycarneiro.com/">Levy Carneiro Jr</a>. Currently maintained by <a
+                    href="http://github.com/aehlke">Alex Ehlke</a>.</p>
         </div>
-        <p class="right weak">Template adopted from <a href="http://orderedlist.com/demos/fancy-zoom-jquery/">orderedlist.com</a></p>
+        <p class="right weak">Template adopted from <a href="http://orderedlist.com/demos/fancy-zoom-jquery/">orderedlist.com</a>
+        </p>
         <br class="clear"/>
-    </div> 
+    </div>
 </div>
 </body>
 </html>

@@ -11,9 +11,9 @@ public class LoginForm {
     public String password;
 
 
+    public LoginForm() {
+    }
 
-
-    public LoginForm() {}
     public LoginForm(String usernameOrEmail, String password) {
         this.usernameOrEmail = usernameOrEmail;
         this.password = password;

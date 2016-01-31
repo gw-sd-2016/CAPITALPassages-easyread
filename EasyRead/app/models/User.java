@@ -29,9 +29,8 @@ import java.util.Map;
 public class User extends Model {
 
 
-
     /********************************
-     ENUMERATOR: For each User type
+     * ENUMERATOR: For each User type
      ********************************/
     public enum Role {
         SUPERADMIN,
@@ -42,7 +41,7 @@ public class User extends Model {
         public static Role getRole(String roleString) {
             Role role = null;
 
-            switch(roleString) {
+            switch (roleString) {
                 case "Super Administrator":
                     role = SUPERADMIN;
                     break;
@@ -63,9 +62,9 @@ public class User extends Model {
 
 
     /********************************
-     FIELDS
+     * FIELDS
      ********************************/
-	/* Universal */
+    /* Universal */
 	/*===========*/
     @Id
     public Long id;
@@ -94,7 +93,7 @@ public class User extends Model {
     public String username;
 
     @Required
-    public String password;	// hashed using utilities.PasswordHash
+    public String password;    // hashed using utilities.PasswordHash
 
     @Email
     public String email;
@@ -108,9 +107,8 @@ public class User extends Model {
     public Institution institution;*/
 
 
-
     /********************************
-     CONSTRUCTORS
+     * CONSTRUCTORS
      ********************************/
     public User(String email, String username, String password, String firstName, String lastName, Role type, Long creatorId) throws NoSuchAlgorithmException, InvalidKeySpecException {
         this.email = email;
@@ -124,7 +122,7 @@ public class User extends Model {
 
     public User(play.data.Form<UserForm> userForm) throws InvalidKeySpecException, NoSuchAlgorithmException {
 
-        Map<String,String> formData = userForm.data();
+        Map<String, String> formData = userForm.data();
 
         this.email = formData.get("email");
         this.username = formData.get("username");
@@ -132,21 +130,20 @@ public class User extends Model {
         this.firstName = formData.get("firstName");
         this.lastName = formData.get("lastName");
         this.type = Role.INSTRUCTOR;
-     //   this.creatorId = Long.valueOf(formData.get("creatorId"));
-       // this.institution = User.byId(userForm.creatorId).institution;
+        //   this.creatorId = Long.valueOf(formData.get("creatorId"));
+        // this.institution = User.byId(userForm.creatorId).institution;
     }
 
 
     /********************************
-     FINDER
+     * FINDER
      ********************************/
     //Initialize Ebean Finder
     public static Finder<Long, User> find = new Finder<Long, User>(User.class);
 
 
-
     /********************************
-     CREATE / DELETE
+     * CREATE / DELETE
      ********************************/
     public static User create(User user) {
         user.save();
@@ -165,7 +162,7 @@ public class User extends Model {
 
 
     /********************************
-     VALIDATION
+     * VALIDATION
      ********************************/
 
     //check if a user is in the database (i.e. the entity is not null)
@@ -179,9 +176,9 @@ public class User extends Model {
 
         List<User.Role> roles = new ArrayList<>();
         roles.add(User.Role.values()[0]); //SA always has permission
-        for (int i=0; i < pflags.size(); i++) {
+        for (int i = 0; i < pflags.size(); i++) {
             if (pflags.get(i)) {
-                roles.add(User.Role.values()[i+1]);
+                roles.add(User.Role.values()[i + 1]);
             }
         }
 
@@ -195,7 +192,7 @@ public class User extends Model {
 
 
     /********************************
-     GETTERS
+     * GETTERS
      ********************************/
 
     //-----------Single-------------//
@@ -324,11 +321,11 @@ public class User extends Model {
     public static List<User> getAllStudentsForCourse(Long courseId) {
         String sql = "select * from user" +
                 " where retired=0" +
-                " and type="+ Role.STUDENT.ordinal() +
+                " and type=" + Role.STUDENT.ordinal() +
                 " and id in " +
                 "(select user_id from course_user " +
                 "where retired=0 " +
-                "and course_id="+courseId+")";
+                "and course_id=" + courseId + ")";
 
         List<User> allStudents = new ArrayList<User>();
         for (SqlRow row : Ebean.createSqlQuery(sql).findList()) {
@@ -347,8 +344,8 @@ public class User extends Model {
                 " where institution_id = " + institutionId +
                 " and retired=false) " +
                 "and id not in " +
-                "(select user_id from course_user"+
-                " where course_id = " + courseId+") " +
+                "(select user_id from course_user" +
+                " where course_id = " + courseId + ") " +
                 "and retired=false";
 
         List<User> students = new ArrayList<User>();
@@ -376,7 +373,6 @@ public class User extends Model {
     }
 
 
-
     ////////////////////////////////////////////
     //TEST
     ////////////////////////////////////////////
@@ -388,19 +384,19 @@ public class User extends Model {
         private List<String> nameInstructions = new ArrayList<String>();
 
         public NameGenerator() {
-            String demoVocals[] = { "a", "e", "i", "o", "u", "ei", "ai", "ou", "j",
-                    "ji", "y", "oi", "au", "oo" };
+            String demoVocals[] = {"a", "e", "i", "o", "u", "ei", "ai", "ou", "j",
+                    "ji", "y", "oi", "au", "oo"};
 
-            String demoStartConsonants[] = { "b", "c", "d", "f", "g", "h", "k",
+            String demoStartConsonants[] = {"b", "c", "d", "f", "g", "h", "k",
                     "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "z",
                     "ch", "bl", "br", "fl", "gl", "gr", "kl", "pr", "st", "sh",
-                    "th" };
+                    "th"};
 
-            String demoEndConsonants[] = { "b", "d", "f", "g", "h", "k", "l", "m",
+            String demoEndConsonants[] = {"b", "d", "f", "g", "h", "k", "l", "m",
                     "n", "p", "r", "s", "t", "v", "w", "z", "ch", "gh", "nn", "st",
-                    "sh", "th", "tt", "ss", "pf", "nt" };
+                    "sh", "th", "tt", "ss", "pf", "nt"};
 
-            String nameInstructions[] = { "vd", "cvdvd", "cvd", "vdvd" };
+            String nameInstructions[] = {"vd", "cvdvd", "cvd", "vdvd"};
 
             this.vocals.addAll(Arrays.asList(demoVocals));
             this.startConsonants.addAll(Arrays.asList(demoStartConsonants));
@@ -409,16 +405,12 @@ public class User extends Model {
         }
 
         /**
-         *
          * The names will look like this
          * (v=vocal,c=startConsonsonant,d=endConsonants): vd, cvdvd, cvd, vdvd
          *
-         * @param vocals
-         * pass something like {"a","e","ou",..}
-         * @param startConsonants
-         * pass something like {"s","f","kl",..}
-         * @param endConsonants
-         * pass something like {"th","sh","f",..}
+         * @param vocals          pass something like {"a","e","ou",..}
+         * @param startConsonants pass something like {"s","f","kl",..}
+         * @param endConsonants   pass something like {"th","sh","f",..}
          */
         public NameGenerator(String[] vocals, String[] startConsonants,
                              String[] endConsonants) {
@@ -433,10 +425,9 @@ public class User extends Model {
          * @param vocals
          * @param startConsonants
          * @param endConsonants
-         * @param nameInstructions
-         * Use only the following letters:
-         * (v=vocal,c=startConsonsonant,d=endConsonants)! Pass something
-         * like {"vd", "cvdvd", "cvd", "vdvd"}
+         * @param nameInstructions Use only the following letters:
+         *                         (v=vocal,c=startConsonsonant,d=endConsonants)! Pass something
+         *                         like {"vd", "cvdvd", "cvd", "vdvd"}
          */
         public NameGenerator(String[] vocals, String[] startConsonants,
                              String[] endConsonants, String[] nameInstructions) {
@@ -456,7 +447,29 @@ public class User extends Model {
             String name = "";
             int l = nameInstructions.length();
 
-            for (int i = 0; i < l; i++) { char x = nameInstructions.charAt(0); switch (x) { case 'v': name += getRandomElementFrom(vocals); break; case 'c': name += getRandomElementFrom(startConsonants); break; case 'd': name += getRandomElementFrom(endConsonants); break; } nameInstructions = nameInstructions.substring(1); } return name; } private String firstCharUppercase(String name) { return Character.toString(name.charAt(0)).toUpperCase() + name.substring(1); } private String getRandomElementFrom(List<String> v) {
+            for (int i = 0; i < l; i++) {
+                char x = nameInstructions.charAt(0);
+                switch (x) {
+                    case 'v':
+                        name += getRandomElementFrom(vocals);
+                        break;
+                    case 'c':
+                        name += getRandomElementFrom(startConsonants);
+                        break;
+                    case 'd':
+                        name += getRandomElementFrom(endConsonants);
+                        break;
+                }
+                nameInstructions = nameInstructions.substring(1);
+            }
+            return name;
+        }
+
+        private String firstCharUppercase(String name) {
+            return Character.toString(name.charAt(0)).toUpperCase() + name.substring(1);
+        }
+
+        private String getRandomElementFrom(List<String> v) {
             return v.get(randomInt(0, v.size() - 1));
         }
     }

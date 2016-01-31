@@ -13,62 +13,61 @@ import java.util.List;
 @Entity
 public class PassageQuestionAnswer extends Model {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// Fields
-	@Id
-	@Expose
-	public Long id;
-
-
-	@Required
-	@Lob
-	public String text;
-	
-	@Expose
-	public Long choiceId;
-	
-	
+    // Fields
+    @Id
+    @Expose
+    public Long id;
 
 
-	public static Finder<String,PassageQuestionAnswer> find = new Finder<String,PassageQuestionAnswer>(String.class, PassageQuestionAnswer.class);
+    @Required
+    @Lob
+    public String text;
 
-	public static PassageQuestionAnswer byId(Long id) {
-		return find.where().eq("id", id).findUnique();
-	}
-	public static List<PassageQuestionAnswer> byPassageQuestionChoice(Long id) {
-		System.out.println("asked about choice : " + id);
-		return find.where().eq("choice_id", id).findList();
-	}
-	
-	
-	public static List<PassageQuestionAnswer> all() {
-		return find.where().findList();
-	}
+    @Expose
+    public Long choiceId;
 
-	public PassageQuestionAnswer(PassageQuestionChoice c, String text){
-		// answers id is choice id
-		this.choiceId = c.id;
-		this.text = text;
-		
-	}
+
+    public static Finder<String, PassageQuestionAnswer> find = new Finder<String, PassageQuestionAnswer>(String.class, PassageQuestionAnswer.class);
+
+    public static PassageQuestionAnswer byId(Long id) {
+        return find.where().eq("id", id).findUnique();
+    }
+
+    public static List<PassageQuestionAnswer> byPassageQuestionChoice(Long id) {
+        System.out.println("asked about choice : " + id);
+        return find.where().eq("choice_id", id).findList();
+    }
+
+
+    public static List<PassageQuestionAnswer> all() {
+        return find.where().findList();
+    }
+
+    public PassageQuestionAnswer(PassageQuestionChoice c, String text) {
+        // answers id is choice id
+        this.choiceId = c.id;
+        this.text = text;
+
+    }
 
 	
 	/*
-	public void delete(){
+    public void delete(){
 		this.delete();
 		System.out.println("deleting");
 	}
 */
 
-	public static List<PassageQuestionAnswer> allAnswers() {
-		return find.all();
-	}
-	
+    public static List<PassageQuestionAnswer> allAnswers() {
+        return find.all();
+    }
 
-	public static PassageQuestionAnswer create(PassageQuestionAnswer answer) {
-		answer.save();
-		return answer;
-	}
+
+    public static PassageQuestionAnswer create(PassageQuestionAnswer answer) {
+        answer.save();
+        return answer;
+    }
 
 }

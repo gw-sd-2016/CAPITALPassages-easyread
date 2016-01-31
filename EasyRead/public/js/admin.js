@@ -14,10 +14,9 @@ $(function () {
 });
 
 
-
 var EnterKey = 13;
 
-$.fn.isBound = function(type, fn) {
+$.fn.isBound = function (type, fn) {
     var data = this.data('events')[type];
 
     if (data === undefined || data.length === 0) {
@@ -27,21 +26,21 @@ $.fn.isBound = function(type, fn) {
     return (-1 !== $.inArray(fn, data));
 };
 
-$(document).ready(function() {
+$(document).ready(function () {
     function runBind() {
-        $('.destroy').on('click', function(e) {
+        $('.destroy').on('click', function (e) {
             $currentListItem = $(this).closest('li');
 
             $currentListItem.remove();
         });
 
-        $('.toggle').on('click', function(e) {
+        $('.toggle').on('click', function (e) {
             var $currentListItemLabel = $(this).closest('li').find('label');
             $(this).parent().parent().addClass('donebg');
             /*
              * Do this or add css and remove JS dynamic css.
              */
-            if ( $currentListItemLabel.attr('data') == 'done' ) {
+            if ($currentListItemLabel.attr('data') == 'done') {
                 $currentListItemLabel.attr('data', '');
                 $currentListItemLabel.css('text-decoration', 'none');
             }
@@ -53,12 +52,12 @@ $(document).ready(function() {
     }
 
     $todoList = $('#todo-list');
-    $('#new-todo').keypress(function(e) {
+    $('#new-todo').keypress(function (e) {
         if (e.which === EnterKey) {
             $('.destroy').off('click');
             $('.toggle').off('click');
             var todos = $todoList.html();
-            todos += ""+
+            todos += "" +
                 "<li>" +
                 "<div class='view'>" +
                 "<input class='toggle' type='checkbox'>" +
@@ -72,5 +71,6 @@ $(document).ready(function() {
             runBind();
             $('#main').show();
 
-        }}); // end if
+        }
+    }); // end if
 });

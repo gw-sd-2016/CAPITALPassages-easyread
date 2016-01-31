@@ -17,12 +17,11 @@ public class GoogleNGramsValidator implements PhraseValidator {
     String url = "https://books.google.com/ngrams/graph?content=FIRST&year_start=2000&year_end=2004&corpus=15&smoothing=3&share=&direct_url=t1%3B%2CINSERT%3B%2Cc0";
 
 
-
-    public void fetchFrequencies(Suggestion s, String p){
+    public void fetchFrequencies(Suggestion s, String p) {
 
         String insert = "";
 
-        for(String substring : p.split(" ")){
+        for (String substring : p.split(" ")) {
             insert += substring + "+";
         }
 
@@ -60,8 +59,8 @@ public class GoogleNGramsValidator implements PhraseValidator {
 
                         StringBuilder sb = new StringBuilder();
 
-                        for(int i = 0; i < arr.length; i++){
-                            if(arr[i] != 'e'){
+                        for (int i = 0; i < arr.length; i++) {
+                            if (arr[i] != 'e') {
                                 sb.append(arr[i]);
                             } else {
                                 double number = Double.valueOf(sb.toString());
@@ -70,11 +69,11 @@ public class GoogleNGramsValidator implements PhraseValidator {
                                 int previousI = i + 1;
 
                                 String exp;
-                                if(arr.length - 4 <= i){
+                                if (arr.length - 4 <= i) {
                                     exp = body.substring(previousI, body.length());
                                     i = arr.length;
                                 } else {
-                                    while(arr[i] != ',' && i < arr.length) i++;
+                                    while (arr[i] != ',' && i < arr.length) i++;
                                     exp = body.substring(previousI, i);
                                 }
 
@@ -86,7 +85,7 @@ public class GoogleNGramsValidator implements PhraseValidator {
                         }
 
                         double total = 0;
-                        for(Double a : freq) total += a;
+                        for (Double a : freq) total += a;
 
                         s.frequency = total / freq.size();
                         s.save();

@@ -2,173 +2,172 @@
 
 @main("View All Passages") {
 
-	@if(flash.containsKey("success")) {
-		<div class="alert alert-success">
-			<h2>Done!</h2> @flash.get("success")
-		</div>
-	}
+    @if(flash.containsKey("success")) {
+        <div class="alert alert-success">
+            <h2>Done!</h2> @flash.get("success")
+        </div>
+    }
 
-	<div>
-    		<div>
-
-
-	              <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages"  style="margin-left:10px;margin-top:10px;margin-bottom: 20px;">
-								            <span class="spinner"><i class="glyphicon glyphicon-spin fa-refresh"></i></span>
-								            <i class="glyphicon glyphicon-flash"></i> Analyze
-				  </button>
-			</div>
-
-	    <div id="students" class="box">
-
-	        <div class="box-header">
-	            <i class="fa fa-group fa-2x"></i>
-	            <h5>View All Passages</h5>
-	        </div>
+    <div>
+        <div>
 
 
-	        <div class="box-content box-table" style="padding: 10px;">
-	        	@if(passages.size == 0) {
-			    	<div class="well">
-			            <strong><em>There are no passages in the system!</em></strong>
-			        </div>
-				} else {
-			        <table class="table table-hover">
-			            <thead>
-			                <tr>
-			                    <th>Title</th>
-			                    <th>Text</th>
-			                    <th>Instructor</th>
-			                    <th>Grade</th>
-			                    <th>Source</th>
-			                    <th>Tag Type</th>
-			                    <th>Tag</th>
-			                    <th>Actions</th>
+            <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
+                <span class="spinner"><i class="glyphicon glyphicon-spin fa-refresh"></i></span>
+                <i class="glyphicon glyphicon-flash"></i> Analyze
+            </button>
+        </div>
 
-			                </tr>
-			            </thead>
-			            <tbody>
-			                @for(passage <- passages) {
-			                    <tr>
+        <div id="students" class="box">
 
-			                        <td><a href="/view?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
-			                        @if(passage.text.length >= 200) {
-			                        	<td>@passage.text.substring(0,200)....</td>
-
-			                        } else {
-			                        	<td>@passage.text</td>
-			                        }
-
-											<td>@inst.firstName @inst.lastName</td>
-
-											<td>@if(passage.sentences.size == 0){
-												Grade Level not available yet.
-											} else {
-												@if(passage.grade == 0) {
-													K
-												}
-
-												@if(passage.grade >= 12){
-													College Level or Above
-												} else {
-
-													@if(passage.grade != 0) {
-														@passage.grade
-													}
-												}
-											}
-
-											</td>
-											<td>@passage.source</td>
-											<td>
-											@for(tag <- passage.tags){
-												@tag.getType()
-
-											}
-											</td>
-
-											<td>
-											@for(tag <- passage.tags){
-												  <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px;">
-	                								<i class="fa fa-tag"> @tag.name</i>
-
-	            								</a>
-											}
-											</td>
+            <div class="box-header">
+                <i class="fa fa-group fa-2x"></i>
+                <h5>View All Passages</h5>
+            </div>
 
 
-			                          <td style="width: 10%">
-			                        	<a href="@routes.SimplePassageController.edit(passage.id)" class="btn btn-small btn-info" style="width: 50px;">
-	                                        <i class="fa fa-edit"></i> Edit
-	                                    </a>
+            <div class="box-content box-table" style="padding: 10px ;">
+            @if(passages.size == 0) {
+                <div class="well">
+                    <strong><em>There are no passages in the system!</em></strong>
+                </div>
+            } else {
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Text</th>
+                            <th>Instructor</th>
+                            <th>Grade</th>
+                            <th>Source</th>
+                            <th>Tag Type</th>
+                            <th>Tag</th>
+                            <th>Actions</th>
 
-	                                  <!--  <button type="button" class="btn btn-small btn-danger has-spinner" id="deletePassage" name="@passage.id:|:@passage.title" style="width: 75px;">
-								            <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
-								            <i class="fa fa-trash"></i> Delete
-								        </button>
-	                                  -->
-			                        </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @for(passage <- passages) {
+                        <tr>
+
+                            <td><a href="/view?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
+                            @if(passage.text.length >= 200) {
+                                <td>@passage.text.substring(0, 200)....</td>
+
+                            } else {
+                                <td>@passage.text</td>
+                            }
+
+                            <td>@inst.firstName @inst.lastName</td>
+
+                            <td>@if(passage.sentences.size == 0) {
+                                Grade Level not available yet.
+                            } else {
+                                @if(passage.grade == 0) {
+                                    K
+                                }
+
+                                @if(passage.grade >= 12) {
+                                    College Level or Above
+                                } else {
+
+                                    @if(passage.grade != 0) {
+                                        @passage.grade
+                                    }
+                                }
+                            }
+
+                            </td>
+                            <td>@passage.source</td>
+                            <td>
+                            @for(tag <- passage.tags) {
+                                @tag.getType()
+
+                            }
+                            </td>
+
+                            <td>
+                            @for(tag <- passage.tags) {
+                                <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px ;">
+                                    <i class="fa fa-tag"> @tag.name</i>
+
+                                </a>
+                            }
+                            </td>
 
 
-			                    </tr>
-			                }
-			            </tbody>
-			        </table>
-				}
+                            <td style="width: 10%">
+                                <a href="@routes.SimplePassageController.edit(passage.id)" class="btn btn-small btn-info" style="width: 50px ;">
+                                    <i class="fa fa-edit"></i> Edit
+                                </a>
 
-    </div>
+                                    <!--  <button type="button" class="btn btn-small btn-danger has-spinner" id="deletePassage" name=" @passage.id:|:@passage.title" style="width: 75px;">
+                                <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
+                                <i class="fa fa-trash"></i> Delete
+                                </button>
+                                -->
+                            </td>
+
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            }
+
+            </div>
 
 
             <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
 
-    <script>
-        $('button#deletePassage').click(function() {
-        	var button = $(this);
-        	button.toggleClass('active');
+            <script>
+                    $('button#deletePassage').click(function() {
+                        var button = $(this);
+                        button.toggleClass('active');
 
-        	var passageData = $(this).attr('name').split(":|:");
-        	var passageId = passageData[0];
-        	var passageName = passageData[1];
+                        var passageData = $(this).attr('name').split(":|:");
+                        var passageId = passageData[0];
+                        var passageName = passageData[1];
 
-            var result = confirm("Are you sure you want to delete passage '" + passageName + "'? This cannot be undone.");
-            	if (result) {
-		            button.prop("disabled", true);
-		            jsRoutes.controllers.SimplePassageController.deletePassage(passageId).ajax({
-					    success : function(data) {
-					    	window.location.reload();
-					    },
-					    error : function(err) {
-							//window.location = "";
-					    }
-					});
-		        } else {
-		        	button.toggleClass('active');
-		        }
+                        var result = confirm("Are you sure you want to delete passage '" + passageName + "'? This cannot be undone.");
+                        if (result) {
+                            button.prop("disabled", true);
+                            jsRoutes.controllers.SimplePassageController.deletePassage(passageId).ajax({
+                                success : function(data) {
+                                    window.location.reload();
+                                },
+                                error : function(err) {
+                                    //window.location = "";
+                                }
+                            });
+                        } else {
+                            button.toggleClass('active');
+                        }
 
-        });
+                    });
 
-        $('button#analyzePassages').click(function() {
-            var button = $(this);
-            button.toggleClass('active');
+                    $('button#analyzePassages').click(function() {
+                        var button = $(this);
+                        button.toggleClass('active');
 
 
-            var result = confirm("Are you sure you want to analyze passages? This may take a couple minutes");
+                        var result = confirm("Are you sure you want to analyze passages? This may take a couple minutes");
 
-            if (result) {
-                button.prop("disabled", true);
-                jsRoutes.controllers.SimplePassageController.analyzePassages().ajax({
-                    success : function(data) {
-                        window.location.reload();
-                    },
-                    error : function(err) {
-                        //window.location = "";
-                    }
-                });
-            } else {
-                button.toggleClass('active');
-            }
+                        if (result) {
+                            button.prop("disabled", true);
+                            jsRoutes.controllers.SimplePassageController.analyzePassages().ajax({
+                                success : function(data) {
+                                    window.location.reload();
+                                },
+                                error : function(err) {
+                                    //window.location = "";
+                                }
+                            });
+                        } else {
+                            button.toggleClass('active');
+                        }
 
-        });
-    </script>
+                    });
+            </script>
 
 
 }

@@ -1,143 +1,139 @@
-@(passage: models.SimplePassage, instructor: models.User, suggestionsOn : Boolean)
+@(passage: models.SimplePassage, instructor: models.User, suggestionsOn: Boolean)
 
 @main("Viewing Passage") {
 
 
-
-	@if(flash.containsKey("success")) {
-		<div class="alert alert-success">
-			<h2>Done!</h2> @flash.get("success")
-		</div>
-	}
-
-
-
-	<div class="holder" style="padding-bottom: 4cm;">
-		<div class="pull-left">
-
-			<div class="btn-group">
-
-				<a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passage.id" style="margin-bottom: 20px;">
-					<i class="glyphicon glyphicon-plus"></i>
-					Add new Questions
-				</a>
-				@if(passage.questions.size > 0) {
-
-					<a class="btn btn-primary" id="view" href="/viewPassageQuestions?passageId=@passage.id" style="margin-bottom: 20px;">
-						<i class="glyphicon glyphicon-book"></i>
-						View Passage Questions
-					</a>
-				}
-
-				<a class="btn btn-primary" id="add" href="@routes.SimplePassageController.edit(passage.id)" style="margin-bottom: 20px;">
-					<i class="glyphicon glyphicon-edit"></i>
-					Edit this Passage
-				</a>
-
-				<a class="btn btn-primary" id="toggle" href="viewPassageWithSuggestions?passageId=@passage.id&grade=0" style="margin-bottom: 20px;">
-					<i class="glyphicon glyphicon-flash"></i>
-					Turn on Suggestions
-				</a>
-
-				<br>
-
-			
-
-				@for(tag <- passage.tags){
-
-
-					<a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px;">
-						<i class="glyphicon glyphicon-tag"> @tag.name</i>
-					</a>
-				}
-
-			</div>
+    @if(flash.containsKey("success")) {
+        <div class="alert alert-success">
+            <h2>Done!</h2> @flash.get("success")
+        </div>
+    }
 
 
 
+    <div class="holder" style="padding-bottom: 4cm ;">
+        <div class="pull-left">
 
-		</div>
-	</div>
+            <div class="btn-group">
 
+                <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passage.id" style="margin-bottom: 20px ;">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    Add new Questions
+                </a>
+                @if(passage.questions.size > 0) {
 
-	<div class="container-fluid">
-		<div style="text-align:left;">
-			<strong> @passage.title </strong>
-			<strong> Added By: </strong> @instructor.firstName @instructor.lastName <br>
-			<strong> Grade Level:  </strong>
-			@if(passage.grade == 0) {
-				K
-			}
+                    <a class="btn btn-primary" id="view" href="/viewPassageQuestions?passageId=@passage.id" style="margin-bottom: 20px ;">
+                        <i class="glyphicon glyphicon-book"></i>
+                        View Passage Questions
+                    </a>
+                }
 
-			@if(passage.grade >= 12){
-				College Level or Above
-			} else {
+                <a class="btn btn-primary" id="add" href="@routes.SimplePassageController.edit(passage.id)" style="margin-bottom: 20px ;">
+                    <i class="glyphicon glyphicon-edit"></i>
+                    Edit this Passage
+                </a>
 
-				@if(passage.grade != 0 && passage.grade <= 12) {
-					@passage.grade
-				}
-			}
+                <a class="btn btn-primary" id="toggle" href="viewPassageWithSuggestions?passageId=@passage.id&grade=0" style="margin-bottom: 20px ;">
+                    <i class="glyphicon glyphicon-flash"></i>
+                    Turn on Suggestions
+                </a>
 
-
-			<br>
-			<strong> Source:  </strong> @passage.source <br><br>
-
-
-		</div>
-
-		@if(suggestionsOn){
-			@for(word <- passage.text.split(" ")){
-				@if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > passage.grade && !passage.getStopWords().contains(word)){
-					<u>@word</u>
-					@Suggestion.byWord(word).size
-					@if(Suggestion.byWord(word).size > 0){
-						<div style="display:none;" id="@word">We suggest
-							@for(w <- Suggestion.all){
-								@w &nbsp
-						}
-						</div>
-					}
-				} else {
-					@word
-				}
-				&nbsp
-			}
-		} else {
-			@passage.text
-		}
-
-	</div>
+                <br>
 
 
-	<script>
-			function alertSuggestions(){
-				alert("This word is too complicated for this grade level!");
-			}
-
-			$(document).ready(function(){
-
-				function isEmpty( el ){
-					return !$.trim(el.html())
-				}
-
-				$("u").click(function(){
-					var string = $(this).html();
+                @for(tag <- passage.tags) {
 
 
-					if(document.getElementById(string) == null){
-						alert("This word is too complicated, but we don't have any suggestions for you yet.");
-					}
+                    <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px ;">
+                        <i class="glyphicon glyphicon-tag"> @tag.name</i>
+                    </a>
+                }
+
+            </div>
+
+
+        </div>
+    </div>
+
+
+    <div class="container-fluid">
+        <div style="text-align:left ;">
+            <strong> @passage.title </strong>
+            <strong> Added By: </strong> @instructor.firstName @instructor.lastName <br>
+            <strong> Grade Level:  </strong>
+            @if(passage.grade == 0) {
+                K
+            }
+
+            @if(passage.grade >= 12) {
+                College Level or Above
+            } else {
+
+                @if(passage.grade != 0 && passage.grade <= 12) {
+                    @passage.grade
+                }
+            }
+
+
+            <br>
+            <strong> Source:  </strong> @passage.source <br><br>
+
+
+        </div>
+
+        @if(suggestionsOn) {
+            @for(word <- passage.text.split(" ")) {
+                @if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > passage.grade && !passage.getStopWords().contains(word)) {
+                    <u>@word</u>
+                    @Suggestion.byWord(word).size
+                    @if(Suggestion.byWord(word).size > 0) {
+                        <div style="display:none ;" id="@word">We suggest
+                            @for(w <- Suggestion.all) {
+                                @w &nbsp
+                        }
+                        </div>
+                    }
+                } else {
+                    @word
+                }
+                &nbsp
+            }
+        } else {
+            @passage.text
+        }
+
+    </div>
+
+
+    <script>
+            function alertSuggestions(){
+                alert("This word is too complicated for this grade level!");
+            }
+
+            $(document).ready(function(){
+
+                function isEmpty( el ){
+                    return !$.trim(el.html())
+                }
+
+                $("u").click(function(){
+                    var string = $(this).html();
+
+
+                    if(document.getElementById(string) == null){
+                        alert("This word is too complicated, but we don't have any suggestions for you yet.");
+                    }
 
 
 
 
-					$("#" + string).show();
+                    $("#" + string).show();
 
 
-				});
+                });
 
-			});
-	</script>
+            });
+    </script>
 
 
 }

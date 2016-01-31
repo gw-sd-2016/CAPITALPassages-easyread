@@ -46,17 +46,17 @@
                 var $this = $(this);
                 $this.find('.fileupload-progress')
                     .find('.progress').progressbar(
-                        'option',
-                        'value',
-                        parseInt(data.loaded / data.total * 100, 10)
-                    ).end()
+                    'option',
+                    'value',
+                    parseInt(data.loaded / data.total * 100, 10)
+                ).end()
                     .find('.progress-extended').each(function () {
-                        $(this).html(
-                            ($this.data('blueimp-fileupload') ||
-                                    $this.data('fileupload'))
-                                ._renderExtendedProgress(data)
-                        );
-                    });
+                    $(this).html(
+                        ($this.data('blueimp-fileupload') ||
+                        $this.data('fileupload'))
+                            ._renderExtendedProgress(data)
+                    );
+                });
             }
         },
 

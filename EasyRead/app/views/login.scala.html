@@ -1,38 +1,33 @@
 @(form: Form[formdata.LoginForm])
-@main("Login") {
+    @main("Login") {
 
-    @helper.form(routes.Application.login_submit()) {
-
-
+        @helper.form(routes.Application.login_submit()) {
 
 
-                <div class="container">
+            <div class="container">
 
 
-
-                    <form action="@routes.Application.login_submit()" method="post" enctype="multipart/form-data">
-
-
-                        <h2 class="form-signin-heading">Log In</h2>
+                <form action="@routes.Application.login_submit()" method="post" enctype="multipart/form-data">
 
 
-
-                        <input type="text" class="form-control" name="usernameOrEmail" placeholder="Username or Email" value='@form("usernameOrEmails").value'>
-
-                        <input type="password" class="form-control" name="password" placeholder="Password" value='@form("password").value'>
+                    <h2 class="form-signin-heading">Log In</h2>
 
 
-                        <div class="text-center">
+                    <input type="text" class="form-control" name="usernameOrEmail" placeholder="Username or Email" value='@form("usernameOrEmails").value'>
 
-                            <button type="submit" class="btn btn-default">Log In</button>
-                        </div>
+                    <input type="password" class="form-control" name="password" placeholder="Password" value='@form("password").value'>
 
-                    </form>
-                </div> <!-- /container -->
+
+                    <div class="text-center">
+
+                        <button type="submit" class="btn btn-default">Log In</button>
+                    </div>
+
+                </form>
+            </div> <!-- /container -->
+
+
+        }
 
 
     }
-
-
-
-}

@@ -1,329 +1,329 @@
 
-@(form: Form[formdata.SimplePassageData], passageId: Long, grade: Int)
+@(form: Form[formdata.SimplePassageData], passageId: Long, grade : Int)
 
 
-@import play.api.libs.json.Json
+    @import play.api.libs.json.Json
 
-@main("Edit a  Passage") {
-
-
-
-    <style type="text/css">
-    /*This entire example and the sliders are from  https://github.com/eduardomb/jquery-panelslider */
-    .panel {
-    display: none;
-    width: 20%;
-    overflow-y: scroll;
-    overflow-x:scroll;
-    padding: 20px;
-    background-color: #333;
-    color: #fff;
-    box-shadow: inset 0 0 5px 5px #222;
-    }
-    </style>
-
-    <div id="left-panel" class="panel"></div>
-
-    <a id="left-panel-link" class="btn btn-primary" href="#left-panel" style="display: none;">
-        <i class="glyphicon glyphicon-edit"> Left Panel</i>
-    </a>
+    @main("Edit a  Passage") {
 
 
-
-    <div>
-    @for(word <- SimplePassage.byId(passageId).text.split(" ")){
-        @if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > (grade + 6) && !SimplePassage.byId(passageId).getStopWords().contains(word)){
-            @if(Suggestion.byWord(word).map(x => x.suggestedWord).distinct.size > 0){
-                    <!-- http://stackoverflow.com/questions/18830813/how-can-i-remove-punctuation-from-input-text-in-java -->
-                <div style="display:none;" id="@word">
-                    @for(w <- Suggestion.byWord(word).sortWith(_.frequency > _.frequency).map(x => x.suggestedWord).distinct){@w&nbsp}
-                    <br>
-                </div>
-            }
+        <style type="text/css">
+        /*This entire example and the sliders are from  https://github.com/eduardomb/jquery-panelslider */
+        .panel {
+        display: none ;
+        width: 20% ;
+        overflow-y: scroll ;
+        overflow-x:scroll ;
+        padding: 20px ;
+        background-color: #333 ;
+        color: #fff ;
+        box-shadow: inset 0 0 5px 5px #222 ;
         }
-    }
+        </style>
 
-    </div>
+        <div id="left-panel" class="panel"></div>
 
-
-    @helper.form(routes.SimplePassageController.edit_submit(passageId)) {
-
-            <!-- Left panel -->
+        <a id="left-panel-link" class="btn btn-primary" href="#left-panel" style="display: none ;">
+            <i class="glyphicon glyphicon-edit"> Left Panel</i>
+        </a>
 
 
 
         <div>
-            <div class="box">
-                <div class="box-header">
-                    <i class="icon-plus"></i>
-                    <i class="icon-user icon-large"></i>
-                    <h5>Edit an existing Passage</h5>
-                </div>
-                <div class="box-content box-table" style="padding: 10px;">
-                    @if(form.hasGlobalErrors) {
-                        <div class="alert alert-danger">
-                        @form.globalError.message
+        @for(word <- SimplePassage.byId(passageId).text.split(" ")) {
+            @if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > (grade + 6) && !SimplePassage.byId(passageId).getStopWords().contains(word)) {
+                @if(Suggestion.byWord(word).map(x => x.suggestedWord).distinct.size > 0) {
+                        <!-- http://stackoverflow.com/questions/18830813/how-can-i-remove-punctuation-from-input-text-in-java -->
+                    <div style="display:none ;" id="@word">
+                        @for(w <- Suggestion.byWord(word).sortWith(_.frequency > _.frequency).map(x => x.suggestedWord).distinct) {@w&nbsp}
+                        <br>
+                    </div>
+                }
+            }
+        }
 
-                        </div>
-                    }
-                    <p>
-
-                        <strong>This page shows Suggestions to make this passage readable for a @if(grade == 0) { Kindergarten } @if(grade >= 12){ College Level } else { @if(grade > 0) { Grade @grade }} reader</strong>
+        </div>
 
 
-                        <div class="pull-right">
+        @helper.form(routes.SimplePassageController.edit_submit(passageId)) {
+
+                <!-- Left panel -->
 
 
-                            <div class="btn-group">
-                                <h5>Choose The Grade Level this passage should be edited at</h5>
-                                <div class="dropdown">
-                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
 
-                                        Grade
+            <div>
+                <div class="box">
+                    <div class="box-header">
+                        <i class="icon-plus"></i>
+                        <i class="icon-user icon-large"></i>
+                        <h5>Edit an existing Passage</h5>
+                    </div>
+                    <div class="box-content box-table" style="padding: 10px ;">
+                        @if(form.hasGlobalErrors) {
+                            <div class="alert alert-danger">
+                            @form.globalError.message
 
-                                        @if(SimplePassage.byId(passageId) == 0) {
-                                            K
+                            </div>
+                        }
+                        <p>
+
+                            <strong>
+                                This page shows Suggestions to make this passage readable for a @if(grade == 0) { Kindergarten } @if(grade >= 12) { College Level } else {
+                                @if(grade > 0) { Grade @grade}
+                            } reader</strong>
+
+
+                            <div class="pull-right">
+
+
+                                <div class="btn-group">
+                                    <h5>Choose The Grade Level this passage should be edited at</h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+
+                                            Grade
+
+                                            @if(SimplePassage.byId(passageId) == 0) {
+                                                K
+                                            }
+
+                                            @if(SimplePassage.byId(passageId).grade >= 12) {
+                                                College Level or Above
+                                        } else {
+                                        @if(SimplePassage.byId(passageId).grade != 0 && SimplePassage.byId(passageId).grade <= 12) {
+                                            @SimplePassage.byId(passageId).grade
                                         }
+                                        }
+                                            <span class="caret"></span></button>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=0">K</a></li>
+                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=1">1</a></li>
+                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=2">2</a></li>
+                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=3">3</a></li>
+                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=4">4</a></li>
+                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=5">5</a></li>
+                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=6">6</a></li>
+                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=7">7</a></li>
+                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=8">8</a></li>
+                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=9">9</a></li>
+                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=10">10</a></li>
+                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=11">11</a></li>
+                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=12">12</a></li>
+                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=13">College</a></li>
+                                        </ul>
+                                    </div>
 
-                                        @if(SimplePassage.byId(passageId).grade >= 12){
-                                            College Level or Above
-                                    } else {
-                                    @if(SimplePassage.byId(passageId).grade != 0 && SimplePassage.byId(passageId).grade <= 12) {
-                                        @SimplePassage.byId(passageId).grade
-                                    }
-                                    }
-                                        <span class="caret"></span></button>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=0">K</a></li>
-                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=1">1</a></li>
-                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=2">2</a></li>
-                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=3">3</a></li>
-                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=4">4</a></li>
-                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=5">5</a></li>
-                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=6">6</a></li>
-                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=7">7</a></li>
-                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=8">8</a></li>
-                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=9">9</a></li>
-                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=10">10</a></li>
-                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=11">11</a></li>
-                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=12">12</a></li>
-                                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=13">College</a></li>
-                                    </ul>
+
                                 </div>
 
 
-                            </div>
+                                <h4>Title</h4>
+                                <input type="text" name="passageTitle" placeholder="Passage Title" value="@form("passageTitle").value">
+
+                                <h4>Source</h4>
+                                <input type="text" name="source" placeholder="Passage Source" value="@form("source").value">
+
+                                <input type="text" id="text" name="passageText" value="@form("passageText").value" style="display:none">
 
 
-                            <h4>Title</h4>
-                    <input type="text" name="passageTitle" placeholder="Passage Title" value="@form("passageTitle").value">
+                                <h4>Passage Body</h4>
+                                    <!-- http://quilljs.com/docs/quickstart/ -->
+                                    <!-- Create the editor container -->
+                                <div id="editor">
+                                    <div>@SimplePassage.byId(passageId).text</div>
 
-                    <h4>Source</h4>
-                    <input type="text" name="source" placeholder="Passage Source" value="@form("source").value">
+                                    <div><br></div>
+                                </div>
 
-                    <input type="text" id="text" name="passageText" value="@form("passageText").value" style="display:none">
+                    <p>
+                    </p>
+                        <br>
+                        <p>
 
-
-                    <h4>Passage Body</h4>
-                        <!-- http://quilljs.com/docs/quickstart/ -->
-                        <!-- Create the editor container -->
-                    <div id="editor">
-                        <div>@SimplePassage.byId(passageId).text</div>
-
-                        <div><br></div>
+                        </p>
                     </div>
-
-
-
-                    <p>
-                    </p>
-                    <br>
-                    <p>
-
-                    </p>
                 </div>
+
+                <button type="submit" class="btn btn-success">
+                    <i class="btn-icon-only icon-check"></i> Submit
+                </button>
+
+
+                <br>
+                <br>
             </div>
+        }
+        <script src="/assets/js/jquery.panelslider.min.js"></script>
+        <script>
+                $('#left-panel-link').panelslider({side: 'left', clickClose: false, duration: 200 });
+                $('#right-panel-link').panelslider({side: 'right', clickClose: false, duration: 200 });
 
-            <button type="submit" class="btn btn-success">
-                <i class="btn-icon-only icon-check"></i> Submit
-            </button>
-
-
-            <br>
-            <br>
-        </div>
-    }
-    <script src="/assets/js/jquery.panelslider.min.js"></script>
-    <script>
-            $('#left-panel-link').panelslider({side: 'left', clickClose: false, duration: 200 });
-            $('#right-panel-link').panelslider({side: 'right', clickClose: false, duration: 200 });
-
-            $('#close-panel-bt').click(function() {
-                $.panelslider.close();
-                document.body.style.display = 'none';
-                document.body.style.display = '';
-            });
-    </script>
+                $('#close-panel-bt').click(function() {
+                    $.panelslider.close();
+                    document.body.style.display = 'none';
+                    document.body.style.display = '';
+                });
+        </script>
 
 
-    <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+        <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
 
-        <!-- http://quilljs.com/docs/api -->
-        <!-- Include the Quill library -->
-    <script src="//cdn.quilljs.com/0.20.1/quill.js"></script>
+            <!-- http://quilljs.com/docs/api -->
+            <!-- Include the Quill library -->
+        <script src="//cdn.quilljs.com/0.20.1/quill.js"></script>
 
-        <!-- Initialize Quill editor -->
-    <script>
-            var quill = new Quill('#editor');
+            <!-- Initialize Quill editor -->
+        <script>
+                var quill = new Quill('#editor');
 
-            quill.on('text-change', function(delta, source) {
-                console.log("Called");
-                var element = document.getElementsByName("passageText")[0];
-                element.setAttribute("value", quill.getText());
-            });
+                quill.on('text-change', function(delta, source) {
+                    console.log("Called");
+                    var element = document.getElementsByName("passageText")[0];
+                    element.setAttribute("value", quill.getText());
+                });
 
 
 
 
-            //http://www.creativejuiz.fr/blog/en/javascript-en/read-url-get-parameters-with-javascript
-            function $_GET(param) {
-                var vars = {};
-                window.location.href.replace(
-                        /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
-                        function( m, key, value ) { // callback
-                            vars[key] = value !== undefined ? value : '';
+                //http://www.creativejuiz.fr/blog/en/javascript-en/read-url-get-parameters-with-javascript
+                function $_GET(param) {
+                    var vars = {};
+                    window.location.href.replace(
+                            /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+                            function( m, key, value ) { // callback
+                                vars[key] = value !== undefined ? value : '';
+                            }
+                    );
+
+                    if ( param ) {
+                        return vars[param] ? vars[param] : null;
+                    }
+                    return vars;
+                }
+
+                function acceptWord(word){
+                    jsRoutes.controllers.SimplePassageController.acceptWord(word.id, @grade).ajax({
+                        success : function(data) {
+                            //window.location.reload();
+                        },
+                        error : function(err) {
+                            //window.location = "";
+                        },
+                        complete : function() {
+                            window.location.reload();
                         }
-                );
-
-                if ( param ) {
-                    return vars[param] ? vars[param] : null;
-                }
-                return vars;
-            }
-
-            function acceptWord(word){
-                jsRoutes.controllers.SimplePassageController.acceptWord(word.id, @grade).ajax({
-                    success : function(data) {
-                        //window.location.reload();
-                    },
-                    error : function(err) {
-                        //window.location = "";
-                    },
-                    complete : function() {
-                        window.location.reload();
-                    }
-                });
-            }
-
-
-
-            function replaceWord(word, replacement){
-                jsRoutes.controllers.SimplePassageController.replaceWord(@passageId, word, replacement).ajax({
-                    success : function(data) {
-                        //window.location.reload();
-                    },
-                    error : function(err) {
-                        //window.location = "";
-                    },
-                    complete : function() {
-                        window.location.reload();
-                    }
-                });
-            }
-
-
-            function underlineSpecificWords(words){
-
-                var text = quill.getText();
-
-                for(var i = 0; i < words.length; i++){
-                    var currentText = text;
-                    var word = words[i];
-                    var index = text.indexOf(word);
-
-                    while(index != -1){
-                        console.log(index);
-                        var offset = text.length - currentText.length;
-                        quill.formatText(index + offset, index + offset + word.length, 'underline', true);
-                        currentText = currentText.substring(index + word.length);
-                        index = currentText.indexOf(word);
-                    }
-                }
-            }
-
-
-
-            function save(){
-
-            }
-
-
-            $( document ).ready(function() {
-
-                // http://stackoverflow.com/questions/24309803/playframework-jsvalue-in-html-template
-                underlineSpecificWords(@Html(Json.stringify(Json.toJson(SimplePassage.byId(passageId).text.split(" ").toList.distinct.filter(p => (Word.byLemma(p) != null && Word.byLemma(p).ageOfAcquisition > grade + 6) && !SimplePassage.byId(passageId).getStopWords().contains(p))))));
-
-
-                //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
-                // locate your element and add the Click Event Listener
-
-                function isEmpty( el ){
-                    return !$.trim(el.html())
+                    });
                 }
 
 
-                $("u").click(function(){
-                    var string = $(this).html();
+
+                function replaceWord(word, replacement){
+                    jsRoutes.controllers.SimplePassageController.replaceWord(@passageId, word, replacement).ajax({
+                        success : function(data) {
+                            //window.location.reload();
+                        },
+                        error : function(err) {
+                            //window.location = "";
+                        },
+                        complete : function() {
+                            window.location.reload();
+                        }
+                    });
+                }
+
+
+                function underlineSpecificWords(words){
+
+                    var text = quill.getText();
+
+                    for(var i = 0; i < words.length; i++){
+                        var currentText = text;
+                        var word = words[i];
+                        var index = text.indexOf(word);
+
+                        while(index != -1){
+                            console.log(index);
+                            var offset = text.length - currentText.length;
+                            quill.formatText(index + offset, index + offset + word.length, 'underline', true);
+                            currentText = currentText.substring(index + word.length);
+                            index = currentText.indexOf(word);
+                        }
+                    }
+                }
 
 
 
-                    var leftPanel = document.getElementById("left-panel");
+                function save(){
+
+                }
 
 
-                    if(window.getComputedStyle(leftPanel).display === 'none'){
-                        console.log("doing this");
+                $( document ).ready(function() {
 
-                        $("#left-panel-link").click();
+                    // http://stackoverflow.com/questions/24309803/playframework-jsvalue-in-html-template
+                    underlineSpecificWords(@Html(Json.stringify(Json.toJson(SimplePassage.byId(passageId).text.split(" ").toList.distinct.filter(p => (Word.byLemma(p) != null && Word.byLemma(p).ageOfAcquisition > grade + 6) && !SimplePassage.byId(passageId).getStopWords().contains(p))))));
 
+
+                    //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
+                    // locate your element and add the Click Event Listener
+
+                    function isEmpty( el ){
+                        return !$.trim(el.html())
                     }
 
 
+                    $("u").click(function(){
+                        var string = $(this).html();
 
 
 
-                    var upperDiv = '<div id="title"><h1>' + string + '</h1></div>';
-                    var approvalDiv = "<div id='accept'><button class='btn btn-primary' onclick='acceptWord(" + string + ");'>This is okay!</button></div><br>";
-
-                    var synonymnDiv = "<div class='container-fluid'> <div id='list'>";
-
-                    if(document.getElementById(string) == null){
-                        synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
-                    } else {
-                        //http://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
-                        //http://stackoverflow.com/questions/22036576/why-does-the-javascript-string-whitespace-character-nbsp-not-match
-                        var synonymnList = document.getElementById(string).innerText.trim("/\r?\n|\r/g").split(String.fromCharCode(160));
+                        var leftPanel = document.getElementById("left-panel");
 
 
-                        var ran = false;
-                        for(var i = 1; i < synonymnList.length; i++){
-                            ran = true;
-                            synonymnDiv += i + ". <span onclick='replaceWord(\"" + string + "\", \"" + synonymnList[i] + "\");' style='background-color: gray;'><h3>" + synonymnList[i] + "</h3></span><br>";
+                        if(window.getComputedStyle(leftPanel).display === 'none'){
+                            console.log("doing this");
+
+                            $("#left-panel-link").click();
+
                         }
 
-                        if(!ran){
+
+
+
+
+                        var upperDiv = '<div id="title"><h1>' + string + '</h1></div>';
+                        var approvalDiv = "<div id='accept'><button class='btn btn-primary' onclick='acceptWord(" + string + ");'>This is okay!</button></div><br>";
+
+                        var synonymnDiv = "<div class='container-fluid'> <div id='list'>";
+
+                        if(document.getElementById(string) == null){
                             synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
+                        } else {
+                            //http://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
+                            //http://stackoverflow.com/questions/22036576/why-does-the-javascript-string-whitespace-character-nbsp-not-match
+                            var synonymnList = document.getElementById(string).innerText.trim("/\r?\n|\r/g").split(String.fromCharCode(160));
+
+
+                            var ran = false;
+                            for(var i = 1; i < synonymnList.length; i++){
+                                ran = true;
+                                synonymnDiv += i + ". <span onclick='replaceWord(\"" + string + "\", \"" + synonymnList[i] + "\");' style='background-color: gray;'><h3>" + synonymnList[i] + "</h3></span><br>";
+                            }
+
+                            if(!ran){
+                                synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
+                            }
+
+
                         }
 
+                        synonymnDiv += "</div></div><br><button id='close-panel-bt' class='btn btn-primary' onclick='$.panelslider.close();'>Close Planel</button>";
 
-                    }
+                        leftPanel.innerHTML = upperDiv + approvalDiv + synonymnDiv;
 
-                    synonymnDiv += "</div></div><br><button id='close-panel-bt' class='btn btn-primary' onclick='$.panelslider.close();'>Close Planel</button>";
-
-                    leftPanel.innerHTML = upperDiv + approvalDiv + synonymnDiv;
+                    });
 
                 });
+        </script>
 
-            });
-    </script>
-
-}
+    }

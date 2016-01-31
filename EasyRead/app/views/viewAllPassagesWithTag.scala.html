@@ -1,152 +1,149 @@
-@(passages: List[models.SimplePassage], inst: models.User, name : String)
+@(passages: List[models.SimplePassage], inst: models.User, name: String)
 
-@main("View All Passages") {
+    @main("View All Passages") {
 
-<!-- Code adapted from browseCourses file -->
+        <!-- Code adapted from browseCourses file -->
 
-	<link rel="stylesheet" type="text/css" href='https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css'>
-	<script type="text/javascript" href='https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js'></script>
+        <link rel="stylesheet" type="text/css" href='https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css'>
+        <script type="text/javascript" href='https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js'></script>
 
-    <div style="margin-left:15px;">
-    		<div>
-	            <a class="btn btn-primary" id="add" href="@routes.SimplePassageController.createSimplePassage()" style="margin-bottom: 20px;">
-	                <i class="glyphicon glyphicon-plus"></i><i class="glyphicon glyphicon-group"></i>
-	                Add a new Passage
-	            </a>
-	              
-	        </div>
+        <div style="margin-left:15px ;">
+            <div>
+                <a class="btn btn-primary" id="add" href="@routes.SimplePassageController.createSimplePassage()" style="margin-bottom: 20px ;">
+                    <i class="glyphicon glyphicon-plus"></i><i class="glyphicon glyphicon-group"></i>
+                    Add a new Passage
+                </a>
 
-	    <div id="students" class="box">
+            </div>
 
-	        <div class="box-header">
-	            <i class="glyphicon glyphicon-group fa-2x"></i>
-	            <h5>View All Passages Tagged as @name</h5>
-	        </div>
-	      
-	        <div class="box-content box-table" style="padding: 10px;">
-	        	@if(passages.size == 0) {
-			    	<div class="well">
-			            <strong><em>There are no passages matching this tag in the system!</em></strong>
-			        </div>
-				} else {
-			        <table class="table table-hover">
-			            <thead>
-			                <tr>
-			                    <th>Title</th>
-			                    <th>Text</th>
-			                    <th>Instructor</th>
-			                    <th>Grade</th>
-			                    <th>Source</th>
-			                    <th>Type</th>
-			                    <th>Tag</th>
-			                    <th>Actions</th>
-			                
-			                </tr>
-			            </thead>
-			            <tbody>
-			                @for(passage <- SimplePassage.byPassageTagName(name)) {
-			                    <tr>
-			                      
-			                        <td><a href="/view?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
-			                        @if(passage.text.length >= 200) {
-			                        	<td>@passage.text.substring(0,200)....</td>
-			                        	
-			                        } else {
-			                        	<td>@passage.text</td>
-			                        }
-			                        
-			                        
-											<td>@inst.firstName @inst.lastName</td>	
+            <div id="students" class="box">
 
-												<td>@if(passage.sentences.size == 0){
-												Grade Level not available yet.
-											} else {
-													@if(passage.grade == 0) {
-													K
-												} 
-												@if(passage.grade >= 12){
-													College Level or Above
-												} else {
-													@passage.grade
-											}
-											}
-											
-											</td>
-											<td>@passage.source</td>
-											<td>
-											@for(tag <- passage.tags){
-												@tag.getType() 
-											
-											}
-											</td>
+                <div class="box-header">
+                    <i class="glyphicon glyphicon-group fa-2x"></i>
+                    <h5>View All Passages Tagged as @name</h5>
+                </div>
 
-											<td>
-											@for(tag <- passage.tags){
+                <div class="box-content box-table" style="padding: 10px ;">
+                @if(passages.size == 0) {
+                    <div class="well">
+                        <strong><em>There are no passages matching this tag in the system!</em></strong>
+                    </div>
+                } else {
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Text</th>
+                                <th>Instructor</th>
+                                <th>Grade</th>
+                                <th>Source</th>
+                                <th>Type</th>
+                                <th>Tag</th>
+                                <th>Actions</th>
 
-												
-												  <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px;">
-	                								<i class="glyphicon glyphicon-tag"> @tag.name</i>
-	                								
-	            								</a>
-											
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @for(passage <- SimplePassage.byPassageTagName(name)) {
+                            <tr>
 
-									
-												
-											}
-											</td>
-											
-			                        	
-			                          <td style="width: 10%">
-			                        	<a href="@routes.SimplePassageController.edit(passage.id)" class="btn btn-small btn-info">
-	                                        <i class="glyphicon glyphicon-edit"></i> 
-	                                        Edit
-	                                    </a>
-	                                <!--  <button type="button" class="btn btn-small btn-danger has-spinner" id="deletePassage" name="@passage.id:|:@passage.title" style="width: 75px;">
-								            <span class="spinner"><i class="glyphicon glyphicon-spin fa-refresh"></i></span>
-								            <i class="glyphicon glyphicon-trash"></i> Delete 
-								        </button>-->
-			                        </td>
-			                        
-			                        
-			                    </tr>
-			                }
-			            </tbody>
-			        </table>
-				}
-	        </div>
-	    </div>
-    </div>
+                                <td><a href="/view?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
+                                @if(passage.text.length >= 200) {
+                                    <td>@passage.text.substring(0, 200)....</td>
 
-    
+                                } else {
+                                    <td>@passage.text</td>
+                                }
 
-    <script>
-         $('button#deletePassage').click(function() {
-        	var button = $(this);
-        	button.toggleClass('active');
 
-        	var passageData = $(this).attr('name').split(":|:");
-        	var passageId = passageData[0];
-        	var passageName = passageData[1];
+                                <td>@inst.firstName @inst.lastName</td>
 
-        	console.log(passageId);
-        	console.log(passageName);
+                                <td>@if(passage.sentences.size == 0) {
+                                    Grade Level not available yet.
+                                } else {
+                                    @if(passage.grade == 0) {
+                                        K
+                                    }
+                                    @if(passage.grade >= 12) {
+                                        College Level or Above
+                                    } else {
+                                        @passage.grade
+                                    }
+                                }
 
-            bootbox.confirm("Are you sure you want to delete passage '" + passageName + "'? This cannot be undone.", function(result) {
-            	if (result) {
-		            button.prop("disabled", true);
-		            jsRoutes.controllers.SimplePassageController.deletePassage(passageId).ajax({
-					    success : function(data) {
-					    	window.location.reload();
-					    },
-					    error : function(err) {
-					    	//window.location = "";
-					    }
-					});
-		        } else {
-		        	button.toggleClass('active');
-		        }
-            });
-        });
-    </script>
+                                </td>
+                                <td>@passage.source</td>
+                                <td>
+                                @for(tag <- passage.tags) {
+                                    @tag.getType()
 
-}
+                                }
+                                </td>
+
+                                <td>
+                                @for(tag <- passage.tags) {
+
+
+                                    <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px ;">
+                                        <i class="glyphicon glyphicon-tag"> @tag.name</i>
+
+                                    </a>
+
+
+                                }
+                                </td>
+
+
+                                <td style="width: 10%">
+                                    <a href="@routes.SimplePassageController.edit(passage.id)" class="btn btn-small btn-info">
+                                        <i class="glyphicon glyphicon-edit"></i>
+                                        Edit
+                                    </a>
+                                        <!--  <button type="button" class="btn btn-small btn-danger has-spinner" id="deletePassage" name=" @passage.id:|:@passage.title" style="width: 75px;">
+                                    <span class="spinner"><i class="glyphicon glyphicon-spin fa-refresh"></i></span>
+                                    <i class="glyphicon glyphicon-trash"></i> Delete
+                                    </button>-->
+                                </td>
+
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                }
+                </div>
+            </div>
+        </div>
+
+
+
+        <script>
+                $('button#deletePassage').click(function() {
+                    var button = $(this);
+                    button.toggleClass('active');
+
+                    var passageData = $(this).attr('name').split(":|:");
+                    var passageId = passageData[0];
+                    var passageName = passageData[1];
+
+                    console.log(passageId);
+                    console.log(passageName);
+
+                    bootbox.confirm("Are you sure you want to delete passage '" + passageName + "'? This cannot be undone.", function(result) {
+                        if (result) {
+                            button.prop("disabled", true);
+                            jsRoutes.controllers.SimplePassageController.deletePassage(passageId).ajax({
+                                success : function(data) {
+                                    window.location.reload();
+                                },
+                                error : function(err) {
+                                    //window.location = "";
+                                }
+                            });
+                        } else {
+                            button.toggleClass('active');
+                        }
+                    });
+                });
+        </script>
+
+    }

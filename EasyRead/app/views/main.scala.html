@@ -16,30 +16,30 @@
 
 
         <style>
-            /* https://getbootstrap.com/examples/sticky-footer/ */
-            /* https://www.codementor.io/tips/4292721368/twitter-bootstrap-3-sticky-footer */ 
-            html {
-                position: relative;
-                min-height: 100%;
-            }
-            body {
-            /* Margin bottom by footer height */
-            margin-bottom: 60px;
-            }
-            footer {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            /* Set the fixed height of the footer here */
-            height: 60px;
-            background-color: #f5f5f5;
-            }
+        /* https://getbootstrap.com/examples/sticky-footer/ */
+        /* https://www.codementor.io/tips/4292721368/twitter-bootstrap-3-sticky-footer */
+        html {
+        position: relative ;
+        min-height: 100% ;
+        }
+        body {
+        /* Margin bottom by footer height */
+        margin-bottom: 60px ;
+        }
+        footer {
+        position: absolute ;
+        bottom: 0 ;
+        width: 100% ;
+        /* Set the fixed height of the footer here */
+        height: 60px ;
+        background-color: #f5f5f5 ;
+        }
         </style>
 
 
 
-    <!-- CODE FROM BOOTSTRAP -->
-        <nav class="navbar navbar-inverse" style="background-color: transparent;">
+            <!-- CODE FROM BOOTSTRAP -->
+        <nav class="navbar navbar-inverse" style="background-color: transparent ;">
             <div class="container-fluid">
                     <!-- Brand and toggle get grouped for better mobile display -->
                 <div class="navbar-header">
@@ -48,7 +48,6 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
 
-
                     </button>
                     <a class="navbar-brand" href="http://localhost:9000">EasyRead</a>
                 </div>
@@ -56,7 +55,7 @@
                     <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
-                        @if(session.get("userFirstName") != null){
+                        @if(session.get("userFirstName") != null) {
                             <li><a href="@routes.SimplePassageController.viewAllPassages">All Passages</a></li>
                             <li><a href="@routes.SimplePassageController.createSimplePassage()">Add a Passage</a></li>
                             <li><a href="@routes.Application.logout">Logout</a></li>
@@ -64,19 +63,19 @@
                             <li><a href="@routes.Application.login()">Log In</a></li>
                         }
                     </ul>
-                </div><!-- /.navbar-collapse -->
-            </div><!-- /.container-fluid -->
+                </div> <!-- /.navbar-collapse -->
+            </div> <!-- /.container-fluid -->
         </nav>
 
     </head>
-    <body class="has-drawer" style="padding-left: 10px; padding-right: 10px">
+    <body class="has-drawer" style="padding-left: 10px ; padding-right: 10px">
         <div class="container">
-            @content
+        @content
         </div>
 
     </body>
 
-<!-- https://getbootstrap.com/examples/sticky-footer/ -->
+        <!-- https://getbootstrap.com/examples/sticky-footer/ -->
     <footer class="footer">
         <div class="container">
             <p class="text-muted">Based on templates from <a href="http://getbootstrap.com">Bootstrap</a></p>

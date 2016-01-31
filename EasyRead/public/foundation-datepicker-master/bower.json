@@ -6,7 +6,10 @@
     "Peter Beňo <najlepsiwebdesigner@gmail.com>"
   ],
   "description": "Foundation datepicker jQuery plugin",
-  "main": ["js/foundation-datepicker.js","stylesheets/foundation-datepicker.css"],
+  "main": [
+    "js/foundation-datepicker.js",
+    "stylesheets/foundation-datepicker.css"
+  ],
   "keywords": [
     "foundation",
     "datepicker",
@@ -21,5 +24,4 @@
     "test",
     "tests"
   ]
-
 }

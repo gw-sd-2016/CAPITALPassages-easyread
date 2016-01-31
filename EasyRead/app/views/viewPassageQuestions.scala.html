@@ -1,50 +1,50 @@
-@(passageId : Long)
+@(passageId: Long)
 
-@main("View Passage Questions") {
-
-
-@helper.form(routes.SimplePassageController.setNumQuestions_submit) {
-
-				<div style="padding-left:20px">
+    @main("View Passage Questions") {
 
 
-					<div class="pull-right" style="width:50%;">
-						@SimplePassage.byId(passageId).text
-					</div>
-					<div>
+        @helper.form(routes.SimplePassageController.setNumQuestions_submit) {
 
-					  <a class="btn btn-primary" id="add" href="@routes.SimplePassageController.answerPassageQuestions(passageId)" style="margin-left:10px; margin-top:10px;margin-bottom: 20px;">
-	                <i class="glyphicon glyphicon-check"></i><i class="glyphicon glyphicon-group"></i>
-	                Answer These Questions
-	            </a>
-
-						<p>
-							<h3> Multiple Choice Question for @SimplePassage.byId(passageId).title</h3>
-							@for(q <- SimplePassage.byId(passageId).questions.toList.sortWith{(o,p) => o.position < p.position}){
-							<h3></h3>
-							<strong> @PassageQuestionPrompt.byPassageQuestion(q.id).get(0).text </strong> 
-							@for( c <- q.choices.toList.sortWith{(w,v) => w.position < v.position}){
-							<div class="radio">
-								<label>
-
-									<input type="radio" name="optradio">@PassageQuestionAnswer.byPassageQuestionChoice(c.id).get(0).text
-								</label>
-							</div>
-						}
-						<br>
-						<br> 
-					}
+            <div style="padding-left:20px">
 
 
-				</p>
-				<br>
-				<p>
+                <div class="pull-right" style="width:50% ;">
+                @SimplePassage.byId(passageId).text
+                </div>
+                <div>
 
-				</p>
+                    <a class="btn btn-primary" id="add" href="@routes.SimplePassageController.answerPassageQuestions(passageId)" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
+                        <i class="glyphicon glyphicon-check"></i><i class="glyphicon glyphicon-group"></i>
+                        Answer These Questions
+                    </a>
 
-			</div>
+                    <p>
+                <h3> Multiple Choice Question for @SimplePassage.byId(passageId).title</h3>
+                    @for(q <- SimplePassage.byId(passageId).questions.toList.sortWith { (o, p) => o.position < p.position }) {
+                        <h3></h3>
+                        <strong> @PassageQuestionPrompt.byPassageQuestion(q.id).get(0).text </strong>
+                        @for(c <- q.choices.toList.sortWith { (w, v) => w.position < v.position }) {
+                            <div class="radio">
+                                <label>
 
-			</div>
-}
+                                    <input type="radio" name="optradio">@PassageQuestionAnswer.byPassageQuestionChoice(c.id).get(0).text
+                                </label>
+                            </div>
+                        }
+                        <br>
+                        <br>
+                        }
 
-}
+
+                    </p>
+                    <br>
+                    <p>
+
+                    </p>
+
+                </div>
+
+            </div>
+        }
+
+    }

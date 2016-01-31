@@ -1,121 +1,118 @@
-@(passageId : Long , inst: models.User)
+@(passageId: Long, inst: models.User)
 
-@main("View PassageQuestion Responses") {
+    @main("View PassageQuestion Responses") {
 
-<!-- Code adapted from browseCourses file -->
+        <!-- Code adapted from browseCourses file -->
 
-	<link rel="stylesheet" type="text/css" href='https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css'>
-	<script type="text/javascript" href='https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js'></script>
+        <link rel="stylesheet" type="text/css" href='https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css'>
+        <script type="text/javascript" href='https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js'></script>
 
-<div>
-
-
-	<div id="students" class="box">
-
-		<div class="box-header">
-			<i class="glyphicon glyphicon-group glyphicon-2x"></i>
-			<h5>View Your Responses</h5>
-		</div>
+        <div>
 
 
+            <div id="students" class="box">
 
-		<div class="box-content box-table" style="padding: 10px;">
-
-			<table class="table table-hover">
-				<thead>
-					<tr>
-						<th>Question</th>
-						<th>Your Answer</th>
-						<th>Correct?</th>
-					</tr>
-				</thead>
-
-				<tbody>
+                <div class="box-header">
+                    <i class="glyphicon glyphicon-group glyphicon-2x"></i>
+                    <h5>View Your Responses</h5>
+                </div>
 
 
+                <div class="box-content box-table" style="padding: 10px ;">
 
-					@for(q <- SimplePassage.byId(passageId).questions) {
-					
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Question</th>
+                                <th>Your Answer</th>
+                                <th>Correct?</th>
+                            </tr>
+                        </thead>
 
-						
-						@if(PassageQuestionRecord.byPassageQuestionId(q.id).size != 0){
-						<tr>
-							<td><strong> @PassageQuestionPrompt.byPassageQuestion(q.id).get(0).text </strong></td>
-						
-						@for(rec <- PassageQuestionRecord.byPassageQuestionId(q.id)){
-							@if(inst.id == rec.user.id){
+                        <tbody>
 
 
-								<td>@PassageQuestionAnswer.byPassageQuestionChoice(PassageQuestionChoice.byId(rec.responses.toList.reverse.head.entity_id).id).get(0).text</td>
-								<td>@q.correctAnswer.equals(PassageQuestionAnswer.byPassageQuestionChoice(PassageQuestionChoice.byId(rec.responses.toList.reverse.head.entity_id).id).get(0).text) </td>
+                        @for(q <- SimplePassage.byId(passageId).questions) {
 
-							}
-						}
-						</tr>
-}
 
-						
-					}
-	
-</tbody>
-</table>
+                            @if(PassageQuestionRecord.byPassageQuestionId(q.id).size != 0) {
+                                <tr>
+                                    <td><strong> @PassageQuestionPrompt.byPassageQuestion(q.id).get(0).text </strong></td>
 
-</div>
-</div>
-</div>
+                                    @for(rec <- PassageQuestionRecord.byPassageQuestionId(q.id)) {
+                                        @if(inst.id == rec.user.id) {
 
-<script type="text/javascript">
-	$('table').dataTable();
-	$('#DataTables_Table_0_wrapper').css("clear", "none");
-	$('#DataTables_Table_0_wrapper').css("display", "inline-block");
-</script>
 
-<script>
-	$('button#deletePassage').click(function() {
-		var button = $(this);
-		button.toggleClass('active');
+                                            <td>@PassageQuestionAnswer.byPassageQuestionChoice(PassageQuestionChoice.byId(rec.responses.toList.reverse.head.entity_id).id).get(0).text</td>
+                                            <td>@q.correctAnswer.equals(PassageQuestionAnswer.byPassageQuestionChoice(PassageQuestionChoice.byId(rec.responses.toList.reverse.head.entity_id).id).get(0).text) </td>
 
-		var passageData = $(this).attr('name').split(":|:");
-		var passageId = passageData[0];
-		var passageName = passageData[1];
+                                        }
+                                    }
+                                </tr>
+                            }
 
-		bootbox.confirm("Are you sure you want to delete passage '" + passageName + "'? This cannot be undone.", function(result) {
-			if (result) {
-				button.prop("disabled", true);
-				jsRoutes.controllers.SimplePassageController.deletePassage(passageId).ajax({
-					success : function(data) {
-						window.location.reload();
-					},
-					error : function(err) {
-						//window.location = "";
-					}
-				});
-			} else {
-				button.toggleClass('active');
-			}
-		});
-	});
 
-	$('button#analyzePassages').click(function() {
-		var button = $(this);
-		button.toggleClass('active');
+                        }
 
-		bootbox.confirm("Are you sure you want to analyze passages? This may take a couple minutes", function(result) {
-			if (result) {
-				button.prop("disabled", true);
-				jsRoutes.controllers.SimplePassageController.analyzePassages().ajax({
-					success : function(data) {
-						window.location.reload();
-					},
-					error : function(err) {
-					//	window.location = "";
-					}
-				});
-			} else {
-				button.toggleClass('active');
-			}
-		});
-	});
-</script>
+                        </tbody>
+                    </table>
 
-}
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+                $('table').dataTable();
+                $('#DataTables_Table_0_wrapper').css("clear", "none");
+                $('#DataTables_Table_0_wrapper').css("display", "inline-block");
+        </script>
+
+        <script>
+                $('button#deletePassage').click(function() {
+                    var button = $(this);
+                    button.toggleClass('active');
+
+                    var passageData = $(this).attr('name').split(":|:");
+                    var passageId = passageData[0];
+                    var passageName = passageData[1];
+
+                    bootbox.confirm("Are you sure you want to delete passage '" + passageName + "'? This cannot be undone.", function(result) {
+                        if (result) {
+                            button.prop("disabled", true);
+                            jsRoutes.controllers.SimplePassageController.deletePassage(passageId).ajax({
+                                success : function(data) {
+                                    window.location.reload();
+                                },
+                                error : function(err) {
+                                    //window.location = "";
+                                }
+                            });
+                        } else {
+                            button.toggleClass('active');
+                        }
+                    });
+                });
+
+                $('button#analyzePassages').click(function() {
+                    var button = $(this);
+                    button.toggleClass('active');
+
+                    bootbox.confirm("Are you sure you want to analyze passages? This may take a couple minutes", function(result) {
+                        if (result) {
+                            button.prop("disabled", true);
+                            jsRoutes.controllers.SimplePassageController.analyzePassages().ajax({
+                                success : function(data) {
+                                    window.location.reload();
+                                },
+                                error : function(err) {
+                                    //	window.location = "";
+                                }
+                            });
+                        } else {
+                            button.toggleClass('active');
+                        }
+                    });
+                });
+        </script>
+
+    }

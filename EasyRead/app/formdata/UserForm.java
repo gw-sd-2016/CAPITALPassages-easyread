@@ -15,7 +15,9 @@ public class UserForm {
     public Long creatorId;
 
 
-    public UserForm() {}
+    public UserForm() {
+    }
+
     public UserForm(String firstName, String lastName, String email, String username, String password, String passwordRepeat, Long creatorId) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -23,7 +25,7 @@ public class UserForm {
         this.username = username;
         this.password = password;
         this.passwordRepeat = passwordRepeat;
-      	//this.c = userId;
+        //this.c = userId;
         this.creatorId = creatorId;
     }
 

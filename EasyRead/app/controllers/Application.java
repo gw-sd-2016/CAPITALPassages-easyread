@@ -25,21 +25,22 @@ public class Application extends Controller {
 
     public Result index() throws JWNLException {
 
-        /*
-        WordNetController testing = new WordNetController();
 
-        testing.synonymnLookup("passing", "verb");*/
+        /*WordNetController testing = new WordNetController();
 
+        testing.synonymnLookup("passing", "verb");
+*/
 
-        for(SimplePassage p : SimplePassage.all()){
-           // int count = p.sentences.get(0).words.size();
+        for (SimplePassage p : SimplePassage.all()) {
+            // int count = p.sentences.get(0).words.size();
+
         }
 
 
         return ok(index.render(session("userFirstName")));
     }
 
-    public Result signup_submit() throws NoSuchAlgorithmException, InvalidKeySpecException{
+    public Result signup_submit() throws NoSuchAlgorithmException, InvalidKeySpecException {
 
         Form<UserForm> newUserForm = form(UserForm.class).bindFromRequest();
 
@@ -52,23 +53,23 @@ public class Application extends Controller {
         return ok(login.render(form(LoginForm.class)));
     }
 
-    public Result login() throws NoSuchAlgorithmException, InvalidKeySpecException{
+    public Result login() throws NoSuchAlgorithmException, InvalidKeySpecException {
         return ok(login.render(form(LoginForm.class)));
     }
 
-    public Result logout(){
+    public Result logout() {
         session().clear();
         return ok(index.render(null));
     }
 
-    public Result login_submit() throws NoSuchAlgorithmException, InvalidKeySpecException{
+    public Result login_submit() throws NoSuchAlgorithmException, InvalidKeySpecException {
         Form<LoginForm> loginForm = form(LoginForm.class).bindFromRequest();
 
-        LoginForm correctedForm = new LoginForm(loginForm.data().get("usernameOrEmail"),  loginForm.data().get("password"));
+        LoginForm correctedForm = new LoginForm(loginForm.data().get("usernameOrEmail"), loginForm.data().get("password"));
 
         if (correctedForm.validate() != null) {
             return badRequest(login.render(loginForm));
-        }else {
+        } else {
             User loggedInUser = User.byLogin(loginForm.data().get("usernameOrEmail"), loginForm.data().get("password"));
             session().clear();
 
@@ -78,10 +79,9 @@ public class Application extends Controller {
         }
     }
 
-    public Result signup() throws NoSuchAlgorithmException, InvalidKeySpecException{
+    public Result signup() throws NoSuchAlgorithmException, InvalidKeySpecException {
         return ok(signup.render(form(UserForm.class)));
     }
-
 
 
     public Result javascriptRoutes() {
@@ -99,7 +99,7 @@ public class Application extends Controller {
         );
     }
 
-    public static Result viewAllPassageTags(){
+    public static Result viewAllPassageTags() {
         return ok(viewAllPassageTags.render(PassageTag.all()));
     }
 

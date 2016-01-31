@@ -1,98 +1,98 @@
 @(form: Form[formdata.SimplePassageData])
 
-@main("Add a new Passage") {
+    @main("Add a new Passage") {
 
-    @helper.form(routes.SimplePassageController.createSimplePassage_submit) {
+        @helper.form(routes.SimplePassageController.createSimplePassage_submit) {
 
-		<div>
-			<div class="box">
-			    <div class="box-header">
-			    	<i class="icon-plus"></i>
-			        <i class="icon-user icon-large"></i>
-			        <h5>Add a new Passage</h5>
-			    </div>
-			    <div class="box-content box-table" style="padding: 10px;">
-				    @if(form.hasGlobalErrors) {
-					    <div class="alert alert-danger">
-					        	 @form.globalError.message
-					       
-					    </div>
-					}
-					<p>
+            <div>
+                <div class="box">
+                    <div class="box-header">
+                        <i class="icon-plus"></i>
+                        <i class="icon-user icon-large"></i>
+                        <h5>Add a new Passage</h5>
+                    </div>
+                    <div class="box-content box-table" style="padding: 10px ;">
+                        @if(form.hasGlobalErrors) {
+                            <div class="alert alert-danger">
+                            @form.globalError.message
 
-						<h4>Title</h4>
-						<input type="text" name="passageTitle" placeholder="Passage Title" value="@form("passageTitle").value">
+                            </div>
+                        }
+                        <p>
 
-						<h4>Source</h4>
-						<input type="text" name="source" placeholder="Passage Source" value="@form("source").value">
+                    <h4>Title</h4>
+                        <input type="text" name="passageTitle" placeholder="Passage Title" value="@form("passageTitle").value">
 
-                    <!--
+                        <h4>Source</h4>
+                        <input type="text" name="source" placeholder="Passage Source" value="@form("source").value">
+
+                            <!--
                     <div style="padding-top:5px; padding-bottom:5px">
                         <button type="submit" class="btn btn-primary" onclick="addTag()"><i class="glyphicon glyphicon-tag"></i>Add Tag</button>
                     </div>
                     -->
 
-                    <form class="form-inline">
-                        <div class="form-group">
-                            <br>
-                           <strong>Tag 1</strong>
-                            <div class="input-group">
-                                <input type="text" name="names[0]" placeholder="Tag Name" value="names[0]">
+                        <form class="form-inline">
+                            <div class="form-group">
+                                <br>
+                                <strong>Tag 1</strong>
+                                <div class="input-group">
+                                    <input type="text" name="names[0]" placeholder="Tag Name" value="names[0]">
 
-                                <input type="text" name="descriptions[0]" placeholder="Tag Description" value="descriptions[0]">
+                                    <input type="text" name="descriptions[0]" placeholder="Tag Description" value="descriptions[0]">
 
-                                <input type="text" name="types[0]" placeholder="Tag Type" value="types[0]">
+                                    <input type="text" name="types[0]" placeholder="Tag Type" value="types[0]">
 
 
+                                </div>
                             </div>
-                        </div>
 
-                    </form>
-
+                        </form>
 
 
 
 
-					
-
-						<h4>Passage Body</h4>
-
-						<textarea class="form-control" rows="3"name="passageText" qvalue="@form("passageText").value" style="width:90%"></textarea>
 
 
 
-					<br>
-					<p>
-						<button type="submit" class="btn btn-success">
-							<i class="btn-icon-only icon-check"></i> Submit
-						</button>
-					</p>
-			    </div>
-			</div>
-		</div>
-	}
+                        <h4>Passage Body</h4>
 
-	<script>
-	function addTag() {
+                        <textarea class="form-control" rows="3" name="passageText" qvalue="@form("passageText").value" style="width:90%"></textarea>
+
+
+
+                        <br>
+                        <p>
+                            <button type="submit" class="btn btn-success">
+                                <i class="btn-icon-only icon-check"></i> Submit
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <script>
+                function addTag() {
 //problem here
-			//http://stackoverflow.com/questions/3001474/how-to-get-caller-element-using-javascript
-		var numTags = document.getElementsByClassName('tag').length; 
+                    //http://stackoverflow.com/questions/3001474/how-to-get-caller-element-using-javascript
+                    var numTags = document.getElementsByClassName('tag').length;
 
-		console.log('tag' + numTags);
-
-
-		var newTag ='<div class="tag" name="tag' + numTags + '"> Tag' +
-                 numTags + '<input type="text" name="names[' + numTags + ']" placeholder="Tag Name" value="names[' + numTags + ']"><label>Anything you want</label><input type="text" name="descriptions[' + numTags + ']" placeholder="Tag Description" value="descriptions[' + numTags + ']"><label>Ex: Grade, Source, Etc</label><input type="text" name="types[' + numTags + ']" placeholder="Tag Type" value="types[' + numTags + ']"></div>';
+                    console.log('tag' + numTags);
 
 
-		var lastTag = document.getElementsByClassName('tag');
-
-	
-		var $this = $(lastTag); 
-		$(newTag).insertAfter(lastTag[lastTag.length - 1]);
-	}
+                    var newTag ='<div class="tag" name="tag' + numTags + '"> Tag' +
+                            numTags + '<input type="text" name="names[' + numTags + ']" placeholder="Tag Name" value="names[' + numTags + ']"><label>Anything you want</label><input type="text" name="descriptions[' + numTags + ']" placeholder="Tag Description" value="descriptions[' + numTags + ']"><label>Ex: Grade, Source, Etc</label><input type="text" name="types[' + numTags + ']" placeholder="Tag Type" value="types[' + numTags + ']"></div>';
 
 
-</script> 
+                    var lastTag = document.getElementsByClassName('tag');
 
-}
+
+                    var $this = $(lastTag);
+                    $(newTag).insertAfter(lastTag[lastTag.length - 1]);
+                }
+
+
+        </script>
+
+    }

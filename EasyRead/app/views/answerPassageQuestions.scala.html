@@ -1,88 +1,88 @@
-@(form: Form[formdata.PassageQuestionAnswerData], passageId : Long)
+@(form: Form[formdata.PassageQuestionAnswerData], passageId: Long)
 
-@main("Answer Passage Questions") {
-
-
-@helper.form(routes.SimplePassageController.answerPassageQuestions_submit(passageId)) {
-
-				<div style="padding-left:20px">
+    @main("Answer Passage Questions") {
 
 
-					<div class="pull-right" style="width:50%;">
-						@SimplePassage.byId(passageId).text
-					</div>
-					<div>
+        @helper.form(routes.SimplePassageController.answerPassageQuestions_submit(passageId)) {
 
-						<p>
-							<h3> Multiple Choice Question for @SimplePassage.byId(passageId).title</h3>
-							@for(q <- SimplePassage.byId(passageId).questions.toList.sortWith{(o,p) => o.position < p.position}){
-							<h3></h3>
-							<strong> @PassageQuestionPrompt.byPassageQuestion(q.id).get(0).text </strong>    
-							@for( c <- q.choices.toList.sortWith{(o,p) => o.position < p.position}){
-							<div class="radio">
-								<label>
-
-									<input type="radio" name="@q.position,@c.position" onchange="setAnswer();" >@PassageQuestionAnswer.byPassageQuestionChoice(c.id).get(0).text
-								</label>
-								
-							</div>
-						}
-						<br>
-						<br> 
-					}
+            <div style="padding-left:20px">
 
 
-				</p>
-				<br>
+                <div class="pull-right" style="width:50% ;">
+                @SimplePassage.byId(passageId).text
+                </div>
+                <div>
+
+                    <p>
+                <h3> Multiple Choice Question for @SimplePassage.byId(passageId).title</h3>
+                    @for(q <- SimplePassage.byId(passageId).questions.toList.sortWith { (o, p) => o.position < p.position }) {
+                        <h3></h3>
+                        <strong> @PassageQuestionPrompt.byPassageQuestion(q.id).get(0).text </strong>
+                        @for(c <- q.choices.toList.sortWith { (o, p) => o.position < p.position }) {
+                            <div class="radio">
+                                <label>
+
+                                    <input type="radio" name="@q.position,@c.position" onchange="setAnswer();" >@PassageQuestionAnswer.byPassageQuestionChoice(c.id).get(0).text
+                                </label>
+
+                            </div>
+                        }
+                        <br>
+                        <br>
+                        }
 
 
-				<p>
-			<button type="submit" class="btn btn-success">
-				<i class="btn-icon-only icon-check"></i> Submit
-			</button>
-		</p>
-
-			</div>
-
-			</div>
-}
-
-<script>
-	function setAnswer(e){
-		//http://stackoverflow.com/questions/3001474/how-to-get-caller-element-using-javascript
-		var sender = (e && e.target) || (window.event && window.event.srcElement);
-		var name = sender.name;
-
-	
-
-		var questionNumber = name.substr(0,name.indexOf(","));
-
-		
-
-		var choiceNumber = name.substr(name.indexOf(",") + 1, name.length);
-
-		
-		
-
-		var previousAnswers = document.getElementsByName("answers[" + questionNumber + "]");
-
-		console.log(" correctAnswers[" + questionNumber + "] " + previousAnswers.length);
+                    </p>
+                    <br>
 
 
-		var checkboxes = document.getElementsByTagName("input");
-		if(previousAnswers != null && previousAnswers.length > 0){
-			previousAnswers[0].value = choiceNumber;
-		} else {
-			var hiddenChoiceDiv = '<div style="display:none"><input type="text" name="answers[' + questionNumber + ']" value="' + choiceNumber + '" /> </div>';
-			$(hiddenChoiceDiv).insertAfter(sender);
-		}
+                    <p>
+                        <button type="submit" class="btn btn-success">
+                            <i class="btn-icon-only icon-check"></i> Submit
+                        </button>
+                    </p>
 
-		for(var i = 0; i < checkboxes.length; i++){
-			if(checkboxes[i].type == "radio" && checkboxes[i].name != sender.name){
-				if(checkboxes[i].name.indexOf(questionNumber) == 0) checkboxes[i].disabled = true; 
-			}
-		}
-	}
-</script>
+                </div>
 
-}
+            </div>
+        }
+
+        <script>
+                function setAnswer(e){
+                    //http://stackoverflow.com/questions/3001474/how-to-get-caller-element-using-javascript
+                    var sender = (e && e.target) || (window.event && window.event.srcElement);
+                    var name = sender.name;
+
+
+
+                    var questionNumber = name.substr(0,name.indexOf(","));
+
+
+
+                    var choiceNumber = name.substr(name.indexOf(",") + 1, name.length);
+
+
+
+
+                    var previousAnswers = document.getElementsByName("answers[" + questionNumber + "]");
+
+                    console.log(" correctAnswers[" + questionNumber + "] " + previousAnswers.length);
+
+
+                    var checkboxes = document.getElementsByTagName("input");
+                    if(previousAnswers != null && previousAnswers.length > 0){
+                        previousAnswers[0].value = choiceNumber;
+                    } else {
+                        var hiddenChoiceDiv = '<div style="display:none"><input type="text" name="answers[' + questionNumber + ']" value="' + choiceNumber + '" /> </div>';
+                        $(hiddenChoiceDiv).insertAfter(sender);
+                    }
+
+                    for(var i = 0; i < checkboxes.length; i++){
+                        if(checkboxes[i].type == "radio" && checkboxes[i].name != sender.name){
+                            if(checkboxes[i].name.indexOf(questionNumber) == 0) checkboxes[i].disabled = true;
+                        }
+                    }
+                }
+        </script>
+
+    }

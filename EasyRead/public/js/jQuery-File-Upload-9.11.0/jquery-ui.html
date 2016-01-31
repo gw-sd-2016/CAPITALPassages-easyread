@@ -13,35 +13,41 @@
 -->
 <html lang="en">
 <head>
-<!-- Force latest IE rendering engine or ChromeFrame if installed -->
-<!--[if IE]>
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-<![endif]-->
-<meta charset="utf-8">
-<title>jQuery File Upload Demo - jQuery UI version</title>
-<meta name="description" content="File Upload widget with multiple file selection, drag&amp;drop support, progress bars, validation and preview images, audio and video for jQuery. Supports cross-domain, chunked and resumable file uploads and client-side image resizing. Works with any server-side platform (PHP, Python, Ruby on Rails, Java, Node.js, Go etc.) that supports standard HTML form file uploads.">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- jQuery UI styles -->
-<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/dark-hive/jquery-ui.css" id="theme">
-<!-- Demo styles -->
-<link rel="stylesheet" href="css/demo.css">
-<!--[if lte IE 8]>
-<link rel="stylesheet" href="css/demo-ie8.css">
-<![endif]-->
-<style>
-/* Adjust the jQuery UI widget font-size: */
-.ui-widget {
-    font-size: 0.95em;
-}
-</style>
-<!-- blueimp Gallery styles -->
-<link rel="stylesheet" href="//blueimp.github.io/Gallery/css/blueimp-gallery.min.css">
-<!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
-<link rel="stylesheet" href="css/jquery.fileupload.css">
-<link rel="stylesheet" href="css/jquery.fileupload-ui.css">
-<!-- CSS adjustments for browsers with JavaScript disabled -->
-<noscript><link rel="stylesheet" href="css/jquery.fileupload-noscript.css"></noscript>
-<noscript><link rel="stylesheet" href="css/jquery.fileupload-ui-noscript.css"></noscript>
+    <!-- Force latest IE rendering engine or ChromeFrame if installed -->
+    <!--[if IE]>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <![endif]-->
+    <meta charset="utf-8">
+    <title>jQuery File Upload Demo - jQuery UI version</title>
+    <meta name="description"
+          content="File Upload widget with multiple file selection, drag&amp;drop support, progress bars, validation and preview images, audio and video for jQuery. Supports cross-domain, chunked and resumable file uploads and client-side image resizing. Works with any server-side platform (PHP, Python, Ruby on Rails, Java, Node.js, Go etc.) that supports standard HTML form file uploads.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- jQuery UI styles -->
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/dark-hive/jquery-ui.css"
+          id="theme">
+    <!-- Demo styles -->
+    <link rel="stylesheet" href="css/demo.css">
+    <!--[if lte IE 8]>
+    <link rel="stylesheet" href="css/demo-ie8.css">
+    <![endif]-->
+    <style>
+        /* Adjust the jQuery UI widget font-size: */
+        .ui-widget {
+            font-size: 0.95em;
+        }
+    </style>
+    <!-- blueimp Gallery styles -->
+    <link rel="stylesheet" href="//blueimp.github.io/Gallery/css/blueimp-gallery.min.css">
+    <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
+    <link rel="stylesheet" href="css/jquery.fileupload.css">
+    <link rel="stylesheet" href="css/jquery.fileupload-ui.css">
+    <!-- CSS adjustments for browsers with JavaScript disabled -->
+    <noscript>
+        <link rel="stylesheet" href="css/jquery.fileupload-noscript.css">
+    </noscript>
+    <noscript>
+        <link rel="stylesheet" href="css/jquery.fileupload-ui-noscript.css">
+    </noscript>
 </head>
 <body>
 <ul class="navigation">
@@ -90,9 +96,11 @@
     <li class="active"><a href="jquery-ui.html">jQuery UI</a></li>
 </ul>
 <blockquote>
-    <p>File Upload widget with multiple file selection, drag&amp;drop support, progress bars, validation and preview images, audio and video for jQuery UI.<br>
-    Supports cross-domain, chunked and resumable file uploads and client-side image resizing.<br>
-    Works with any server-side platform (PHP, Python, Ruby on Rails, Java, Node.js, Go etc.) that supports standard HTML form file uploads.</p>
+    <p>File Upload widget with multiple file selection, drag&amp;drop support, progress bars, validation and preview
+        images, audio and video for jQuery UI.<br>
+        Supports cross-domain, chunked and resumable file uploads and client-side image resizing.<br>
+        Works with any server-side platform (PHP, Python, Ruby on Rails, Java, Node.js, Go etc.) that supports standard
+        HTML form file uploads.</p>
 </blockquote>
 <!-- The file upload form used as target for the file upload widget -->
 <form id="fileupload" action="//jquery-file-upload.appspot.com/" method="POST" enctype="multipart/form-data">
@@ -122,16 +130,26 @@
         </div>
     </div>
     <!-- The table listing the files available for upload/download -->
-    <table role="presentation"><tbody class="files"></tbody></table>
+    <table role="presentation">
+        <tbody class="files"></tbody>
+    </table>
 </form>
 <br>
 <h3>Demo Notes</h3>
 <ul>
     <li>The maximum file size for uploads in this demo is <strong>999 KB</strong> (default file size is unlimited).</li>
-    <li>Only image files (<strong>JPG, GIF, PNG</strong>) are allowed in this demo (by default there is no file type restriction).</li>
-    <li>Uploaded files will be deleted automatically after <strong>5 minutes or less</strong> (demo files are stored in memory).</li>
-    <li>You can <strong>drag &amp; drop</strong> files from your desktop on this webpage (see <a href="https://github.com/blueimp/jQuery-File-Upload/wiki/Browser-support">Browser support</a>).</li>
-    <li>Please refer to the <a href="https://github.com/blueimp/jQuery-File-Upload">project website</a> and <a href="https://github.com/blueimp/jQuery-File-Upload/wiki">documentation</a> for more information.</li>
+    <li>Only image files (<strong>JPG, GIF, PNG</strong>) are allowed in this demo (by default there is no file type
+        restriction).
+    </li>
+    <li>Uploaded files will be deleted automatically after <strong>5 minutes or less</strong> (demo files are stored in
+        memory).
+    </li>
+    <li>You can <strong>drag &amp; drop</strong> files from your desktop on this webpage (see <a
+            href="https://github.com/blueimp/jQuery-File-Upload/wiki/Browser-support">Browser support</a>).
+    </li>
+    <li>Please refer to the <a href="https://github.com/blueimp/jQuery-File-Upload">project website</a> and <a
+            href="https://github.com/blueimp/jQuery-File-Upload/wiki">documentation</a> for more information.
+    </li>
     <li>Built with <a href="https://jqueryui.com">jQuery UI</a>.</li>
 </ul>
 <!-- The blueimp Gallery widget -->
@@ -169,6 +187,7 @@
         </td>
     </tr>
 {% } %}
+
 </script>
 <!-- The template to display files available for download -->
 <script id="template-download" type="text/x-tmpl">
@@ -198,6 +217,7 @@
         </td>
     </tr>
 {% } %}
+
 </script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
@@ -230,17 +250,17 @@
 <!-- The main application script -->
 <script src="js/main.js"></script>
 <script>
-// Initialize the jQuery UI theme switcher:
-$('#theme-switcher').change(function () {
-    var theme = $('#theme');
-    theme.prop(
-        'href',
-        theme.prop('href').replace(
-            /[\w\-]+\/jquery-ui.css/,
-            $(this).val() + '/jquery-ui.css'
-        )
-    );
-});
+    // Initialize the jQuery UI theme switcher:
+    $('#theme-switcher').change(function () {
+        var theme = $('#theme');
+        theme.prop(
+                'href',
+                theme.prop('href').replace(
+                        /[\w\-]+\/jquery-ui.css/,
+                        $(this).val() + '/jquery-ui.css'
+                )
+        );
+    });
 </script>
 <!-- The XDomainRequest Transport is included for cross-domain file deletion for IE 8 and IE 9 -->
 <!--[if (gte IE 8)&(lt IE 10)]>

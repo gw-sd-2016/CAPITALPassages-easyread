@@ -14,60 +14,59 @@ import java.util.List;
 @Entity
 public class PassageQuestionPrompt extends Model {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// Fields
-	@Id
-	@Expose
-	public Long id;
-
-
-	@Required
-	@Lob
-	public String text;
-	
-	@Expose
-	public Long questionId; 
-	
+    // Fields
+    @Id
+    @Expose
+    public Long id;
 
 
-	public static Finder<String,PassageQuestionPrompt> find = new Finder<String,PassageQuestionPrompt>(String.class, PassageQuestionPrompt.class);
+    @Required
+    @Lob
+    public String text;
 
-	public static PassageQuestionPrompt byId(Long id) {
-		return find.where().eq("id", id).findUnique();
-	}
-	public static List<PassageQuestionPrompt> byPassageQuestion(Long id) {
-		return find.where().eq("question_id", id).findList();
-	}
-	
-	
-	
-	public static List<PassageQuestionPrompt> all() {
-		return find.where().findList();
-	}
+    @Expose
+    public Long questionId;
 
-	public PassageQuestionPrompt(PassageQuestion q, String text){
-		this.questionId = q.id;
-		this.text = text;
-		
-	}
+
+    public static Finder<String, PassageQuestionPrompt> find = new Finder<String, PassageQuestionPrompt>(String.class, PassageQuestionPrompt.class);
+
+    public static PassageQuestionPrompt byId(Long id) {
+        return find.where().eq("id", id).findUnique();
+    }
+
+    public static List<PassageQuestionPrompt> byPassageQuestion(Long id) {
+        return find.where().eq("question_id", id).findList();
+    }
+
+
+    public static List<PassageQuestionPrompt> all() {
+        return find.where().findList();
+    }
+
+    public PassageQuestionPrompt(PassageQuestion q, String text) {
+        this.questionId = q.id;
+        this.text = text;
+
+    }
 
 	
 	/*
-	public void delete(){
+    public void delete(){
 		this.delete();
 		System.out.println("deleting");
 	}
 */
-	
 
-	public static List<PassageQuestionPrompt> allPrompts() {
-		return find.all();
-	}
 
-	public static PassageQuestionPrompt create(PassageQuestionPrompt prompt) {
-		prompt.save();
-		return prompt;
-	}
+    public static List<PassageQuestionPrompt> allPrompts() {
+        return find.all();
+    }
+
+    public static PassageQuestionPrompt create(PassageQuestionPrompt prompt) {
+        prompt.save();
+        return prompt;
+    }
 
 }
