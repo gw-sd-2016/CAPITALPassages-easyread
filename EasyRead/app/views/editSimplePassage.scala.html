@@ -51,17 +51,8 @@
 
                     Grade
 
-                    @if(SimplePassage.byId(passageId) == 0) {
-                        K
-                    }
+                    @PassageAnalysisController.displayGrade(SimplePassage.byId(passageId).grade)
 
-                    @if(SimplePassage.byId(passageId).grade >= 12) {
-                        College Level or Above
-                } else {
-                @if(SimplePassage.byId(passageId).grade != 0 && SimplePassage.byId(passageId).grade <= 12) {
-                    @SimplePassage.byId(passageId).grade
-                }
-                }
                     <span class="caret"></span></button>
                 <ul class="dropdown-menu">
                     <li><a href="editPassageAtGrade?passageId=@passageId&grade=0">K</a></li>

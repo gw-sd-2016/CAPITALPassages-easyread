@@ -158,7 +158,11 @@ public class POS extends Model {
 
     //http://stackoverflow.com/questions/1833252/java-stanford-nlp-part-of-speech-labels
     public static boolean isSignificant(String tag) {
+
         switch (tag) {
+
+            /*
+
             case ("WRB"):
                 return true;
             case ("WP$"):
@@ -228,6 +232,80 @@ public class POS extends Model {
             case ("MD"):
                 return false;
             case ("Noun"):
+                return true;
+            default:
+                return false;
+                */
+
+            case ("Whadverb"):
+                return true;
+            case ("Possessive whpronoun"):
+                return false;
+            case ("Whpronoun"):
+                return false;
+            case ("Whdeterminer"): // possesive
+                return false;
+            case ("Verb, 3rd person Singular Present"):
+                return true;
+            case ("Verb, non 3rd person singular present"):
+                return true;
+            case ("Verb, past participle"):
+                return true;
+            case ("Verb, gerund or present participle"):
+                return true;
+            case ("Verb, past tense"):
+                return true;
+            case ("Verb, base form"):
+                return true;
+            case ("Interjection"):
+                return false;
+            case ("To"):
+                return false;
+            case ("Symbol"):
+                return false;
+            case ("Particle"):
+                return false;
+            case ("Adverb, superlative"):
+                return true;
+            case ("Adverb, comparative"):
+                return true;
+            case ("Adverb"):
+                return true;
+            case ("Possesive Pronoun"):
+                return false;
+            case ("Personal Pronoun"):
+                return false;
+            case ("Possesive Ending"):
+                return false;
+            case ("Predeterminer"):
+                return false;
+            case ("Proper noun, plural"):
+                return false;
+            case ("Proper noun, singular"):
+                return false;
+            case ("Noun, plural"):
+                return true;
+            case ("Coordinating Conjunction"):
+                return false;
+            case ("Determiner"): //possesive
+                return false;
+            case ("Existential there"):
+                return false;
+            case ("Foreign Word"):
+                return false;
+            case ("Preposition or subordinating conjunction"):
+                return false;
+            case ("Adjective"):
+                return true;
+            case ("Adjective, comparative"):
+                return true;
+            case ("Adjective, superlative"):
+                return true;
+            case ("List item marker"):
+                return false;
+            case ("Modal"):
+                return false;
+            case ("Noun, singular or mass"):
                 return true;
             default:
                 return false;

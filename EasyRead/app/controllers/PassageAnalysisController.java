@@ -21,6 +21,18 @@ public class PassageAnalysisController {
         return age - 6;
     }
 
+    public static String toGrade(double age){
+        if (age <= 6) return "K";
+        else if (age > 18) return "College";
+        return String.valueOf((int)age - 6);
+    }
+
+    public static String displayGrade(int grade){
+        if (grade == 0) return "K";
+        else if (grade == 13) return "College";
+        return String.valueOf(grade);
+    }
+
     public double gradeResolution(double grade) {
         if (grade > 12) return 13;
         else return grade;
@@ -201,7 +213,7 @@ public class PassageAnalysisController {
 
             if (Suggestion.byWord(word).size() == 0) {
 
-                HashSet<String> suggestions = c.wordIDLookup(word, p.name);
+                HashSet<String> suggestions = c.synonymnLookup(word, p.name);
 
 
                 for (String root : suggestions) {

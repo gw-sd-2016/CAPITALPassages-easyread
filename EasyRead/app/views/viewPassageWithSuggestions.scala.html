@@ -57,6 +57,11 @@
                     </a>
 
 
+                    <a class="btn btn-primary" id="sentenceDepth" href="@routes.SimplePassageController.viewPassageDeepAnalysis(passage.id)" style="margin-bottom: 20px ;">
+                        <i class="glyphicon glyphicon-equalizer"></i>
+                        Deep Analysis
+                    </a>
+
                     @for(tag <- passage.tags) {
 
 
@@ -85,17 +90,7 @@
 
                             Grade
 
-                            @if(passage.grade == 0) {
-                                K
-                            }
-
-                            @if(passage.grade >= 12) {
-                                College Level or Above
-                        } else {
-                        @if(passage.grade != 0 && passage.grade <= 12) {
-                            @passage.grade
-                        }
-                        }
+                            @PassageAnalysisController.displayGrade(passage.grade)
                             <span class="caret"></span></button>
                         <ul class="dropdown-menu">
                             <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=0">K</a></li>
@@ -138,18 +133,8 @@
                     <h1> @passage.title </h1>
 
                     <strong> Added By: </strong> @instructor.firstName @instructor.lastName <br>
-                    <strong> Displaying at Grade Level:  </strong>   @if(passage.grade == 0) {
-                    K
-                }
-
-                    @if(passage.grade >= 12) {
-                        College Level or Above
-                    } else {
-
-                        @if(passage.grade != 0 && passage.grade <= 12) {
-                            @passage.grade
-                        }
-                    }<br>
+                    <strong> Displaying at Grade Level:  </strong>  @PassageAnalysisController.toGrade(passage.grade)
+                    <br>
                     <strong> Source:  </strong> @passage.source <br><br>
                 </div>
 

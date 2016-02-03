@@ -4,36 +4,6 @@
 
 @main("Viewing Passage Deeper Analysis") {
 
-    <style type="text/css">
-    /*This entire example and the sliders are from  https://github.com/eduardomb/jquery-panelslider */
-    .panel {
-    display: none ;
-    width: 20% ;
-    overflow-y: scroll ;
-    overflow-x:scroll ;
-    padding: 20px ;
-    background-color: #333 ;
-    color: #fff ;
-    box-shadow: inset 0 0 5px 5px #222 ;
-    }
-    </style>
-
-
-        <!-- Left panel -->
-    <div id="left-panel" class="panel" style="overflow-y:scroll"></div>
-
-    @if(flash.containsKey("success")) {
-        <div class="alert alert-success">
-            <h2>Done!</h2> @flash.get("success")
-        </div>
-    }
-
-
-    <a id="left-panel-link" class="btn btn-primary" href="#left-panel" style="display: none ;">
-        <i class="glyphicon glyphicon-edit"> Left Panel</i>
-    </a>
-
-
     <div class="container">
 
         <div class="pull-left">
@@ -66,65 +36,9 @@
                     </a>
                 }
 
-                <a class="btn btn-primary" id="toggle" href="view?passageId=@passage.id&grade=0" style="margin-bottom: 20px ;">
-                    <i class="glyphicon glyphicon-flash"></i>
-                    Turn off Suggestions
-                </a>
-
-
             </div>
         </div>
-
-        <div class="pull-right">
-
-
-            <div class="btn-group">
-                <h5>Choose The Grade Level this passage should be displayed at</h5>
-                <div class="dropdown">
-                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-
-                        Grade
-
-                        @if(passage.grade == 0) {
-                            K
-                        }
-
-                        @if(passage.grade >= 12) {
-                            College Level or Above
-                    } else {
-                    @if(passage.grade != 0 && passage.grade <= 12) {
-                        @passage.grade
-                    }
-                    }
-                        <span class="caret"></span></button>
-                    <ul class="dropdown-menu">
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=0">K</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=1">1</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=2">2</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=3">3</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=4">4</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=5">5</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=6">6</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=7">7</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=8">8</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=9">9</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=10">10</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=11">11</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=12">12</a></li>
-                        <li><a href="viewPassageWithSuggestions?passageId=@passage.id&grade=13">College</a></li>
-                    </ul>
-                </div>
-
-
-            </div>
-
-
-        </div>
-
-
     </div>
-
-
 
     <div class="container-fluid">
 
@@ -136,18 +50,8 @@
 
             <div class="container">
                 <h1> @passage.title </h1>
-                <strong> Displaying at Grade Level:  </strong>   @if(passage.grade == 0) {
-                K
-            }
-
-                @if(passage.grade >= 12) {
-                    College Level or Above
-                } else {
-
-                    @if(passage.grade != 0 && passage.grade <= 12) {
-                        @passage.grade
-                    }
-                }<br>
+                <strong> Displaying at Grade Level:  </strong>   @PassageAnalysisController.toGrade(passage.grade)
+                <br>
                 <strong> Source:  </strong> @passage.source <br><br>
             </div>
 
@@ -163,156 +67,31 @@
                 <li>
 
                     <div>
-                    @if(diff <= passage.grade) {
+
+
+                    @if(Double.valueOf(diff.split(" ").apply(1)) <= passage.grade) {
                         <span class="label label-primary">Just Right</span>
+                        <a  href="@routes.SimplePassageController.viewPassageSentenceDrilldown(passage.id, Integer.valueOf(diff.split(" ")(0)))">
+                            Look Anyway
+                        </a>
                     } else {
 
                         <span class="label label-danger">Too Hard</span>
 
-                        This passage's average grade level is @passage.grade and these two sentences are grade: @diff
+                        This passage's average grade level is @passage.grade and sentences @(Integer.valueOf(diff.split(" ")(0))-2) - @Integer.valueOf(diff.split(" ")(0)) have some words that are a little tough.
 
+                        <a  href="@routes.SimplePassageController.viewPassageSentenceDrilldown(passage.id, Integer.valueOf(diff.split(" ")(0)))">
+                           Dive In
+                        </a>
 
                     }
                     </div>
 
                 </li>
-
-
             }
             </ol>
 
-
-            <script src="/assets/js/jquery.panelslider.min.js"></script>
-            <script>
-                    $('#left-panel-link').panelslider({side: 'left', clickClose: false, duration: 200 });
-                    $('#right-panel-link').panelslider({side: 'right', clickClose: false, duration: 200 });
-
-                    $('#close-panel-bt').click(function() {
-                        $.panelslider.close();
-                    });
-            </script>
-
-
-            <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
-
-            <script>
-                    function alertSuggestions(){
-                        alert("This word is too complicated for this grade level!");
-                    }
-
-                    //http://www.creativejuiz.fr/blog/en/javascript-en/read-url-get-parameters-with-javascript
-                    function $_GET(param) {
-                        var vars = {};
-                        window.location.href.replace(
-                                /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
-                                function( m, key, value ) { // callback
-                                    vars[key] = value !== undefined ? value : '';
-                                }
-                        );
-
-                        if ( param ) {
-                            return vars[param] ? vars[param] : null;
-                        }
-                        return vars;
-                    }
-
-                    function acceptWord(word){
-                        jsRoutes.controllers.SimplePassageController.acceptWord(word.id,$_GET('grade')).ajax({
-                            success : function(data) {
-                                //window.location.reload();
-                            },
-                            error : function(err) {
-                                //window.location = "";
-                            },
-                            complete : function() {
-                                window.location.reload();
-                            }
-                        });
-                    }
-
-                    function replaceWord(word, replacement){
-                        jsRoutes.controllers.SimplePassageController.replaceWord(@passage.id, word, replacement).ajax({
-                            success : function(data) {
-                                //window.location.reload();
-                            },
-                            error : function(err) {
-                                //window.location = "";
-                            },
-                            complete : function() {
-                                window.location.reload();
-                            }
-                        });
-                    }
-
-
-                    $(document).ready(function(){
-
-                        //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
-                        // locate your element and add the Click Event Listener
-
-                        function isEmpty( el ){
-                            return !$.trim(el.html())
-                        }
-
-
-
-
-
-                        $("u").click(function(){
-                            var string = $(this).html();
-
-
-
-                            var leftPanel = document.getElementById("left-panel");
-
-
-                            if(window.getComputedStyle(leftPanel).display === 'none'){
-                                console.log("doing this");
-
-                                $("#left-panel-link").click();
-
-                            }
-
-
-
-
-
-                            var upperDiv = '<div id="title"><h1>' + string + '</h1></div>';
-                            var approvalDiv = "<div id='accept'><button class='btn btn-primary' onclick='acceptWord(" + string + ");'>This is okay!</button></div><br>";
-
-                            var synonymnDiv = "<div class='container-fluid'> <div id='list'>";
-
-                            if(document.getElementById(string) == null){
-                                synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
-                            } else {
-                                //http://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
-                                //http://stackoverflow.com/questions/22036576/why-does-the-javascript-string-whitespace-character-nbsp-not-match
-                                var synonymnList = document.getElementById(string).innerText.trim("/\r?\n|\r/g").split(String.fromCharCode(160));
-
-
-                                var ran = false;
-                                for(var i = 1; i < synonymnList.length; i++){
-                                    ran = true;
-                                    synonymnDiv += i + ". <span onclick='replaceWord(\"" + string + "\", \"" + synonymnList[i] + "\");' style='background-color: gray;'><h3>" + synonymnList[i] + "</h3></span><br>";
-                                }
-
-                                if(!ran){
-                                    synonymnDiv += "This word is too complicated, <br> but we don't have any <br> suggestions for you yet.";
-                                }
-
-
-                            }
-
-                            synonymnDiv += "</div></div><br><button id='close-panel-bt' class='btn btn-primary' onclick='$.panelslider.close();'>Close Planel</button>";
-
-                            leftPanel.innerHTML = upperDiv + approvalDiv + synonymnDiv;
-
-                        });
-
-                    });
-
-
-            </script>
-
+        </div>
+    </div>
 
 }

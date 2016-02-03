@@ -186,5 +186,10 @@ public class Word extends Model {
         }
     }
 
+    public static int convertAgeToGrade(double age){
+        if (age <= 6) return 0;
+        else if (age > 18) return 13;
+        return (int) age - 6;
+    }
 
 }

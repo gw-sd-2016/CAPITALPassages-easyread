@@ -38,6 +38,11 @@
                     Turn on Suggestions
                 </a>
 
+                <a class="btn btn-primary" id="sentenceDepth" href="@routes.SimplePassageController.viewPassageDeepAnalysis(passage.id)" style="margin-bottom: 20px ;">
+                    <i class="glyphicon glyphicon-equalizer"></i>
+                    Deep Analysis
+                </a>
+
                 <br>
 
 
@@ -60,21 +65,7 @@
         <div style="text-align:left ;">
             <strong> @passage.title </strong>
             <strong> Added By: </strong> @instructor.firstName @instructor.lastName <br>
-            <strong> Grade Level:  </strong>
-            @if(passage.grade == 0) {
-                K
-            }
-
-            @if(passage.grade >= 12) {
-                College Level or Above
-            } else {
-
-                @if(passage.grade != 0 && passage.grade <= 12) {
-                    @passage.grade
-                }
-            }
-
-
+            <strong> Grade Level:  </strong> @PassageAnalysisController.displayGrade(passage.grade)
             <br>
             <strong> Source:  </strong> @passage.source <br><br>
 

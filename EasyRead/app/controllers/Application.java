@@ -24,19 +24,6 @@ import static play.data.Form.form;
 public class Application extends Controller {
 
     public Result index() throws JWNLException {
-
-
-        /*WordNetController testing = new WordNetController();
-
-        testing.synonymnLookup("passing", "verb");
-*/
-
-        for (SimplePassage p : SimplePassage.all()) {
-            // int count = p.sentences.get(0).words.size();
-
-        }
-
-
         return ok(index.render(session("userFirstName")));
     }
 
@@ -102,6 +89,5 @@ public class Application extends Controller {
     public static Result viewAllPassageTags() {
         return ok(viewAllPassageTags.render(PassageTag.all()));
     }
-
 
 }

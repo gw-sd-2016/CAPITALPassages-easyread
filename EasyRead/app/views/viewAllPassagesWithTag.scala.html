@@ -61,14 +61,7 @@
                                 <td>@if(passage.sentences.size == 0) {
                                     Grade Level not available yet.
                                 } else {
-                                    @if(passage.grade == 0) {
-                                        K
-                                    }
-                                    @if(passage.grade >= 12) {
-                                        College Level or Above
-                                    } else {
-                                        @passage.grade
-                                    }
+                                    @PassageAnalysisController.displayGrade(passage.grade)
                                 }
 
                                 </td>

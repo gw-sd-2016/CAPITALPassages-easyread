@@ -714,7 +714,7 @@ public class SimplePassageController extends Controller {
             b.append(p.sentences.get(startingSentence).text);
             b.append(p.sentences.get(startingSentence + 1).text);
 
-            return ok(viewPassageSentenceDrillDown.render(p.grade, b.toString()));
+            return ok(viewPassageSentenceDrillDown.render(p.id, p.grade, b.toString()));
         }
 
         return badRequest();

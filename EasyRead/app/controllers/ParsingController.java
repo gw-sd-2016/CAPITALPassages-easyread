@@ -53,7 +53,7 @@ public class ParsingController {
 
         int i = 0;
 
-        int originalSCount = passage.sentences.size();
+        int originalSCount =/*passage.sentences.size();*/ 0;
 
         if (originalSCount == 0) {
             passage.num_characters = 0;
@@ -87,7 +87,7 @@ public class ParsingController {
                     new MashapeController().getNumSyllablesForWord(lemma, passage);
 
 
-                    passage.numWords++;
+                    if(originalSCount == 0) passage.numWords++;
                     a.generateSuggestionsForWord(p, lemma, s.text, passage.id, token.originalText());
                     //}
 
@@ -113,8 +113,7 @@ public class ParsingController {
             sentenceNum++;
         }
 
-			/*if(originalSCount == 0)*/
-        a.determineGradeLevel(passage);
+        if(originalSCount == 0) a.determineGradeLevel(passage);
         try {
             passage.save();
         } catch (Exception e) {
