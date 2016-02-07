@@ -52,7 +52,7 @@
 
                             <td><a href="/view?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
                             @if(passage.text.length >= 200) {
-                                <td>@passage.text.substring(0, 200)....</td>
+                                <td>@Html(passage.text.substring(0, 200))....</td>
 
                             } else {
                                 <td>@passage.text</td>

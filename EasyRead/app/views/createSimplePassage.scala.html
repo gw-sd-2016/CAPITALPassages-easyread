@@ -49,16 +49,12 @@
 
                         </form>
 
-
-
-
-
-
-
                         <h4>Passage Body</h4>
 
-                        <textarea class="form-control" rows="3" name="passageText" qvalue="@form("passageText").value" style="width:90%"></textarea>
+                        <input type="text" name="passageText" value="@Html(form("passageText").value)" style="display: none ;">
 
+
+                        <div id="editor"></div>
 
 
                         <br>
@@ -72,7 +68,23 @@
             </div>
         }
 
+
+            <!-- http://quilljs.com/docs/api -->
+            <!-- Include the Quill library -->
+        <script src="//cdn.quilljs.com/0.20.1/quill.js"></script>
+
+            <!-- Initialize Quill editor -->
         <script>
+                var quill = new Quill('#editor', {
+                    formats: ['size', 'underline']
+                });
+
+                quill.on('text-change', function(delta, source) {
+                    console.log("Called");
+                    var element = document.getElementsByName("passageText")[0];
+                    element.setAttribute("value", quill.getHTML());
+                });
+
                 function addTag() {
 //problem here
                     //http://stackoverflow.com/questions/3001474/how-to-get-caller-element-using-javascript

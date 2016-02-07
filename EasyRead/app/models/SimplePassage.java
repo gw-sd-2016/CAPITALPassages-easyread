@@ -139,13 +139,12 @@ public class SimplePassage extends Model {
     public List<String> sentenceBreakdown() {
         PassageAnalysisController analysisController = new PassageAnalysisController();
 
-
         List<String> difficulties = new ArrayList<String>();
 
         if (this.sentences.size() > 2) {
             for (int i = 2; i < this.sentences.size(); i++) {
                 if (i % 2 == 0) {
-                    difficulties.add(i + " " + analysisController.convertToGrade(analysisController.averageAgeForRange(this, i - 2, i)));
+                    difficulties.add(i + " " + analysisController.determineGradeLevelForString(this.sentences.get(i - 1).text + " " + this.sentences.get(i).text));
                 }
             }
         }

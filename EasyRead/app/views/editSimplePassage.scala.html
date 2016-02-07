@@ -1,7 +1,4 @@
-
-
 @import play.api.libs.json.Json
-
 
 @(form: Form[formdata.SimplePassageData], passageId: Long)
 
@@ -23,22 +20,6 @@
     </style>
 
     <div id="left-panel" class="panel"></div>
-
-    <div>
-    @for(word <- SimplePassage.byId(passageId).text.split(" ")) {
-        @if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > (SimplePassage.byId(passageId).grade + 6) && !SimplePassage.byId(passageId).getStopWords().contains(word)) {
-            @if(Suggestion.byWord(word).map(x => x.suggestedWord).distinct.size > 0) {
-                    <!-- http://stackoverflow.com/questions/18830813/how-can-i-remove-punctuation-from-input-text-in-java -->
-                <div style="display:none ;" id="@word">
-                    @for(w <- Suggestion.byWord(word).sortWith(_.frequency > _.frequency).map(x => x.suggestedWord).distinct) {@w&nbsp}
-                    <br>
-                </div>
-            }
-        }
-    }
-
-    </div>
-
 
 
     <div class="pull-right">
@@ -75,6 +56,7 @@
 
         </div>
 
+        </div>
 
         <a id="left-panel-link" class="btn btn-primary" href="#left-panel" style="display: none ;">
             <i class="glyphicon glyphicon-edit"> Left Panel</i>
@@ -115,18 +97,21 @@
                         <h4>Source</h4>
                         <input type="text" name="source" placeholder="Passage Source" value="@form("source").value">
 
-                        <input type="text" id="text" name="passageText" value="@form("passageText").value" style="display:none">
+                        <input type="text" id="text" name="passageText" value="@Html(form("passageText").value)" style="display:none">
 
 
                         <h4>Passage Body</h4>
                             <!-- http://quilljs.com/docs/quickstart/ -->
                             <!-- Create the editor container -->
+
+                        <a class="btn btn-primary" onClick="fetchSuggestions();">Load Suggestions</a>
+
+
                         <div id="editor">
                             <div>@SimplePassage.byId(passageId).text</div>
 
                             <div><br></div>
                         </div>
-
 
 
                         <p>
@@ -161,6 +146,8 @@
 
 
         <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+        <script type="text/javascript" src='@routes.Assets.at("/javascripts/easyread.js")'></script>
+
 
 
             <!-- http://quilljs.com/docs/api -->
@@ -169,63 +156,95 @@
 
             <!-- Initialize Quill editor -->
         <script>
-                var quill = new Quill('#editor');
+                var quill = new Quill('#editor', {
+                    formats: ['size', 'underline']
+                });
 
                 quill.on('text-change', function(delta, source) {
+                   // quill.formatText(0, quill.getText().length, "size", 20);
                     console.log("Called");
                     var element = document.getElementsByName("passageText")[0];
                     element.setAttribute("value", quill.getText());
                 });
 
 
+                quill.on('selection-change', function(range) {
+                    if (range) {
+                        if (range.start == range.end) {
+                            console.log('User cursor is on', range.start);
+                        } else {
+                            var text = quill.getText(range.start, range.end);
+                            console.log('User has highlighted', text);
+
+                            var string = text;
 
 
-                //http://www.creativejuiz.fr/blog/en/javascript-en/read-url-get-parameters-with-javascript
-                function $_GET(param) {
-                    var vars = {};
-                    window.location.href.replace(
-                            /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
-                            function( m, key, value ) { // callback
-                                vars[key] = value !== undefined ? value : '';
-                            }
-                    );
+                            jsRoutes.controllers.SimplePassageController.getSuggestions(string)).ajax({
+                                success : function(data) {
+                                    //window.location.reload();
+                                    if(data.length > 0){
 
-                    if ( param ) {
-                        return vars[param] ? vars[param] : null;
+
+                                        var leftPanel = document.getElementById("left-panel");
+
+
+                                        if(window.getComputedStyle(leftPanel).display === 'none'){
+                                            console.log("doing this");
+
+                                            $("#left-panel-link").click();
+
+                                        }
+
+
+                                        var upperDiv = '<div id="title"><h1>' + string + '</h1></div>';
+                                        var approvalDiv = "<div id='accept'><button class='btn btn-primary' onclick='acceptWord(" + string + ");'>This is okay!</button></div><br>";
+
+                                        var synonymnDiv = "<div class='container-fluid'> <div id='list'>";
+
+                                        if(document.getElementById(string) == null){
+                                            synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
+                                        } else {
+                                            //http://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
+                                            //http://stackoverflow.com/questions/22036576/why-does-the-javascript-string-whitespace-character-nbsp-not-match
+                                            var synonymnList = document.getElementById(string).innerText.trim("/\r?\n|\r/g").split(String.fromCharCode(160));
+
+
+                                            var ran = false;
+                                            for(var i = 1; i < synonymnList.length; i++){
+                                                ran = true;
+                                                synonymnDiv += i + ". <span onclick='replaceWord(\"" + string + "\", \"" + synonymnList[i] + "\");' style='background-color: gray;'><h3>" + synonymnList[i] + "</h3></span><br>";
+                                            }
+
+                                            if(!ran){
+                                                synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
+                                            }
+
+
+                                        }
+
+                                        synonymnDiv += "</div></div><br><button id='close-panel-bt' class='btn btn-primary' onclick='$.panelslider.close();'>Close Planel</button>";
+
+                                        leftPanel.innerHTML = upperDiv + approvalDiv + synonymnDiv;
+                                    }
+                                },
+                                error : function(err) {
+                                    //window.location = "";
+                                },
+                                complete : function() {
+
+                                }
+                            });
+
+
+                        }
+                    } else {
+                        console.log('Cursor not in the editor');
                     }
-                    return vars;
+                });
+
+                function fetchSuggestions(){
+                    underlineSpecificWords(@Html(Json.stringify(Json.toJson(SimplePassage.byId(passageId).text.split(" ").toList.distinct.filter(p => (Word.byLemma(p) != null && Word.byLemma(p).ageOfAcquisition > (SimplePassage.byId(passageId).grade + 6) && !SimplePassage.byId(passageId).getStopWords().contains(p)))))));
                 }
-
-                function acceptWord(word){
-                    jsRoutes.controllers.SimplePassageController.acceptWord(word.id,$_GET('grade')).ajax({
-                        success : function(data) {
-                            //window.location.reload();
-                        },
-                        error : function(err) {
-                            //window.location = "";
-                        },
-                        complete : function() {
-                            window.location.reload();
-                        }
-                    });
-                }
-
-
-
-                function replaceWord(word, replacement){
-                    jsRoutes.controllers.SimplePassageController.replaceWord(@passageId, word, replacement).ajax({
-                        success : function(data) {
-                            //window.location.reload();
-                        },
-                        error : function(err) {
-                            //window.location = "";
-                        },
-                        complete : function() {
-                            window.location.reload();
-                        }
-                    });
-                }
-
 
                 function underlineSpecificWords(words){
 
@@ -244,84 +263,9 @@
                             index = currentText.indexOf(word);
                         }
                     }
+
+                    quill.formatText(0, quill.getText().length, "size", 20);
                 }
-
-
-
-                function save(){
-
-                }
-
-
-                $( document ).ready(function() {
-
-                    // http://stackoverflow.com/questions/24309803/playframework-jsvalue-in-html-template
-                    underlineSpecificWords(@Html(Json.stringify(Json.toJson(SimplePassage.byId(passageId).text.split(" ").toList.distinct.filter(p => (Word.byLemma(p) != null && Word.byLemma(p).ageOfAcquisition > (SimplePassage.byId(passageId).grade + 6) && !SimplePassage.byId(passageId).getStopWords().contains(p)))))));
-
-
-                    //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
-                    // locate your element and add the Click Event Listener
-
-                    function isEmpty( el ){
-                        return !$.trim(el.html())
-                    }
-
-
-
-
-
-                    $("u").click(function(){
-                        var string = $(this).html();
-
-
-
-                        var leftPanel = document.getElementById("left-panel");
-
-
-                        if(window.getComputedStyle(leftPanel).display === 'none'){
-                            console.log("doing this");
-
-                            $("#left-panel-link").click();
-
-                        }
-
-
-
-
-
-                        var upperDiv = '<div id="title"><h1>' + string + '</h1></div>';
-                        var approvalDiv = "<div id='accept'><button class='btn btn-primary' onclick='acceptWord(" + string + ");'>This is okay!</button></div><br>";
-
-                        var synonymnDiv = "<div class='container-fluid'> <div id='list'>";
-
-                        if(document.getElementById(string) == null){
-                            synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
-                        } else {
-                            //http://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
-                            //http://stackoverflow.com/questions/22036576/why-does-the-javascript-string-whitespace-character-nbsp-not-match
-                            var synonymnList = document.getElementById(string).innerText.trim("/\r?\n|\r/g").split(String.fromCharCode(160));
-
-
-                            var ran = false;
-                            for(var i = 1; i < synonymnList.length; i++){
-                                ran = true;
-                                synonymnDiv += i + ". <span onclick='replaceWord(\"" + string + "\", \"" + synonymnList[i] + "\");' style='background-color: gray;'><h3>" + synonymnList[i] + "</h3></span><br>";
-                            }
-
-                            if(!ran){
-                                synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
-                            }
-
-
-                        }
-
-                        synonymnDiv += "</div></div><br><button id='close-panel-bt' class='btn btn-primary' onclick='$.panelslider.close();'>Close Planel</button>";
-
-                        leftPanel.innerHTML = upperDiv + approvalDiv + synonymnDiv;
-
-                    });
-
-                });
         </script>
 
 }

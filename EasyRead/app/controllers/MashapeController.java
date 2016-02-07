@@ -4,12 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import models.SimplePassage;
 import models.Suggestion;
 import models.Word;
+import net.davidashen.text.Hyphenator;
 import play.libs.F;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
 import play.mvc.Result;
 
 public class MashapeController implements PhraseValidator {
+
+    private Hyphenator h = new Hyphenator();
 
 
     public void getNumSyllablesForWord(String word, SimplePassage p) {
@@ -59,9 +62,15 @@ public class MashapeController implements PhraseValidator {
 
                             nW.lemma = word;
 
-                            nW.numSyllables = res.findValue("syllables").findValue("count").asInt();
+                            int result = res.findValue("syllables").findValue("count").asInt();
 
-                            //SimplePassage thisPassage = SimplePassage.byId(p.id);
+                            if(result == 0){
+                                nW.numSyllables = Math.max(1, h.hyphenate(word).split("-").length);
+                            } else {
+                                nW.numSyllables = result;
+                            }
+
+
 
                             p.numSyllables += nW.numSyllables;
 

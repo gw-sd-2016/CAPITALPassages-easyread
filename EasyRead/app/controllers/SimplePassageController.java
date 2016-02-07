@@ -1,12 +1,16 @@
 package controllers;
 
 
+import com.avaje.ebeaninternal.server.lib.util.Str;
+import com.fasterxml.jackson.databind.JsonNode;
 import formdata.PassageQuestionAnswerData;
 import formdata.SimplePassageData;
 import formdata.SimplePassageNumQuestionsData;
 import models.*;
 import net.sf.extjwnl.JWNLException;
+import play.api.libs.json.JsArray;
 import play.data.Form;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.*;
@@ -523,6 +527,15 @@ public class SimplePassageController extends Controller {
         }
     }
 
+    public Result getSuggestions(String word){
+
+        List<String> res = new ArrayList<String>();
+
+        for(Suggestion s : Suggestion.byWord(word)) res.add(s.suggestedWord);
+
+        return ok(Json.toJson(res));
+    }
+
     public Result viewAllPassages() {
 
         Long instId = Long.valueOf((session("userId")));
@@ -711,8 +724,8 @@ public class SimplePassageController extends Controller {
 
             StringBuilder b = new StringBuilder();
 
-            b.append(p.sentences.get(startingSentence).text);
-            b.append(p.sentences.get(startingSentence + 1).text);
+            if(startingSentence < p.sentences.size()) b.append(p.sentences.get(startingSentence).text);
+            if(startingSentence + 1 < p.sentences.size()) b.append(p.sentences.get(startingSentence + 1).text);
 
             return ok(viewPassageSentenceDrillDown.render(p.id, p.grade, b.toString()));
         }

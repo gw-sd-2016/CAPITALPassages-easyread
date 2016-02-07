@@ -1,6 +1,7 @@
 package controllers;
 
 import models.*;
+import net.davidashen.text.Hyphenator;
 import net.sf.extjwnl.JWNLException;
 
 import java.util.ArrayList;
@@ -56,15 +57,12 @@ public class PassageAnalysisController {
         return (count > 0) ? average / count : 0;
     }
 
-    public double averageAgeForRange(SimplePassage p, int start, int end) {
+    public double averageAgeForRange(String p) {
         double average = 0;
         int count = 0;
 
-        for (int i = start; i < end; i++) {
-            Sentence s = p.sentences.get(i);
 
-            if (s != null) {
-                for (String x : s.text.split(" ")) {
+                for (String x : p.split(" ")) {
                     Word w = Word.byRawString(x);
                     if (w != null && !Word.isStopWord(w)) {
                         average += w.ageOfAcquisition;
@@ -72,12 +70,35 @@ public class PassageAnalysisController {
 
                     }
                 }
-            }
 
-        }
+
+
 
         return (count > 0) ? average / count : 0;
     }
+
+
+    public double determineGradeLevelForString(String p){
+        int combined = 0;
+        int numAlgorithms = 0;
+
+        double ARI = calculateARI(p);
+        if (ARI > 0 && ARI < 14) {
+            combined += ARI;
+            numAlgorithms++;
+        }
+
+        double FK = calculateFKScore(p);
+        if (FK > 0 && FK < 14) {
+            combined += FK;
+            numAlgorithms++;
+        }
+
+        return (combined + convertToGrade(averageAgeForRange(p))) / (numAlgorithms + 1);
+    }
+
+
+
 
     public void determineGradeLevel(SimplePassage p) {
 
@@ -167,6 +188,7 @@ public class PassageAnalysisController {
 
     }
 
+
     public double calculateARI(SimplePassage p) {
         double sentences = Double.valueOf(p.sentences.size());
 
@@ -177,10 +199,43 @@ public class PassageAnalysisController {
         return ARI;
     }
 
+
+    public double calculateARI(String p) {
+
+
+        double numWords = p.split(" ").length;
+
+        double sentences = Double.valueOf(p.split(" ").length);
+
+        double ARI = 4.71 * (Double.valueOf(p.replace(" ", "").toCharArray().length) / numWords) + .5 * (numWords / sentences) - 21.43;
+
+        System.out.println("ARI = " + ARI);
+
+        return ARI;
+    }
+
     public double calculateFKScore(SimplePassage p) {
         double sentences = Double.valueOf(p.sentences.size());
 
         double score = (.39 * (Double.valueOf(p.numWords) / sentences)) + (11.8 * (Double.valueOf(p.numSyllables) / Double.valueOf(p.numWords))) - 15.59;
+
+        System.out.println("FK Score: " + score);
+
+        return score;
+    }
+
+
+    public double calculateFKScore(String p) {
+
+        double numWords = Double.valueOf(p.split(" ").length);
+        double sentences = Double.valueOf(p.split(".").length);
+
+        double numSyllables = 0;
+        for(String s : p.split(" ")){
+            numSyllables += Word.byRawString(s).numSyllables;
+        }
+
+        double score = (.39 * (numWords) / sentences) + (11.8 * (Double.valueOf(numSyllables) /numWords)) - 15.59;
 
         System.out.println("FK Score: " + score);
 

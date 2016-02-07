@@ -2,14 +2,11 @@
 
 @main("Viewing Passage") {
 
-
     @if(flash.containsKey("success")) {
         <div class="alert alert-success">
             <h2>Done!</h2> @flash.get("success")
         </div>
     }
-
-
 
     <div class="holder" style="padding-bottom: 4cm ;">
         <div class="pull-left">
@@ -55,8 +52,6 @@
                 }
 
             </div>
-
-
         </div>
     </div>
 
@@ -68,35 +63,30 @@
             <strong> Grade Level:  </strong> @PassageAnalysisController.displayGrade(passage.grade)
             <br>
             <strong> Source:  </strong> @passage.source <br><br>
-
-
         </div>
 
-        @if(suggestionsOn) {
-            @for(word <- passage.text.split(" ")) {
-                @if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > passage.grade && !passage.getStopWords().contains(word)) {
-                    <u>@word</u>
-                    @Suggestion.byWord(word).size
-                    @if(Suggestion.byWord(word).size > 0) {
-                        <div style="display:none ;" id="@word">We suggest
-                            @for(w <- Suggestion.all) {
-                                @w &nbsp
-                        }
-                        </div>
-                    }
-                } else {
-                    @word
-                }
-                &nbsp
-            }
-        } else {
-            @passage.text
-        }
-
+        <div id="editor"></div>
     </div>
 
+        <!-- http://quilljs.com/docs/api -->
+        <!-- Include the Quill library -->
+    <script src="//cdn.quilljs.com/0.20.1/quill.js"></script>
 
+        <!-- Initialize Quill editor -->
     <script>
+        //http://quilljs.com/docs/configuration/
+
+            var configs = {
+                readOnly: true,
+                theme: 'snow'
+            };
+
+            var quill = new Quill('#editor', configs);
+
+
+            quill.setHTML('@Html(passage.text)');
+            quill.readOnly = true;
+
             function alertSuggestions(){
                 alert("This word is too complicated for this grade level!");
             }
@@ -115,9 +105,6 @@
                         alert("This word is too complicated, but we don't have any suggestions for you yet.");
                     }
 
-
-
-
                     $("#" + string).show();
 
 
@@ -125,6 +112,4 @@
 
             });
     </script>
-
-
 }
