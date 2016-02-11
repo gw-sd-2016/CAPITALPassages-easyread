@@ -142,6 +142,36 @@ function $_GET(param) {
     return vars;
 }
 
+
+function acceptWord(word, grade){
+    jsRoutes.controllers.SimplePassageController.acceptWord(word, grade).ajax({
+        success : function(data) {
+            //window.location.reload();
+        },
+        error : function(err) {
+            //window.location = "";
+        },
+        complete : function() {
+            window.location.reload();
+        }
+    });
+}
+
+
+function replaceWord(word, passageId, replacement){
+    jsRoutes.controllers.SimplePassageController.replaceWord(passageId, word, replacement).ajax({
+        success : function(data) {
+            //window.location.reload();
+        },
+        error : function(err) {
+            //window.location = "";
+        },
+        complete : function() {
+            window.location.reload();
+        }
+    });
+}
+
 /*
 function acceptWord(word){
     jsRoutes.controllers.SimplePassageController.acceptWord(word.id,$_GET('grade')).ajax({

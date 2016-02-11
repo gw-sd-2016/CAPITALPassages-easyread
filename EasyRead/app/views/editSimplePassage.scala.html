@@ -99,6 +99,7 @@
 
                         <input type="text" id="text" name="passageText" value="@Html(form("passageText").value)" style="display:none">
 
+                        <input type="text" id="html" name="passageHTML" value='@Html(form("passageHTML").value)' style="display:none">
 
                         <h4>Passage Body</h4>
                             <!-- http://quilljs.com/docs/quickstart/ -->
@@ -107,11 +108,16 @@
                         <a class="btn btn-primary" onClick="fetchSuggestions();">Load Suggestions</a>
 
 
-                        <div id="editor">
-                            <div>@SimplePassage.byId(passageId).text</div>
 
-                            <div><br></div>
-                        </div>
+
+                            <div id="editor">
+                                @if(SimplePassage.byId(passageId).html.length == SimplePassage.byId(passageId).text.length){
+                                    @SimplePassage.byId(passageId).text
+                                } else{
+                                    @Html(SimplePassage.byId(passageId).html)
+                                }
+                            </div>
+
 
 
                         <p>
@@ -165,6 +171,9 @@
                     console.log("Called");
                     var element = document.getElementsByName("passageText")[0];
                     element.setAttribute("value", quill.getText());
+
+                    var hEl = document.getElementsByName("passageHTML")[0];
+                    hEl.setAttribute("value", quill.getHTML());
                 });
 
 
@@ -179,7 +188,7 @@
                             var string = text;
 
 
-                            jsRoutes.controllers.SimplePassageController.getSuggestions(string)).ajax({
+                            jsRoutes.controllers.SimplePassageController.getSuggestions(string).ajax({
                                 success : function(data) {
                                     //window.location.reload();
                                     if(data.length > 0){

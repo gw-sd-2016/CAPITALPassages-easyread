@@ -65,7 +65,13 @@
             <strong> Source:  </strong> @passage.source <br><br>
         </div>
 
-        <div id="editor"></div>
+        <div id="editor">
+            @if(passage.html.length == passage.text.length){
+                @passage.text
+            } else{
+                @Html(passage.html)
+            }
+        </div>
     </div>
 
         <!-- http://quilljs.com/docs/api -->
@@ -83,8 +89,6 @@
 
             var quill = new Quill('#editor', configs);
 
-
-            quill.setHTML('@Html(passage.text)');
             quill.readOnly = true;
 
             function alertSuggestions(){

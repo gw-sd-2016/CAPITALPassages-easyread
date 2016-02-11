@@ -98,6 +98,7 @@ create table simple_passage (
   source                    varchar(255),
   grade                     integer,
   instructor_id             bigint,
+  html                      varchar(255),
   tag_id                    bigint,
   num_characters            integer,
   num_syllables             integer,

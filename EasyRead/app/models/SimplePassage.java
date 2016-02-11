@@ -42,6 +42,9 @@ public class SimplePassage extends Model {
     @Expose
     public long instructorID;
 
+    @Expose
+    public String html;
+
     @OneToMany(cascade = CascadeType.ALL)
     public List<Sentence> sentences = new ArrayList<Sentence>();
 

@@ -198,7 +198,7 @@ public class SimplePassageController extends Controller {
             return redirect(routes.SimplePassageController.viewAllPassages());
         }
 
-        SimplePassageData data = new SimplePassageData(passage.text, passage.title, 1, "category", passage.source);
+        SimplePassageData data = new SimplePassageData(passage.text, passage.title, 1, "category", passage.source, passage.html);
         Form<SimplePassageData> form = Form.form(SimplePassageData.class);
         form = form.fill(data);
         return ok(editSimplePassage.render(form, passageId));
@@ -383,7 +383,7 @@ public class SimplePassageController extends Controller {
             return redirect(routes.SimplePassageController.viewAllPassages());
         }
 
-        SimplePassageData data = new SimplePassageData(passage.text, passage.title, 1, "category", passage.source);
+        SimplePassageData data = new SimplePassageData(passage.text, passage.title, 1, "category", passage.source, passage.html);
         Form<SimplePassageData> form = Form.form(SimplePassageData.class);
         form = form.fill(data);
         return ok(editSimplePassageAtGrade.render(form, passageId, grade));

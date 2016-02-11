@@ -52,10 +52,26 @@
 
                             <td><a href="/view?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
                             @if(passage.text.length >= 200) {
-                                <td>@Html(passage.text.substring(0, 200))....</td>
+                                <td>@if(Html(passage.text.substring(0, 200)) != passage.html){
+                                    @Html(passage.text.substring(0, 200))....
+                                } else {
+                                    @passage.text.substring(0, 200)
+                                }
+
+
+
+                                </td>
+
+
 
                             } else {
-                                <td>@passage.text</td>
+                                <td>
+                                @if(Html(passage.text) != passage.html){
+                                @Html(passage.text)....
+                                } else {
+                                    @passage.text
+                                }
+                                </td>
                             }
 
                             <td>@inst.firstName @inst.lastName</td>
