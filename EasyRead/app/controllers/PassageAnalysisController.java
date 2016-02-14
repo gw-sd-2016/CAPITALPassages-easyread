@@ -8,9 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public class PassageAnalysisController {
-
-
-    private PhraseValidator validator = new MicrosoftNGramsValidator();
+    
     private PhraseValidator secondaryValidator = new MashapeController();
     private PhraseValidator tertiaryValidator = new GoogleNGramsValidator();
     private WordNetController c;
