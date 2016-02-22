@@ -1,3 +1,5 @@
+@import play.api.libs.json.Json
+
 @(passage: models.SimplePassage, instructor: models.User, suggestionsOn: Boolean)
 
 
@@ -136,30 +138,20 @@
                     <strong> Displaying at Grade Level:  </strong>  @PassageAnalysisController.toGrade(passage.grade)
                     <br>
                     <strong> Source:  </strong> @passage.source <br><br>
+
+
                 </div>
 
-                @if(suggestionsOn) {
-                    @for(word <- passage.text.split(" ")) {
-                        @if(Word.byRawString(word) != null && Word.byRawString(word).ageOfAcquisition > (Integer.valueOf(request().getQueryString("grade").toString) + 6) && !passage.getStopWords().contains(word) && !word.charAt(0).isUpper /*&& (POS.byWord(word) == null  || POS.byWord(word) != null && POS.byWord(word).name.toLowerCase.indexOf("verb") != -1)*/ ) {
-                            <u>@word</u>
 
-
-
-                            @if(Suggestion.byWord(word).map(x => x.suggestedWord).distinct.size > 0) {
-                                    <!-- http://stackoverflow.com/questions/18830813/how-can-i-remove-punctuation-from-input-text-in-java -->
-                                <div style="display:none ;" id="@word">
-                                    @for(w <- Suggestion.byWord(word).sortWith(_.frequency > _.frequency).map(x => x.suggestedWord).distinct) {@w&nbsp}
-                                    <br>
-                                </div>
-                            }
-                        } else {
-                            @word
-                        }
-                        &nbsp
-                    }
-                } else {
+               <div id="editor">
+                @if(passage.html.length == passage.text.length){
                     @passage.text
+                } else{
+                    @Html(passage.html)
                 }
+            </div>
+
+
 
             </div>
         </div>
@@ -177,10 +169,63 @@
 
         <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
 
-        <script>
-                function alertSuggestions(){
-                    alert("This word is too complicated for this grade level!");
+    <script src="//cdn.quilljs.com/0.20.1/quill.js"></script>
+
+        <!-- Initialize Quill editor -->
+    <script>
+
+            //http://quilljs.com/docs/configuration/
+            // http://stackoverflow.com/questions/15409429/how-to-limit-text-width
+            var configs = {
+                readOnly: true,
+                theme: 'snow',
+                styles: {
+                    '.ql-editor' : {
+                        'word-wrap': 'break-word',
+                        'word-spacing': 'normal',
+                        'text-align': 'left',
+                        'line-height': '250%',
+                        'width': '60%'
+                    }
+
                 }
+            };
+
+            var quill = new Quill('#editor', configs);
+
+
+
+            function alertSuggestions(){
+                alert("This word is too complicated for this grade level!");
+            }
+
+            function fetchSuggestions(){
+                underlineSpecificWords(@Html(Json.stringify(Json.toJson(passage.text.split(" ").toList.distinct.filter(p => (Word.byLemma(p) != null && Word.byLemma(p).ageOfAcquisition > (passage.grade + 6) && !passage.getStopWords().contains(p)))))));
+            }
+
+            function underlineSpecificWords(words){
+
+                var text = quill.getText();
+
+                for(var i = 0; i < words.length; i++){
+                    var currentText = text;
+                    var word = words[i];
+                    var index = text.indexOf(word);
+
+                    while(index != -1){
+                        console.log(index);
+                        var offset = text.length - currentText.length;
+                        quill.formatText(index + offset, index + offset + word.length, 'underline', true);
+                        currentText = currentText.substring(index + word.length);
+                        index = currentText.indexOf(word);
+                    }
+                }
+
+                quill.formatText(0, quill.getText().length, "size", 20);
+
+
+            }
+
 
                 //http://www.creativejuiz.fr/blog/en/javascript-en/read-url-get-parameters-with-javascript
                 function $_GET(param) {
@@ -229,6 +274,22 @@
 
                 $(document).ready(function(){
 
+
+                    quill.on('selection-change', function(range) {
+                        console.log("in here");
+                        if (range) {
+                            if (range.start == range.end) {
+                                console.log('User cursor is on', range.start);
+                            } else {
+                                var text = editor.getText(range.start, range.end);
+                                console.log('User has highlighted', text);
+                            }
+                        } else {
+                            console.log('Cursor not in the editor');
+                        }
+                    });
+
+
                     //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
                     // locate your element and add the Click Event Listener
 
@@ -242,6 +303,8 @@
 
                     $("u").click(function(){
                         var string = $(this).html();
+
+                        console.log("clicked");
 
 
 

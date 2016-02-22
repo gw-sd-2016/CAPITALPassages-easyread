@@ -81,13 +81,47 @@
         <!-- Initialize Quill editor -->
     <script>
         //http://quilljs.com/docs/configuration/
-
+        // http://stackoverflow.com/questions/15409429/how-to-limit-text-width
+        //http://www.w3.org/TR/WCAG20-TECHS/C21.html
+        //http://blog.usabilla.com/8-guidelines-for-better-readability-on-the-web/
             var configs = {
                 readOnly: true,
-                theme: 'snow'
+                theme: 'snow',
+                styles: {
+                    '.ql-editor' : {
+                        'word-wrap': 'break-word',
+                        'word-spacing': 'normal',
+                        'text-align': 'left',
+                        'line-height': '250%',
+                        'width': '60%',
+                        'font-size': '24'
+                    }
+
+                },
+                formats: ['size']
             };
 
             var quill = new Quill('#editor', configs);
+
+
+        quill.on('text-change', function(delta, source) {
+
+            quill.formatText(0, quill.getText().length - 1, 'size', 36);
+        });
+
+        quill.on('selection-change', function(range) {
+            console.log("in here");
+            if (range) {
+                if (range.start == range.end) {
+                    console.log('User cursor is on', range.start);
+                } else {
+                    var text = editor.getText(range.start, range.end);
+                    console.log('User has highlighted', text);
+                }
+            } else {
+                console.log('Cursor not in the editor');
+            }
+        });
 
             quill.readOnly = true;
 
