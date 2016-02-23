@@ -15,6 +15,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.*;
 
+import javax.json.JsonArray;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -530,11 +531,27 @@ public class SimplePassageController extends Controller {
 
     public Result getSuggestions(String word){
 
+        word = word.replace("<span>","");
+        word = word.replace("</span>","");
+
+        System.out.println("--" + word );
+
         List<String> res = new ArrayList<String>();
 
-        for(Suggestion s : Suggestion.byWord(word)) res.add(s.suggestedWord);
 
-        return ok(Json.toJson(res));
+        StringBuilder ret = new StringBuilder("[");
+
+
+        List<Suggestion> sugg = Suggestion.byWord(word);
+
+        for(int i = 0; i < sugg.size(); i++){
+            ret.append("\"" + sugg.get(i).suggestedWord + "\"");
+            if(i < sugg.size() - 1) ret.append(",");
+            res.add(sugg.get(i).suggestedWord);
+        }
+        ret.append("]");
+
+        return ok(ret.toString());
     }
 
     public Result viewAllPassages() {

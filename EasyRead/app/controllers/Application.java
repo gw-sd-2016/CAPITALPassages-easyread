@@ -4,6 +4,7 @@ import formdata.LoginForm;
 import formdata.UserForm;
 import models.PassageTag;
 import models.SimplePassage;
+import models.Suggestion;
 import models.User;
 import net.sf.extjwnl.JWNLException;
 import play.Routes;

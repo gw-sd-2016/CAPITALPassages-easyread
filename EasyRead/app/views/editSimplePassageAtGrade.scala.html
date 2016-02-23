@@ -114,8 +114,9 @@
                                 <h4>Source</h4>
                                 <input type="text" name="source" placeholder="Passage Source" value="@form("source").value">
 
-                                <input type="text" id="text" name="passageText" value="@form("passageText").value" style="display:none">
+                                <input type="text" id="text" name="passageText" value="" style="display:none">
 
+                                <input type="text" id="html" name="passageHTML" value='' style="display:none">
 
                                 <h4>Passage Body</h4>
                                     <!-- http://quilljs.com/docs/quickstart/ -->
@@ -275,9 +276,66 @@
                 }
 
 
+                function updateSynonymnList(string, arr){
+                    arr = JSON.parse(arr);
+                    var leftPanel = document.getElementById("left-panel");
 
-                function save(){
 
+                    if(window.getComputedStyle(leftPanel).display === 'none'){
+                        console.log("doing this");
+
+                        $("#left-panel-link").click();
+
+                    }
+
+
+
+
+
+                    var upperDiv = '<div id="title"><h1>' + string + '</h1></div>';
+                    var approvalDiv = "<div id='accept'><button class='btn btn-primary' onclick='acceptWord(" + string + ", " + $_GET('grade') + ");'>This is okay!</button></div><br>";
+
+                    var synonymnDiv = "<div class='container-fluid'> <div id='list'>";
+
+                    if(arr.length == 0){
+                        synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
+                    } else {
+                        //http://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
+                        //http://stackoverflow.com/questions/22036576/why-does-the-javascript-string-whitespace-character-nbsp-not-match
+                        // var synonymnList = document.getElementById(string).innerText.trim("/\r?\n|\r/g").split(String.fromCharCode(160));
+
+
+                        var ran = false;
+                        for(var i = 0; i < arr.length; i++){
+                            ran = true;
+                            synonymnDiv += i + ". <span onclick='replaceWord(\"" + string + "\", \"" + arr[i] + "\");' style='background-color: gray;'><h3>" + arr[i] + "</h3></span><br>";
+                        }
+
+                        if(!ran){
+                            synonymnDiv += "This word is too complicated, <br> but we don't have any <br> suggestions for you yet.";
+                        }
+
+
+                    }
+
+                    synonymnDiv += "</div></div><br><button id='close-panel-bt' class='btn btn-primary' onclick='$.panelslider.close();'>Close Planel</button>";
+
+                    leftPanel.innerHTML = upperDiv + approvalDiv + synonymnDiv;
+                }
+
+                function getSuggestions(word){
+                    jsRoutes.controllers.SimplePassageController.getSuggestions(word).ajax({
+                        success : function(data) {
+                            console.log(data);
+                            updateSynonymnList(word, data);
+                        },
+                        error : function(err) {
+                            //window.location = "";
+                        },
+                        complete : function() {
+
+                        }
+                    });
                 }
 
 
@@ -290,62 +348,14 @@
                     //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
                     // locate your element and add the Click Event Listener
 
-                    function isEmpty( el ){
-                        return !$.trim(el.html())
-                    }
-
-
-                    $("u").click(function(){
-                        var string = $(this).html();
-
-
-
-                        var leftPanel = document.getElementById("left-panel");
-
-
-                        if(window.getComputedStyle(leftPanel).display === 'none'){
-                            console.log("doing this");
-
-                            $("#left-panel-link").click();
-
+                        function isEmpty( el ){
+                            return !$.trim(el.html())
                         }
 
-
-
-
-
-                        var upperDiv = '<div id="title"><h1>' + string + '</h1></div>';
-                        var approvalDiv = "<div id='accept'><button class='btn btn-primary' onclick='acceptWord(" + string + ");'>This is okay!</button></div><br>";
-
-                        var synonymnDiv = "<div class='container-fluid'> <div id='list'>";
-
-                        if(document.getElementById(string) == null){
-                            synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
-                        } else {
-                            //http://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
-                            //http://stackoverflow.com/questions/22036576/why-does-the-javascript-string-whitespace-character-nbsp-not-match
-                            var synonymnList = document.getElementById(string).innerText.trim("/\r?\n|\r/g").split(String.fromCharCode(160));
-
-
-                            var ran = false;
-                            for(var i = 1; i < synonymnList.length; i++){
-                                ran = true;
-                                synonymnDiv += i + ". <span onclick='replaceWord(\"" + string + "\", \"" + synonymnList[i] + "\");' style='background-color: gray;'><h3>" + synonymnList[i] + "</h3></span><br>";
-                            }
-
-                            if(!ran){
-                                synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
-                            }
-
-
-                        }
-
-                        synonymnDiv += "</div></div><br><button id='close-panel-bt' class='btn btn-primary' onclick='$.panelslider.close();'>Close Planel</button>";
-
-                        leftPanel.innerHTML = upperDiv + approvalDiv + synonymnDiv;
-
-                    });
-
+                        $("u").click(function(){
+                            var string = $(this).html();
+                            getSuggestions(string);
+                        });
                 });
         </script>
 
