@@ -120,9 +120,6 @@
                                     <!-- http://quilljs.com/docs/quickstart/ -->
                                     <!-- Create the editor container -->
                                 <div id="editor">
-                                    <div>@SimplePassage.byId(passageId).text</div>
-
-                                    <div><br></div>
                                 </div>
 
                     <p>
@@ -164,12 +161,45 @@
 
             <!-- Initialize Quill editor -->
         <script>
-                var quill = new Quill('#editor');
+
+
+                var configs = {
+                    readOnly: false,
+                    theme: 'snow',
+                    styles: {
+                        '.ql-editor' : {
+                            'word-wrap': 'break-word',
+                            'word-spacing': 'normal',
+                            'text-align': 'left',
+                            'line-height': '250%',
+                            'width': '60%',
+                            'font-size': '24'
+                        }
+
+                    },
+                    formats: ['size', 'underline']
+                };
+
+
+
+                var quill = new Quill('#editor', configs);
+
+                @if(SimplePassage.byId(passageId).html != null){
+                    quill.setHTML('@Html(SimplePassage.byId(passageId).html)')
+                } else {
+                    quill.setText("@SimplePassage.byId(passageId).text");
+                }
 
                 quill.on('text-change', function(delta, source) {
+                    // quill.formatText(0, quill.getText().length, "size", 20);
                     console.log("Called");
                     var element = document.getElementsByName("passageText")[0];
+
+
                     element.setAttribute("value", quill.getText());
+
+                    var hEl = document.getElementsByName("passageHTML")[0];
+                    hEl.setAttribute("value", quill.getHTML());
                 });
 
 

@@ -356,6 +356,7 @@ public class SimplePassageController extends Controller {
 
         SimplePassageData data = form.get();
         passage.text = data.passageText;
+        passage.html = data.passageHTML;
         passage.grade = data.grade;
         passage.source = data.source;
 

@@ -75,9 +75,27 @@
 
             <!-- Initialize Quill editor -->
         <script>
-                var quill = new Quill('#editor', {
+                var configs = {
+                    readOnly: true,
+                    theme: 'snow',
+                    styles: {
+                        '.ql-editor' : {
+                            'word-wrap': 'break-word',
+                            'word-spacing': 'normal',
+                            'text-align': 'left',
+                            'line-height': '250%',
+                            'width': '60%',
+                            'font-size': '24'
+                        }
+
+                    },
                     formats: ['size', 'underline']
-                });
+                };
+
+
+
+
+                var quill = new Quill('#editor', configs);
 
                 quill.on('text-change', function(delta, source) {
                     console.log("Called");

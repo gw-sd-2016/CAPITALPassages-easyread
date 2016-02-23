@@ -97,9 +97,14 @@
                         <h4>Source</h4>
                         <input type="text" name="source" placeholder="Passage Source" value="@form("source").value">
 
-                        <input type="text" id="text" name="passageText" value="@Html(form("passageText").value)" style="display:none">
+                        <input type="text" id="text" name="passageText" value="" style="display:none">
 
-                        <input type="text" id="html" name="passageHTML" value='@Html(form("passageHTML").value)' style="display:none">
+                        <input type="text" id="html" name="passageHTML" value='' style="display:none">
+
+                    </div>
+                        <br>
+                        <br>
+
 
                         <h4>Passage Body</h4>
                             <!-- http://quilljs.com/docs/quickstart/ -->
@@ -111,23 +116,10 @@
 
 
                             <div id="editor">
-                                @if(SimplePassage.byId(passageId).html.length == SimplePassage.byId(passageId).text.length){
-                                    @SimplePassage.byId(passageId).text
-                                } else{
-                                    @Html(SimplePassage.byId(passageId).html)
-                                }
                             </div>
 
 
 
-                        <p>
-                        </p>
-                        <br>
-                        <p>
-
-                        </p>
-                    </div>
-                </div>
 
                 <button type="submit" class="btn btn-success">
                     <i class="btn-icon-only icon-check"></i> Submit
@@ -136,6 +128,8 @@
 
                 <br>
                 <br>
+
+                </div>
             </div>
         }
         <script src="/assets/js/jquery.panelslider.min.js"></script>
@@ -162,14 +156,41 @@
 
             <!-- Initialize Quill editor -->
         <script>
-                var quill = new Quill('#editor', {
+
+                var configs = {
+                    readOnly: false,
+                    theme: 'snow',
+                    styles: {
+                        '.ql-editor' : {
+                            'word-wrap': 'break-word',
+                            'word-spacing': 'normal',
+                            'text-align': 'left',
+                            'line-height': '250%',
+                            'width': '60%',
+                            'font-size': '24'
+                        }
+
+                    },
                     formats: ['size', 'underline']
-                });
+                };
+
+
+
+                var quill = new Quill('#editor', configs);
+
+                @if(SimplePassage.byId(passageId).html != null){
+                 quill.setHTML('@Html(SimplePassage.byId(passageId).html)')
+                } else {
+                 quill.setText("@SimplePassage.byId(passageId).text");
+                }
+
 
                 quill.on('text-change', function(delta, source) {
                    // quill.formatText(0, quill.getText().length, "size", 20);
                     console.log("Called");
                     var element = document.getElementsByName("passageText")[0];
+
+
                     element.setAttribute("value", quill.getText());
 
                     var hEl = document.getElementsByName("passageHTML")[0];

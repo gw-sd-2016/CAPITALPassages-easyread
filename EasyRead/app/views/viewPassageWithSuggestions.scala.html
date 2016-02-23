@@ -144,15 +144,7 @@
 
 
                <div id="editor">
-                @if(passage.html.length == passage.text.length){
-                    @passage.text
-                } else{
-                    @Html(passage.html)
-                }
-            </div>
-
-
-
+               </div>
             </div>
         </div>
 
@@ -167,34 +159,13 @@
         </script>
 
 
-        <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+
 
     <script src="//cdn.quilljs.com/0.20.1/quill.js"></script>
 
-        <!-- Initialize Quill editor -->
+    <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+
     <script>
-
-            //http://quilljs.com/docs/configuration/
-            // http://stackoverflow.com/questions/15409429/how-to-limit-text-width
-            var configs = {
-                readOnly: true,
-                theme: 'snow',
-                styles: {
-                    '.ql-editor' : {
-                        'word-wrap': 'break-word',
-                        'word-spacing': 'normal',
-                        'text-align': 'left',
-                        'line-height': '250%',
-                        'width': '60%'
-                    }
-
-                }
-            };
-
-            var quill = new Quill('#editor', configs);
-
-
-
             function alertSuggestions(){
                 alert("This word is too complicated for this grade level!");
             }
@@ -222,139 +193,168 @@
                 }
 
                 quill.formatText(0, quill.getText().length, "size", 20);
-
-
             }
 
 
-                //http://www.creativejuiz.fr/blog/en/javascript-en/read-url-get-parameters-with-javascript
-                function $_GET(param) {
-                    var vars = {};
-                    window.location.href.replace(
-                            /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
-                            function( m, key, value ) { // callback
-                                vars[key] = value !== undefined ? value : '';
-                            }
-                    );
+            //http://www.creativejuiz.fr/blog/en/javascript-en/read-url-get-parameters-with-javascript
+            function $_GET(param) {
+                var vars = {};
+                window.location.href.replace(
+                        /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+                        function( m, key, value ) { // callback
+                            vars[key] = value !== undefined ? value : '';
+                        }
+                );
 
-                    if ( param ) {
-                        return vars[param] ? vars[param] : null;
+                if ( param ) {
+                    return vars[param] ? vars[param] : null;
+                }
+                return vars;
+            }
+
+            function acceptWord(word){
+                jsRoutes.controllers.SimplePassageController.acceptWord(word.id,$_GET('grade')).ajax({
+                    success : function(data) {
+                        //window.location.reload();
+                    },
+                    error : function(err) {
+                        //window.location = "";
+                    },
+                    complete : function() {
+                        window.location.reload();
                     }
-                    return vars;
+                });
+            }
+
+            function replaceWord(word, replacement){
+                jsRoutes.controllers.SimplePassageController.replaceWord(@passage.id, word, replacement).ajax({
+                    success : function(data) {
+                        //window.location.reload();
+                    },
+                    error : function(err) {
+                        //window.location = "";
+                    },
+                    complete : function() {
+                        window.location.reload();
+                    }
+                });
+            }
+
+
+            $(document).ready(function(){
+
+                //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
+                // locate your element and add the Click Event Listener
+
+                function isEmpty( el ){
+                    return !$.trim(el.html())
                 }
 
-                function acceptWord(word){
-                    jsRoutes.controllers.SimplePassageController.acceptWord(word.id,$_GET('grade')).ajax({
-                        success : function(data) {
-                            //window.location.reload();
-                        },
-                        error : function(err) {
-                            //window.location = "";
-                        },
-                        complete : function() {
-                            window.location.reload();
-                        }
-                    });
-                }
+                $("u").click(function(){
+                    var string = $(this).html();
 
-                function replaceWord(word, replacement){
-                    jsRoutes.controllers.SimplePassageController.replaceWord(@passage.id, word, replacement).ajax({
-                        success : function(data) {
-                            //window.location.reload();
-                        },
-                        error : function(err) {
-                            //window.location = "";
-                        },
-                        complete : function() {
-                            window.location.reload();
-                        }
-                    });
-                }
+                    console.log("clicked");
 
 
-                $(document).ready(function(){
+
+                    var leftPanel = document.getElementById("left-panel");
 
 
-                    quill.on('selection-change', function(range) {
-                        console.log("in here");
-                        if (range) {
-                            if (range.start == range.end) {
-                                console.log('User cursor is on', range.start);
-                            } else {
-                                var text = editor.getText(range.start, range.end);
-                                console.log('User has highlighted', text);
-                            }
-                        } else {
-                            console.log('Cursor not in the editor');
-                        }
-                    });
+                    if(window.getComputedStyle(leftPanel).display === 'none'){
+                        console.log("doing this");
 
+                        $("#left-panel-link").click();
 
-                    //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
-                    // locate your element and add the Click Event Listener
-
-                    function isEmpty( el ){
-                        return !$.trim(el.html())
                     }
 
 
 
 
 
-                    $("u").click(function(){
-                        var string = $(this).html();
+                    var upperDiv = '<div id="title"><h1>' + string + '</h1></div>';
+                    var approvalDiv = "<div id='accept'><button class='btn btn-primary' onclick='acceptWord(" + string + ", " + $_GET('grade') + ");'>This is okay!</button></div><br>";
 
-                        console.log("clicked");
+                    var synonymnDiv = "<div class='container-fluid'> <div id='list'>";
+
+                    if(document.getElementById(string) == null){
+                        synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
+                    } else {
+                        //http://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
+                        //http://stackoverflow.com/questions/22036576/why-does-the-javascript-string-whitespace-character-nbsp-not-match
+                        var synonymnList = document.getElementById(string).innerText.trim("/\r?\n|\r/g").split(String.fromCharCode(160));
 
 
+                        var ran = false;
+                        for(var i = 1; i < synonymnList.length; i++){
+                            ran = true;
+                            synonymnDiv += i + ". <span onclick='replaceWord(\"" + string + "\", \"" + synonymnList[i] + "\");' style='background-color: gray;'><h3>" + synonymnList[i] + "</h3></span><br>";
+                        }
 
-                        var leftPanel = document.getElementById("left-panel");
-
-
-                        if(window.getComputedStyle(leftPanel).display === 'none'){
-                            console.log("doing this");
-
-                            $("#left-panel-link").click();
-
+                        if(!ran){
+                            synonymnDiv += "This word is too complicated, <br> but we don't have any <br> suggestions for you yet.";
                         }
 
 
+                    }
 
+                    synonymnDiv += "</div></div><br><button id='close-panel-bt' class='btn btn-primary' onclick='$.panelslider.close();'>Close Planel</button>";
 
-
-                        var upperDiv = '<div id="title"><h1>' + string + '</h1></div>';
-                        var approvalDiv = "<div id='accept'><button class='btn btn-primary' onclick='acceptWord(" + string + ", " + $_GET('grade') + ");'>This is okay!</button></div><br>";
-
-                        var synonymnDiv = "<div class='container-fluid'> <div id='list'>";
-
-                        if(document.getElementById(string) == null){
-                            synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
-                        } else {
-                            //http://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
-                            //http://stackoverflow.com/questions/22036576/why-does-the-javascript-string-whitespace-character-nbsp-not-match
-                            var synonymnList = document.getElementById(string).innerText.trim("/\r?\n|\r/g").split(String.fromCharCode(160));
-
-
-                            var ran = false;
-                            for(var i = 1; i < synonymnList.length; i++){
-                                ran = true;
-                                synonymnDiv += i + ". <span onclick='replaceWord(\"" + string + "\", \"" + synonymnList[i] + "\");' style='background-color: gray;'><h3>" + synonymnList[i] + "</h3></span><br>";
-                            }
-
-                            if(!ran){
-                                synonymnDiv += "This word is too complicated, <br> but we don't have any <br> suggestions for you yet.";
-                            }
-
-
-                        }
-
-                        synonymnDiv += "</div></div><br><button id='close-panel-bt' class='btn btn-primary' onclick='$.panelslider.close();'>Close Planel</button>";
-
-                        leftPanel.innerHTML = upperDiv + approvalDiv + synonymnDiv;
-
-                    });
+                    leftPanel.innerHTML = upperDiv + approvalDiv + synonymnDiv;
 
                 });
+
+            });
+
+            //http://quilljs.com/docs/configuration/
+            // http://stackoverflow.com/questions/15409429/how-to-limit-text-width
+            var configs = {
+                readOnly: true,
+                theme: 'snow',
+                styles: {
+                    '.ql-editor' : {
+                        'word-wrap': 'break-word',
+                        'word-spacing': 'normal',
+                        'text-align': 'left',
+                        'line-height': '250%',
+                        'width': '60%'
+                    }
+
+                },
+                formats: ['size', 'underline']
+            };
+
+            /*
+             if(passage.html.length == passage.text.length){
+             passage.text
+             } else{
+             Html(passage.html)
+             }
+             */
+
+            var quill = new Quill('#editor', configs);
+
+            @if(passage.html != null){
+            quill.setHTML('@Html(passage.html)')
+            } else {
+            quill.setText("@passage.text");
+            }
+
+
+            quill.on('selection-change', function(range) {
+                console.log("in here");
+                if (range) {
+                    if (range.start == range.end) {
+                        console.log('User cursor is on', range.start);
+                    } else {
+                        var text = quill.getText(range.start, range.end);
+                        console.log('User has highlighted', text);
+                    }
+                } else {
+                    console.log('Cursor not in the editor');
+                }
+            });
+
+            fetchSuggestions();
 
 
         </script>
