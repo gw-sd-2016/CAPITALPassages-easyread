@@ -751,5 +751,28 @@ public class SimplePassageController extends Controller {
         return badRequest();
     }
 
+    public Result beginSentenceBreakdown(Long passageId){
+        SimplePassage p = SimplePassage.byId(passageId);
+
+        String ret = "[";
+
+        List<String> sb = p.sentenceBreakdown();
+
+
+        for(int i = 0; i < sb.size(); i++){
+            ret += p.text.indexOf(sb.get(i));
+            ret += ",";
+            ret += p.text.indexOf(sb.get(i)) + sb.get(i).length();
+            if(i < sb.size() - 1) ret += ",";
+        }
+
+        ret += "]";
+
+        System.out.println(ret);
+
+
+        return ok(ret);
+    }
+
 
 }

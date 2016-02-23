@@ -42,6 +42,7 @@ GET         /replaceWord                          @controllers.SimplePassageCont
 GET         /viewPassageDeep                      controllers.SimplePassageController.viewPassageDeepAnalysis(passageId : Long)
 GET         /viewPassageSD                        controllers.SimplePassageController.viewPassageSentenceDrilldown(passageId : Long, startingSentence : Int)
 GET        /getSugg                               controllers.SimplePassageController.getSuggestions(word : String)
+GET        /getSB                                 controllers.SimplePassageController.beginSentenceBreakdown(passageId : Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                         controllers.Assets.at(path="/public", file)

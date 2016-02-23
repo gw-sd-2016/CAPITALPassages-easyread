@@ -230,7 +230,11 @@ public class PassageAnalysisController {
 
         double numSyllables = 0;
         for(String s : p.split(" ")){
-            numSyllables += Word.byRawString(s).numSyllables;
+            Word w = Word.byRawString(s);
+            if(w != null){
+                numSyllables += w.numSyllables;
+            }
+
         }
 
         double score = (.39 * (numWords) / sentences) + (11.8 * (Double.valueOf(numSyllables) /numWords)) - 15.59;

@@ -142,16 +142,26 @@ public class SimplePassage extends Model {
     public List<String> sentenceBreakdown() {
         PassageAnalysisController analysisController = new PassageAnalysisController();
 
-        List<String> difficulties = new ArrayList<String>();
+        HashSet<String> difficulties = new HashSet<String>();
 
         if (this.sentences.size() > 2) {
             for (int i = 2; i < this.sentences.size(); i++) {
                 if (i % 2 == 0) {
-                    difficulties.add(i + " " + analysisController.determineGradeLevelForString(this.sentences.get(i - 1).text + " " + this.sentences.get(i).text));
+
+                    if(!difficulties.contains(this.sentences.get(i - 1).text + " " + this.sentences.get(i).text)){
+                        Double diff = analysisController.determineGradeLevelForString(this.sentences.get(i - 1).text + " " + this.sentences.get(i).text);
+
+                        if(diff > this.grade) difficulties.add(this.sentences.get(i - 1).text + " " + this.sentences.get(i).text);
+
+                    }
                 }
             }
         }
 
-        return difficulties;
+
+        List<String> r = new ArrayList<String>();
+        r.addAll(difficulties);
+
+       return r;
     }
 }
