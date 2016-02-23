@@ -1,3 +1,5 @@
+@import scala.reflect.runtime.universe._
+
 @(passage: models.SimplePassage, instructor: models.User, suggestionsOn: Boolean)
 
 @main("Viewing Passage") {
@@ -79,6 +81,9 @@
             // http://stackoverflow.com/questions/15409429/how-to-limit-text-width
             //http://www.w3.org/TR/WCAG20-TECHS/C21.html
             //http://blog.usabilla.com/8-guidelines-for-better-readability-on-the-web/
+
+
+
             var configs = {
                 readOnly: true,
                 theme: 'snow',
@@ -99,9 +104,10 @@
             var quill = new Quill('#editor', configs);
 
            @if(passage.html != null){
-             quill.setHTML('@Html(passage.html)')
+             quill.setHTML('@Html(passage.html)');
             } else {
-             quill.setText("@passage.text");
+            //http://stackoverflow.com/questions/9913971/scala-how-can-i-get-an-escaped-representation-of-a-string
+             quill.setText(@Html(Literal(Constant(passage.text)).toString));
             }
 
 

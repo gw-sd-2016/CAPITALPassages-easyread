@@ -3,6 +3,7 @@
 
 
     @import play.api.libs.json.Json
+    @import scala.reflect.runtime.universe._
 
     @main("Edit a  Passage") {
 
@@ -185,10 +186,12 @@
                 var quill = new Quill('#editor', configs);
 
                 @if(SimplePassage.byId(passageId).html != null){
-                    quill.setHTML('@Html(SimplePassage.byId(passageId).html)')
+                     quill.setHTML('@Html(SimplePassage.byId(passageId).html)');
                 } else {
-                    quill.setText("@SimplePassage.byId(passageId).text");
+                    //http://stackoverflow.com/questions/9913971/scala-how-can-i-get-an-escaped-representation-of-a-string
+                    quill.setText(@Html(Literal(Constant(SimplePassage.byId(passageId).text)).toString));
                 }
+
 
                 quill.on('text-change', function(delta, source) {
                     // quill.formatText(0, quill.getText().length, "size", 20);
