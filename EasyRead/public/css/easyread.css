@@ -1,0 +1,11 @@
+ /*This entire example and the sliders are from  https://github.com/eduardomb/jquery-panelslider */
+    .panel {
+    display: none ;
+    width: 20% ;
+    overflow-y: scroll ;
+    overflow-x:scroll ;
+    padding: 20px ;
+    background-color: #333 ;
+    color: #fff ;
+    box-shadow: inset 0 0 5px 5px #222 ;
+    }

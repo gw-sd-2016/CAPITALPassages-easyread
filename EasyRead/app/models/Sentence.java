@@ -24,6 +24,9 @@ public class Sentence extends Model {
     @Lob
     public String text;
 
+    @Expose
+    public double difficulty;
+
     @OneToMany(cascade = CascadeType.ALL)
     public List<Word> words = new ArrayList<Word>();
 

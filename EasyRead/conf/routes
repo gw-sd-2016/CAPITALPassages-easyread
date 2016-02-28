@@ -39,11 +39,10 @@ GET         /viewPassageWithSuggestions           controllers.SimplePassageContr
 GET         /acceptWord                           @controllers.SimplePassageController.acceptWord(word : String, grade : Int)
 GET         /replaceWord                          @controllers.SimplePassageController.replaceWord(passageId : Long, word : String, replacement : String)
 #GET     /viewAllPassageTags             controllers.SimplePassageController.viewAllPassageTags(tags : util.List[PassageTag])
-GET         /viewPassageDeep                      controllers.SimplePassageController.viewPassageDeepAnalysis(passageId : Long)
-GET         /viewPassageSD                        controllers.SimplePassageController.viewPassageSentenceDrilldown(passageId : Long, startingSentence : Int)
 GET        /getSugg                               controllers.SimplePassageController.getSuggestions(word : String)
 GET        /getSB                                 controllers.SimplePassageController.beginSentenceBreakdown(passageId : Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                         controllers.Assets.at(path="/public", file)
+GET         /scripts/*file                        controllers.Assets.at(path="/public/javascripts", file)
 GET         /assets/javascripts/routes            controllers.Application.javascriptRoutes()

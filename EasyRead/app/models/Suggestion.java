@@ -47,5 +47,7 @@ public class Suggestion extends Model {
     public static List<Suggestion> bySimplePassage(Long simple_passage_id) {
         return find.where().eq("simple_passage_id", simple_passage_id).findList();
     }
+
+
 }
     

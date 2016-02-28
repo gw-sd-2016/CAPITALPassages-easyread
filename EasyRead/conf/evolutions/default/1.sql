@@ -84,10 +84,19 @@ create table passage_tag (
   constraint pk_passage_tag primary key (id))
 ;
 
+create table passage_text (
+  id                        bigint auto_increment not null,
+  simple_passage_id         bigint not null,
+  grade                     integer,
+  html                      longtext,
+  constraint pk_passage_text primary key (id))
+;
+
 create table sentence (
   id                        bigint auto_increment not null,
   simple_passage_id         bigint not null,
   text                      longtext,
+  difficulty                double,
   constraint pk_sentence primary key (id))
 ;
 
@@ -98,7 +107,6 @@ create table simple_passage (
   source                    varchar(255),
   grade                     integer,
   instructor_id             bigint,
-  html                      varchar(255),
   tag_id                    bigint,
   num_characters            integer,
   num_syllables             integer,
@@ -165,10 +173,12 @@ alter table passage_question_response add constraint fk_passage_question_respons
 create index ix_passage_question_response_passage_question_record_6 on passage_question_response (passage_question_record_id);
 alter table passage_question_response add constraint fk_passage_question_response_submitter_7 foreign key (submitter_id) references user (id) on delete restrict on update restrict;
 create index ix_passage_question_response_submitter_7 on passage_question_response (submitter_id);
-alter table sentence add constraint fk_sentence_simple_passage_8 foreign key (simple_passage_id) references simple_passage (id) on delete restrict on update restrict;
-create index ix_sentence_simple_passage_8 on sentence (simple_passage_id);
-alter table word add constraint fk_word_sentence_9 foreign key (sentence_id) references sentence (id) on delete restrict on update restrict;
-create index ix_word_sentence_9 on word (sentence_id);
+alter table passage_text add constraint fk_passage_text_simple_passage_8 foreign key (simple_passage_id) references simple_passage (id) on delete restrict on update restrict;
+create index ix_passage_text_simple_passage_8 on passage_text (simple_passage_id);
+alter table sentence add constraint fk_sentence_simple_passage_9 foreign key (simple_passage_id) references simple_passage (id) on delete restrict on update restrict;
+create index ix_sentence_simple_passage_9 on sentence (simple_passage_id);
+alter table word add constraint fk_word_sentence_10 foreign key (sentence_id) references sentence (id) on delete restrict on update restrict;
+create index ix_word_sentence_10 on word (sentence_id);
 
 
 
@@ -195,6 +205,8 @@ drop table passage_question_record;
 drop table passage_question_response;
 
 drop table passage_tag;
+
+drop table passage_text;
 
 drop table sentence;
 

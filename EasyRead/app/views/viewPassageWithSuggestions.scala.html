@@ -61,12 +61,6 @@
                         Edit this Passage
                     </a>
 
-
-                    <a class="btn btn-primary" id="sentenceDepth" href="@routes.SimplePassageController.viewPassageDeepAnalysis(passage.id)" style="margin-bottom: 20px ;">
-                        <i class="glyphicon glyphicon-equalizer"></i>
-                        Deep Analysis
-                    </a>
-
                     @for(tag <- passage.tags) {
 
 
@@ -234,7 +228,7 @@
                 });
             }
 
-            function getSentences(){
+            function getSentences(length){
                 jsRoutes.controllers.SimplePassageController.beginSentenceBreakdown(@passage.id).ajax({
                     success : function(data) {
                         console.log(data);
@@ -250,10 +244,21 @@
                 });
             }
 
-            function highlightDifficultAreas(arr){
+            function highlightDifficultAreas(arr, numUnderlines){
+
+                var html = quill.getHTML();
+                var offset = 0;
                 for(var i = 0; i + 1 < arr.length; i+= 2){
-                    quill.formatText(arr[i], arr[i + 1], "background", "#DA70D6") ;
+
+                    if(arr[i] > 0 && arr[i] < html.length){
+                        html = html.substring(0, arr[i] + offset) + "<span class='glyphicon glyphicon-exclamation-sign'>" + html.substring(arr[i] + offset);
+                        offset += "<span class='glyphicon glyphicon-exclamation-sign'>".length;
+                        html = html.substring(0, arr[i + 1] + offset) + "</span> " + html.substring(arr[i + 1] + offset);
+                        offset += 7;
+                    }
                 }
+
+                quill.setHTML(html);
 
             }
 
@@ -348,6 +353,61 @@
                     return !$.trim(el.html())
                 }
 
+
+
+                //http://quilljs.com/docs/configuration/
+                // http://stackoverflow.com/questions/15409429/how-to-limit-text-width
+                var configs = {
+                    readOnly: true,
+                    theme: 'snow',
+                    styles: {
+                        '.ql-editor' : {
+                            'word-wrap': 'break-word',
+                            'word-spacing': 'normal',
+                            'text-align': 'left',
+                            'line-height': '250%',
+                            'width': '60%'
+                        }
+
+                    },
+                    formats: ['size', 'underline', 'background']
+                };
+
+                /*
+                 if(passage.html.length == passage.text.length){
+                 passage.text
+                 } else{
+                 Html(passage.html)
+                 }
+                 */
+
+                var quill = new Quill('#editor', configs);
+
+
+                //http://stackoverflow.com/questions/9913971/scala-how-can-i-get-an-escaped-representation-of-a-string
+                quill.setHTML(@Html(Literal(Constant(PassageText.bySimplePassageAndGrade(passage.id, passage.grade).html)).toString));
+
+
+
+
+
+                quill.on('selection-change', function(range) {
+                    console.log("in here");
+                    if (range) {
+                        if (range.start == range.end) {
+                            console.log('User cursor is on', range.start);
+                        } else {
+                            var text = quill.getText(range.start, range.end);
+                            console.log('User has highlighted', text);
+                        }
+                    } else {
+                        console.log('Cursor not in the editor');
+                    }
+                });
+
+
+
+
                 $("u").click(function(){
                     var string = $(this).html();
                     getSuggestions(string);
@@ -355,60 +415,7 @@
 
             });
 
-            //http://quilljs.com/docs/configuration/
-            // http://stackoverflow.com/questions/15409429/how-to-limit-text-width
-            var configs = {
-                readOnly: true,
-                theme: 'snow',
-                styles: {
-                    '.ql-editor' : {
-                        'word-wrap': 'break-word',
-                        'word-spacing': 'normal',
-                        'text-align': 'left',
-                        'line-height': '250%',
-                        'width': '60%'
-                    }
 
-                },
-                formats: ['size', 'underline', 'background']
-            };
-
-            /*
-             if(passage.html.length == passage.text.length){
-             passage.text
-             } else{
-             Html(passage.html)
-             }
-             */
-
-            var quill = new Quill('#editor', configs);
-
-            @if(passage.html != null){
-                quill.setHTML('@Html(passage.html)');
-            } else {
-                //http://stackoverflow.com/questions/9913971/scala-how-can-i-get-an-escaped-representation-of-a-string
-                quill.setText(@Html(Literal(Constant(passage.text)).toString));
-            }
-
-
-
-
-            quill.on('selection-change', function(range) {
-                console.log("in here");
-                if (range) {
-                    if (range.start == range.end) {
-                        console.log('User cursor is on', range.start);
-                    } else {
-                        var text = quill.getText(range.start, range.end);
-                        console.log('User has highlighted', text);
-                    }
-                } else {
-                    console.log('Cursor not in the editor');
-                }
-            });
-
-            fetchSuggestions();
-            getSentences();
 
 
         </script>

@@ -8,7 +8,6 @@ public class SimplePassageData {
     public int grade;
     public String source;
     public String category;
-    public String passageHTML;
 
     public ArrayList<String> names = new ArrayList<String>();
     public ArrayList<String> descriptions = new ArrayList<String>();
@@ -18,15 +17,13 @@ public class SimplePassageData {
     }
 
 
-    public SimplePassageData(String p, String t, int g, String c, String s, String h) {
+    public SimplePassageData(String p, String t, int g, String c, String s) {
         this.passageText = p;
         this.passageTitle = t;
         this.grade = g;
         this.category = c;
         this.source = s;
-        this.passageHTML = h;
     }
-
     public String getPassageText() {
         return this.passageText;
     }

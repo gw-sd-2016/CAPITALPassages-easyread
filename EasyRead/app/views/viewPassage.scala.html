@@ -36,12 +36,6 @@
                     <i class="glyphicon glyphicon-flash"></i>
                     Turn on Suggestions
                 </a>
-
-                <a class="btn btn-primary" id="sentenceDepth" href="@routes.SimplePassageController.viewPassageDeepAnalysis(passage.id)" style="margin-bottom: 20px ;">
-                    <i class="glyphicon glyphicon-equalizer"></i>
-                    Deep Analysis
-                </a>
-
                 <br>
 
 
@@ -71,18 +65,21 @@
         </div>
     </div>
 
+
+
         <!-- http://quilljs.com/docs/api -->
         <!-- Include the Quill library -->
     <script src="//cdn.quilljs.com/0.20.1/quill.js"></script>
 
+
         <!-- Initialize Quill editor -->
     <script>
+
+
             //http://quilljs.com/docs/configuration/
             // http://stackoverflow.com/questions/15409429/how-to-limit-text-width
             //http://www.w3.org/TR/WCAG20-TECHS/C21.html
             //http://blog.usabilla.com/8-guidelines-for-better-readability-on-the-web/
-
-
 
             var configs = {
                 readOnly: true,
@@ -103,41 +100,69 @@
 
             var quill = new Quill('#editor', configs);
 
-           @if(passage.html != null){
-             quill.setHTML('@Html(passage.html)');
-            } else {
-            //http://stackoverflow.com/questions/9913971/scala-how-can-i-get-an-escaped-representation-of-a-string
-             quill.setText(@Html(Literal(Constant(passage.text)).toString));
+
+
+            function underlineSpecificWords(words){
+
+                var text = quill.getText();
+
+                for(var i = 0; i < words.length; i++){
+                    var currentText = text;
+                    var word = words[i];
+                    var index = text.indexOf(word);
+
+                    while(index != -1){
+                        console.log(index);
+                        var offset = text.length - currentText.length;
+                        quill.formatText(index + offset, index + offset + word.length, 'underline', true);
+                        currentText = currentText.substring(index + word.length);
+                        index = currentText.indexOf(word);
+                    }
+                }
+
+                quill.formatText(0, quill.getText().length, "size", 20);
             }
+
+            quill.on('text-change', function(delta, source) {
+                // quill.formatText(0, quill.getText().length, "size", 20);
+                console.log("Called");
+                var element = document.getElementsByName("passageText")[0];
+
+
+                element.setAttribute("value", quill.getText());
+
+                var hEl = document.getElementsByName("passageHTML")[0];
+                hEl.setAttribute("value", quill.getHTML());
+            });
 
 
             quill.on('selection-change', function(range) {
-                console.log("in here");
                 if (range) {
                     if (range.start == range.end) {
                         console.log('User cursor is on', range.start);
                     } else {
                         var text = quill.getText(range.start, range.end);
                         console.log('User has highlighted', text);
+
+                        var string = text;
+
                     }
                 } else {
                     console.log('Cursor not in the editor');
                 }
             });
 
-            function alertSuggestions(){
-                alert("This word is too complicated for this grade level!");
-            }
 
-            function fetchSuggestions(word){
 
-            }
+
 
             $(document).ready(function(){
 
-                function isEmpty( el ){
-                    return !$.trim(el.html())
-                }
+
+
+                //http://stackoverflow.com/questions/9913971/scala-how-can-i-get-an-escaped-representation-of-a-string
+                quill.setHTML(@Html(Literal(Constant(PassageText.bySimplePassageAndGrade(passage.id, passage.grade).html)).toString));
+
 
                 $("u").click(function(){
                     var string = $(this).html();

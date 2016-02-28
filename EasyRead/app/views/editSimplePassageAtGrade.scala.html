@@ -186,12 +186,12 @@
 
                 var quill = new Quill('#editor', configs);
 
-                @if(SimplePassage.byId(passageId).html != null){
-                     quill.setHTML('@Html(SimplePassage.byId(passageId).html)');
-                } else {
-                    //http://stackoverflow.com/questions/9913971/scala-how-can-i-get-an-escaped-representation-of-a-string
-                    quill.setText(@Html(Literal(Constant(SimplePassage.byId(passageId).text)).toString));
-                }
+
+
+                //http://stackoverflow.com/questions/9913971/scala-how-can-i-get-an-escaped-representation-of-a-string
+                quill.setText(@Html(Literal(Constant(PassageText.bySimplePassageAndGrade(passageId, grade))).toString));
+
+
 
 
                 quill.on('text-change', function(delta, source) {

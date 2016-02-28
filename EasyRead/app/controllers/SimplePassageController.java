@@ -17,6 +17,7 @@ import views.html.*;
 
 import javax.json.JsonArray;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -199,7 +200,7 @@ public class SimplePassageController extends Controller {
             return redirect(routes.SimplePassageController.viewAllPassages());
         }
 
-        SimplePassageData data = new SimplePassageData(passage.text, passage.title, 1, "category", passage.source, passage.html);
+        SimplePassageData data = new SimplePassageData(passage.text, passage.title, 1, "category", passage.source);
         Form<SimplePassageData> form = Form.form(SimplePassageData.class);
         form = form.fill(data);
         return ok(editSimplePassage.render(form, passageId));
@@ -357,7 +358,6 @@ public class SimplePassageController extends Controller {
 
         SimplePassageData data = form.get();
         passage.text = data.passageText;
-        passage.html = data.passageHTML;
         passage.grade = data.grade;
         passage.source = data.source;
 
@@ -385,7 +385,7 @@ public class SimplePassageController extends Controller {
             return redirect(routes.SimplePassageController.viewAllPassages());
         }
 
-        SimplePassageData data = new SimplePassageData(passage.text, passage.title, 1, "category", passage.source, passage.html);
+        SimplePassageData data = new SimplePassageData(passage.text, passage.title, 1, "category", passage.source);
         Form<SimplePassageData> form = Form.form(SimplePassageData.class);
         form = form.fill(data);
         return ok(editSimplePassageAtGrade.render(form, passageId, grade));
@@ -477,17 +477,17 @@ public class SimplePassageController extends Controller {
 
     public Result analyzePassages() throws JWNLException {
         for (SimplePassage p : SimplePassage.all()) {
+
             String[] sentences = p.text.split(" ");
 
             String portion = "";
 
             int sCounter = 0;
-
+/*
             for (int i = 0; i < sentences.length; i++) {
                 portion += sentences[i] + " ";
                 if (sentences[i].indexOf(". ") >= 0) {
                     sCounter++;
-
                 }
                 if (sCounter == 10 || (i + 1) == sentences.length) {
                     if (parsingController == null) parsingController = new ParsingController();
@@ -497,11 +497,54 @@ public class SimplePassageController extends Controller {
                 }
             }
 
+*/
+            p.htmlRepresentations = new HashSet<PassageText>();
+            for(int i = 0 ; i < 14; i++){
+                generatePassageTextAtGrade(p, i);
+            }
+
             p.save();
         }
 
         flash("success", "Passage Analysis Completed.");
         return ok("true");
+    }
+
+
+    HashMap<String, String> sugMap = new HashMap<String, String>();
+    String[] split;
+
+    public void generatePassageTextAtGrade(SimplePassage p, int grade){
+        PassageText current = new PassageText(grade, null);
+        List<Suggestion> s = Suggestion.bySimplePassage(p.id);
+
+        if(split == null) split = p.text.split(" ");
+        if(sugMap.size() == 0){
+            for(Suggestion sugg : s){
+                sugMap.put(sugg.word, sugg.suggestedWord);
+            }
+        }
+
+        current.html = "<div>" + p.text + "</div>";
+
+        HashSet<String> alreadySeen = new HashSet<String>();
+
+        for(String w : split){
+            if(!alreadySeen.contains(w.toLowerCase())){
+                alreadySeen.add(w.toLowerCase());
+
+                Word raw = Word.byRawString(w);
+
+                if(raw != null && raw.ageOfAcquisition > (grade + 6) && !w.contains("<u>")){
+                    current.html = current.html.replace(" " + w + " ", " <u>" + w + "</u> ");
+                    current.html = current.html.replace(" " + w.toLowerCase() + " ", " <u>" + w + "</u> ");
+                }
+            }
+        }
+
+        current.html = current.html.replace("</u> <u>", "</u>&nbsp<u>");
+        p.htmlRepresentations.add(current);
+        p.save();
     }
 
 
@@ -527,6 +570,20 @@ public class SimplePassageController extends Controller {
         } catch (Exception e) {
             return badRequest();
         }
+    }
+
+    public HashSet<Suggestion> getSuggestionsList(SimplePassage p) {
+        String[] split = p.text.split(" ");
+
+        HashSet<Suggestion> ret = new HashSet<Suggestion>();
+
+        for (String s : split) {
+            List<Suggestion> a = Suggestion.byWord(s);
+            if (a != null) {
+                ret.addAll(a);
+            }
+        }
+        return ret;
     }
 
     public Result getSuggestions(String word){
@@ -725,44 +782,18 @@ public class SimplePassageController extends Controller {
 
     }
 
-    public Result viewPassageDeepAnalysis(Long passageId) {
-        SimplePassage p = SimplePassage.byId(passageId);
 
-        if (p != null) {
-            return ok(viewPassageDeepAnalysis.render(p));
-        }
-
-        return badRequest();
-    }
-
-    public Result viewPassageSentenceDrilldown(Long passageId, int startingSentence) {
-        SimplePassage p = SimplePassage.byId(passageId);
-
-        if (p != null) {
-
-            StringBuilder b = new StringBuilder();
-
-            if(startingSentence < p.sentences.size()) b.append(p.sentences.get(startingSentence).text);
-            if(startingSentence + 1 < p.sentences.size()) b.append(p.sentences.get(startingSentence + 1).text);
-
-            return ok(viewPassageSentenceDrillDown.render(p.id, p.grade, b.toString()));
-        }
-
-        return badRequest();
-    }
 
     public Result beginSentenceBreakdown(Long passageId){
         SimplePassage p = SimplePassage.byId(passageId);
 
         String ret = "[";
 
-        List<String> sb = p.sentenceBreakdown();
+        List<Integer> sb = p.sentenceBreakdown();
 
 
         for(int i = 0; i < sb.size(); i++){
-            ret += p.text.indexOf(sb.get(i));
-            ret += ",";
-            ret += p.text.indexOf(sb.get(i)) + sb.get(i).length();
+            ret += sb.get(i);
             if(i < sb.size() - 1) ret += ",";
         }
 

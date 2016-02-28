@@ -106,22 +106,22 @@ function setCorrectAnswer(e){
 
 //PassageCreation
 function addTag() {
-//problem here
-//http://stackoverflow.com/questions/3001474/how-to-get-caller-element-using-javascript
-var numTags = document.getElementsByClassName('tag').length;
+    //problem here
+    //http://stackoverflow.com/questions/3001474/how-to-get-caller-element-using-javascript
+    var numTags = document.getElementsByClassName('tag').length;
 
-console.log('tag' + numTags);
-
-
-var newTag ='<div class="tag" name="tag' + numTags + '"> Tag' +
-numTags + '<input type="text" name="names[' + numTags + ']" placeholder="Tag Name" value="names[' + numTags + ']"><label>Anything you want</label><input type="text" name="descriptions[' + numTags + ']" placeholder="Tag Description" value="descriptions[' + numTags + ']"><label>Ex: Grade, Source, Etc</label><input type="text" name="types[' + numTags + ']" placeholder="Tag Type" value="types[' + numTags + ']"></div>';
+    console.log('tag' + numTags);
 
 
-var lastTag = document.getElementsByClassName('tag');
+    var newTag ='<div class="tag" name="tag' + numTags + '"> Tag' +
+    numTags + '<input type="text" name="names[' + numTags + ']" placeholder="Tag Name" value="names[' + numTags + ']"><label>Anything you want</label><input type="text" name="descriptions[' + numTags + ']" placeholder="Tag Description" value="descriptions[' + numTags + ']"><label>Ex: Grade, Source, Etc</label><input type="text" name="types[' + numTags + ']" placeholder="Tag Type" value="types[' + numTags + ']"></div>';
 
 
-var $this = $(lastTag);
-$(newTag).insertAfter(lastTag[lastTag.length - 1]);
+    var lastTag = document.getElementsByClassName('tag');
+
+
+    var $this = $(lastTag);
+    $(newTag).insertAfter(lastTag[lastTag.length - 1]);
 }
 
 //Passage Edit
@@ -137,9 +137,9 @@ function $_GET(param) {
     );
 
     if ( param ) {
-     return vars[param] ? vars[param] : null;
-    }
-    return vars;
+       return vars[param] ? vars[param] : null;
+   }
+   return vars;
 }
 
 
@@ -202,3 +202,61 @@ function replaceWord(word, replacement){
     });
 }*/
 
+function alertSuggestions(){
+     alert("This word is too complicated for this grade level!");
+}
+
+
+function updateSynonymnList(string, arr){
+    arr = JSON.parse(arr);
+    var leftPanel = document.getElementById("left-panel");
+
+
+    if(window.getComputedStyle(leftPanel).display === 'none'){
+        console.log("doing this");
+
+        $("#left-panel-link").click();
+
+    }
+
+    var upperDiv = '<div id="title"><h1>' + string + '</h1></div>';
+    var approvalDiv = "<div id='accept'><button class='btn btn-primary' onclick='acceptWord(" + string + ", " + $_GET('grade') + ");'>This is okay!</button></div><br>";
+
+    var synonymnDiv = "<div class='container-fluid'> <div id='list'>";
+
+    if(arr.length == 0){
+        synonymnDiv += "This word is too complicated, <br> but we don't have any suggestions for you yet.";
+    } else {
+        //http://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
+        //http://stackoverflow.com/questions/22036576/why-does-the-javascript-string-whitespace-character-nbsp-not-match
+        // var synonymnList = document.getElementById(string).innerText.trim("/\r?\n|\r/g").split(String.fromCharCode(160));
+
+
+        var ran = false;
+        for(var i = 0; i < arr.length; i++){
+            ran = true;
+            synonymnDiv += i + ". <span onclick='replaceWord(\"" + string + "\", \"" + arr[i] + "\");' style='background-color: gray;'><h3>" + arr[i] + "</h3></span><br>";
+        }
+
+        if(!ran){
+            synonymnDiv += "This word is too complicated, <br> but we don't have any <br> suggestions for you yet.";
+        }
+}
+
+
+var configs = {
+    readOnly: false,
+    theme: 'snow',
+    styles: {
+        '.ql-editor' : {
+            'word-wrap': 'break-word',
+            'word-spacing': 'normal',
+            'text-align': 'left',
+            'line-height': '250%',
+            'width': '60%',
+            'font-size': '24'
+        }
+
+    },
+    formats: ['size', 'underline', 'background','color','bold']
+};

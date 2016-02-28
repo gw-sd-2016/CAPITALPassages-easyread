@@ -42,14 +42,14 @@ public class SimplePassage extends Model {
     @Expose
     public long instructorID;
 
-    @Expose
-    public String html;
-
     @OneToMany(cascade = CascadeType.ALL)
     public List<Sentence> sentences = new ArrayList<Sentence>();
 
     @OneToMany(cascade = CascadeType.ALL)
     public Set<PassageQuestion> questions = new HashSet<PassageQuestion>();
+
+    @OneToMany(cascade = CascadeType.ALL)
+    public Set<PassageText> htmlRepresentations = new HashSet<PassageText>();
 
     @Expose
     public Long tagId;
@@ -134,15 +134,10 @@ public class SimplePassage extends Model {
         }
     }
 
-
-
-
-
-
-    public List<String> sentenceBreakdown() {
+    public List<Integer> sentenceBreakdown() {
         PassageAnalysisController analysisController = new PassageAnalysisController();
 
-        HashSet<String> difficulties = new HashSet<String>();
+        HashSet<Integer> difficulties = new HashSet<Integer>();
 
         if (this.sentences.size() > 2) {
             for (int i = 2; i < this.sentences.size(); i++) {
@@ -151,7 +146,11 @@ public class SimplePassage extends Model {
                     if(!difficulties.contains(this.sentences.get(i - 1).text + " " + this.sentences.get(i).text)){
                         Double diff = analysisController.determineGradeLevelForString(this.sentences.get(i - 1).text + " " + this.sentences.get(i).text);
 
-                        if(diff > this.grade) difficulties.add(this.sentences.get(i - 1).text + " " + this.sentences.get(i).text);
+                        if(diff > this.grade){
+                            difficulties.add(this.text.indexOf(this.sentences.get(i - 1).text));
+                            difficulties.add(this.text.indexOf(this.sentences.get(i).text) + this.sentences.get(i).text.length());
+                        }
+
 
                     }
                 }
@@ -159,7 +158,7 @@ public class SimplePassage extends Model {
         }
 
 
-        List<String> r = new ArrayList<String>();
+        List<Integer> r = new ArrayList<Integer>();
         r.addAll(difficulties);
 
        return r;
