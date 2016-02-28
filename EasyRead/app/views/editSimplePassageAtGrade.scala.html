@@ -21,29 +21,48 @@
         box-shadow: inset 0 0 5px 5px #222 ;
         }
         </style>
-
         <div id="left-panel" class="panel"></div>
+
+
+        <div class="pull-right">
+
+
+            <div class="btn-group">
+                <h5>Choose The Grade Level this passage should be edited at</h5>
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+
+                        Grade
+
+                        @PassageAnalysisController.displayGrade(grade)
+
+                        <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=0">K</a></li>
+                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=1">1</a></li>
+                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=2">2</a></li>
+                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=3">3</a></li>
+                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=4">4</a></li>
+                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=5">5</a></li>
+                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=6">6</a></li>
+                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=7">7</a></li>
+                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=8">8</a></li>
+                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=9">9</a></li>
+                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=10">10</a></li>
+                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=11">11</a></li>
+                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=12">12</a></li>
+                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=13">College</a></li>
+                    </ul>
+                </div>
+
+
+            </div>
+
+        </div>
 
         <a id="left-panel-link" class="btn btn-primary" href="#left-panel" style="display: none ;">
             <i class="glyphicon glyphicon-edit"> Left Panel</i>
         </a>
-
-
-
-        <div>
-        @for(word <- SimplePassage.byId(passageId).text.split(" ")) {
-            @if(Word.byLemma(word) != null && Word.byLemma(word).ageOfAcquisition > (grade + 6) && !SimplePassage.byId(passageId).getStopWords().contains(word)) {
-                @if(Suggestion.byWord(word).map(x => x.suggestedWord).distinct.size > 0) {
-                        <!-- http://stackoverflow.com/questions/18830813/how-can-i-remove-punctuation-from-input-text-in-java -->
-                    <div style="display:none ;" id="@word">
-                        @for(w <- Suggestion.byWord(word).sortWith(_.frequency > _.frequency).map(x => x.suggestedWord).distinct) {@w&nbsp}
-                        <br>
-                    </div>
-                }
-            }
-        }
-
-        </div>
 
 
         @helper.form(routes.SimplePassageController.edit_submit(passageId)) {
@@ -68,78 +87,46 @@
                         }
                         <p>
 
+
                             <strong>
                                 This page shows Suggestions to make this passage readable for a @if(grade == 0) { Kindergarten } @if(grade >= 12) { College Level } else {
                                 @if(grade > 0) { Grade @grade}
-                            } reader</strong>
+                            }reader</strong>
 
+                    <h4>Title</h4>
+                        <input type="text" name="passageTitle" placeholder="Passage Title" value="@form("passageTitle").value">
 
-                            <div class="pull-right">
+                        <h4>Source</h4>
+                        <input type="text" name="source" placeholder="Passage Source" value="@form("source").value">
 
+                        <input type="text" id="text" name="passageText" value="" style="display:none">
 
-                                <div class="btn-group">
-                                    <h5>Choose The Grade Level this passage should be edited at</h5>
-                                    <div class="dropdown">
-                                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                        <input type="text" id="html" name="passageHTML" value='' style="display:none">
 
-                                            Grade
-
-                                           @PassageAnalysisController.displayGrade(grade)
-                                            <span class="caret"></span></button>
-                                        <ul class="dropdown-menu">
-                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=0">K</a></li>
-                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=1">1</a></li>
-                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=2">2</a></li>
-                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=3">3</a></li>
-                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=4">4</a></li>
-                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=5">5</a></li>
-                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=6">6</a></li>
-                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=7">7</a></li>
-                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=8">8</a></li>
-                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=9">9</a></li>
-                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=10">10</a></li>
-                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=11">11</a></li>
-                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=12">12</a></li>
-                                            <li><a href="editPassageAtGrade?passageId=@passageId&grade=13">College</a></li>
-                                        </ul>
-                                    </div>
-
-
-                                </div>
-
-
-                                <h4>Title</h4>
-                                <input type="text" name="passageTitle" placeholder="Passage Title" value="@form("passageTitle").value">
-
-                                <h4>Source</h4>
-                                <input type="text" name="source" placeholder="Passage Source" value="@form("source").value">
-
-                                <input type="text" id="text" name="passageText" value="" style="display:none">
-
-                                <input type="text" id="html" name="passageHTML" value='' style="display:none">
-
-                                <h4>Passage Body</h4>
-                                    <!-- http://quilljs.com/docs/quickstart/ -->
-                                    <!-- Create the editor container -->
-                                <div id="editor">
-                                </div>
-
-                    <p>
-                    </p>
-                        <br>
-                        <p>
-
-                        </p>
                     </div>
+                    <br>
+                    <br>
+
+
+                    <h4>Passage Body</h4>
+                        <!-- http://quilljs.com/docs/quickstart/ -->
+                        <!-- Create the editor container -->
+
+                    <div id="editor">
+                    </div>
+
+
+
+
+                    <button type="submit" class="btn btn-success">
+                        <i class="btn-icon-only icon-check"></i> Submit
+                    </button>
+
+
+                    <br>
+                    <br>
+
                 </div>
-
-                <button type="submit" class="btn btn-success">
-                    <i class="btn-icon-only icon-check"></i> Submit
-                </button>
-
-
-                <br>
-                <br>
             </div>
         }
         <script src="/assets/js/jquery.panelslider.min.js"></script>
@@ -186,25 +173,33 @@
 
                 var quill = new Quill('#editor', configs);
 
-
-
                 //http://stackoverflow.com/questions/9913971/scala-how-can-i-get-an-escaped-representation-of-a-string
-                quill.setText(@Html(Literal(Constant(PassageText.bySimplePassageAndGrade(passageId, grade))).toString));
-
-
-
+                quill.setHTML(@Html(Literal(Constant(PassageText.bySimplePassageAndGrade(passageId, grade).html)).toString));
 
                 quill.on('text-change', function(delta, source) {
-
+                    // quill.formatText(0, quill.getText().length, "size", 20);
                     console.log("Called");
                     var element = document.getElementsByName("passageText")[0];
 
 
                     element.setAttribute("value", quill.getText());
 
-                    var hEl = document.getElementsByName("passageHTML")[0];
-                    hEl.setAttribute("value", quill.getHTML());
+                    saveHtml(quill.getHTML())
                 });
+
+                function saveHtml(html){
+                    jsRoutes.controllers.SimplePassageController.savePassageHtml(@passageId, html, @grade ).ajax({
+                        success : function(data) {
+                            console.log("saved");
+                        },
+                        error : function(err) {
+                            //window.location = "";
+                        },
+                        complete : function() {
+
+                        }
+                    });
+                }
 
 
 
@@ -348,14 +343,19 @@
                     //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
                     // locate your element and add the Click Event Listener
 
-                        function isEmpty( el ){
-                            return !$.trim(el.html())
-                        }
+                    function isEmpty( el ){
+                        return !$.trim(el.html())
+                    }
 
-                        $("u").click(function(){
-                            var string = $(this).html();
-                            getSuggestions(string);
-                        });
+
+                    //http://stackoverflow.com/questions/1206203/how-to-distinguish-between-left-and-right-mouse-click-with-jquery
+                    //http://jsfiddle.net/Kn9s7/5/
+                    $(document).on("contextmenu", "u", function(e){
+                        var string = $(this).html();
+                        getSuggestions(string);
+                        return false;
+                    });
+
                 });
         </script>
 

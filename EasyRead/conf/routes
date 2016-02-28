@@ -41,6 +41,8 @@ GET         /replaceWord                          @controllers.SimplePassageCont
 #GET     /viewAllPassageTags             controllers.SimplePassageController.viewAllPassageTags(tags : util.List[PassageTag])
 GET        /getSugg                               controllers.SimplePassageController.getSuggestions(word : String)
 GET        /getSB                                 controllers.SimplePassageController.beginSentenceBreakdown(passageId : Long)
+GET        /savePT                                controllers.SimplePassageController.savePassagePlainText(passageId : Long, text : String)
+GET        /saveHt                                controllers.SimplePassageController.savePassageHtml(passageId : Long, html : String, grade : Int)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                         controllers.Assets.at(path="/public", file)

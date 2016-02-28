@@ -81,7 +81,9 @@ public class Application extends Controller {
                         controllers.routes.javascript.SimplePassageController.acceptWord(),
                         controllers.routes.javascript.SimplePassageController.replaceWord(),
                         controllers.routes.javascript.SimplePassageController.getSuggestions(),
-                        controllers.routes.javascript.SimplePassageController.beginSentenceBreakdown()/*,
+                        controllers.routes.javascript.SimplePassageController.beginSentenceBreakdown(),
+                        controllers.routes.javascript.SimplePassageController.savePassagePlainText(),
+                        controllers.routes.javascript.SimplePassageController.savePassageHtml()/*,
                         controllers.routes.javascript.SimplePassageController.deletePassageQuestion()
                         controllers.routes.javascript.SimplePassageController.deletePassageQuestionChoice()*/
 

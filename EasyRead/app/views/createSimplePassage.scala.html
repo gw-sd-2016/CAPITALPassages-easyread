@@ -75,33 +75,7 @@
 
             <!-- Initialize Quill editor -->
         <script>
-                var configs = {
-                    readOnly: true,
-                    theme: 'snow',
-                    styles: {
-                        '.ql-editor' : {
-                            'word-wrap': 'break-word',
-                            'word-spacing': 'normal',
-                            'text-align': 'left',
-                            'line-height': '250%',
-                            'width': '60%',
-                            'font-size': '24'
-                        }
 
-                    },
-                    formats: ['size', 'underline']
-                };
-
-
-
-
-                var quill = new Quill('#editor', configs);
-
-                quill.on('text-change', function(delta, source) {
-                    console.log("Called");
-                    var element = document.getElementsByName("passageText")[0];
-                    element.setAttribute("value", quill.getHTML());
-                });
 
                 function addTag() {
 //problem here
@@ -121,6 +95,36 @@
                     var $this = $(lastTag);
                     $(newTag).insertAfter(lastTag[lastTag.length - 1]);
                 }
+
+                $(document).ready(function() {
+                    var configs = {
+                        readOnly: false,
+                        theme: 'snow',
+                        styles: {
+                            '.ql-editor' : {
+                                'word-wrap': 'break-word',
+                                'word-spacing': 'normal',
+                                'text-align': 'left',
+                                'line-height': '250%',
+                                'width': '60%',
+                                'font-size': '24'
+                            }
+
+                        },
+                        formats: ['size', 'underline']
+                    };
+
+
+
+
+                    var quill = new Quill('#editor', configs);
+
+                    quill.on('text-change', function(delta, source) {
+                        console.log("Called");
+                        var element = document.getElementsByName("passageText")[0];
+                        element.setAttribute("value", quill.getHTML());
+                    });
+                });
 
 
         </script>

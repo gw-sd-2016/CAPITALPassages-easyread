@@ -357,6 +357,11 @@ public class SimplePassageController extends Controller {
 
 
         SimplePassageData data = form.get();
+
+        PassageText current = PassageText.bySimplePassageAndGrade(passageId, data.grade);
+        current.html = data.passageText;
+
+
         passage.text = data.passageText;
         passage.grade = data.grade;
         passage.source = data.source;
@@ -805,5 +810,36 @@ public class SimplePassageController extends Controller {
         return ok(ret);
     }
 
+    public Result savePassagePlainText(Long passageId, String text){
+        try{
+            SimplePassage p = SimplePassage.byId(passageId);
+            p.text = text;
+            p.save();
+            return ok("true");
+        } catch(Exception e){
+            return badRequest();
+        }
+    }
+
+    public Result savePassageHtml(Long passageId, String html, int grade){
+        try{
+            SimplePassage p = SimplePassage.byId(passageId);
+
+            if(grade == -1) grade = p.grade;
+
+
+            for(PassageText c : p.htmlRepresentations){
+                if(c.grade == grade){
+                    c.html = html;
+                    break;
+                }
+            }
+
+            p.save();
+            return ok("true");
+        } catch(Exception e){
+            return badRequest();
+        }
+    }
 
 }

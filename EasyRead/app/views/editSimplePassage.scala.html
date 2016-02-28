@@ -111,11 +111,6 @@
                             <!-- http://quilljs.com/docs/quickstart/ -->
                             <!-- Create the editor container -->
 
-                        <a class="btn btn-primary" onClick="fetchSuggestions();">Load Suggestions</a>
-
-
-
-
                             <div id="editor">
                             </div>
 
@@ -181,8 +176,9 @@
 
 
 
+
                 //http://stackoverflow.com/questions/9913971/scala-how-can-i-get-an-escaped-representation-of-a-string
-                quill.setText(@Html(Literal(Constant(PassageText.bySimplePassageAndGrade(passageId, SimplePassage.byId(passageId).grade))).toString));
+                quill.setHTML(@Html(Literal(Constant(PassageText.bySimplePassageAndGrade(passageId, SimplePassage.byId(passageId).grade).html)).toString));
 
 
 
@@ -194,8 +190,8 @@
 
                     element.setAttribute("value", quill.getText());
 
-                    var hEl = document.getElementsByName("passageHTML")[0];
-                    hEl.setAttribute("value", quill.getHTML());
+                    saveHtml(quill.getHTML())
+
                 });
 
 
@@ -274,6 +270,20 @@
                     });
                 }
 
+                function saveHtml(html){
+                    jsRoutes.controllers.SimplePassageController.savePassageHtml(@passageId, html, -1 ).ajax({
+                        success : function(data) {
+                            console.log("saved");
+                        },
+                        error : function(err) {
+                            //window.location = "";
+                        },
+                        complete : function() {
+
+                        }
+                    });
+                }
+
 
                 function fetchSuggestions(){
                     underlineSpecificWords(@Html(Json.stringify(Json.toJson(SimplePassage.byId(passageId).text.split(" ").toList.distinct.filter(p => (Word.byLemma(p) != null && Word.byLemma(p).ageOfAcquisition > (SimplePassage.byId(passageId).grade + 6) && !SimplePassage.byId(passageId).getStopWords().contains(p)))))));
@@ -307,10 +317,15 @@
                     // http://stackoverflow.com/questions/24309803/playframework-jsvalue-in-html-template
                     underlineSpecificWords(@Html(Json.stringify(Json.toJson(SimplePassage.byId(passageId).text.split(" ").toList.distinct.filter(p => (Word.byLemma(p) != null && Word.byLemma(p).ageOfAcquisition > SimplePassage.byId(passageId).grade + 6) && !SimplePassage.byId(passageId).getStopWords().contains(p))))));
 
-                    $("u").click(function(){
+
+                    //http://stackoverflow.com/questions/1206203/how-to-distinguish-between-left-and-right-mouse-click-with-jquery
+                    //http://jsfiddle.net/Kn9s7/5/
+                    $(document).on("contextmenu", "u", function(e){
                         var string = $(this).html();
                         getSuggestions(string);
+                        return false;
                     });
+
                 });
         </script>
 
