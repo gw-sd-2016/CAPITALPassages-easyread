@@ -505,7 +505,8 @@ public class SimplePassageController extends Controller {
 */
             p.htmlRepresentations = new HashSet<PassageText>();
             for(int i = 0 ; i < 14; i++){
-                generatePassageTextAtGrade(p, i);
+                generatePassageTextAtGrade(p.id, i);
+                beginSentenceBreakdown(p.id, i);
             }
 
             p.save();
@@ -519,7 +520,8 @@ public class SimplePassageController extends Controller {
     HashMap<String, String> sugMap = new HashMap<String, String>();
     String[] split;
 
-    public void generatePassageTextAtGrade(SimplePassage p, int grade){
+    public void generatePassageTextAtGrade(Long passageId, int grade){
+        SimplePassage p = SimplePassage.byId(passageId);
         PassageText current = new PassageText(grade, null);
         List<Suggestion> s = Suggestion.bySimplePassage(p.id);
 
@@ -789,25 +791,61 @@ public class SimplePassageController extends Controller {
 
 
 
-    public Result beginSentenceBreakdown(Long passageId){
+    public Result beginSentenceBreakdown(Long passageId, int grade){
         SimplePassage p = SimplePassage.byId(passageId);
 
-        String ret = "[";
+        PassageAnalysisController analysisController = new PassageAnalysisController();
 
-        List<Integer> sb = p.sentenceBreakdown();
+        HashSet<Integer> difficulties = new HashSet<Integer>();
+
+        if (p.sentences.size() > 2) {
+            for (int i = 2; i < p.sentences.size(); i++) {
+                if (i % 2 == 0) {
+
+                    if(!difficulties.contains(p.sentences.get(i - 1).text + " " + p.sentences.get(i).text)){
+                        Double diff = analysisController.determineGradeLevelForString(p.sentences.get(i - 1).text + " " + p.sentences.get(i).text);
+
+                        if(diff > grade){
+                            difficulties.add(i);
+                        }
 
 
-        for(int i = 0; i < sb.size(); i++){
-            ret += sb.get(i);
-            if(i < sb.size() - 1) ret += ",";
+                    }
+                }
+            }
         }
 
-        ret += "]";
 
-        System.out.println(ret);
+        List<Integer> r = new ArrayList<Integer>();
+        r.addAll(difficulties);
+
+        PassageText current = PassageText.bySimplePassageAndGrade(passageId, grade);
+
+        String[] split = current.html.split(". ");
+
+        StringBuilder hBuilder = new StringBuilder();
+
+        for(int i = 0; i <split.length; i++){
+            if(r.contains(i)){
+                hBuilder.append("&nbsp<span class='glyphicon glyphicon-exclamation-sign'></span>" + split[i] + ". ");
+
+            } else {
+                hBuilder.append(split[i] + ". ");
+            }
+        }
 
 
-        return ok(ret);
+        for(PassageText pt : p.htmlRepresentations){
+            if(pt.grade == current.grade){
+                pt.html = hBuilder.toString();
+                break;
+            }
+        }
+
+
+        p.save();
+
+        return ok();
     }
 
     public Result savePassagePlainText(Long passageId, String text){

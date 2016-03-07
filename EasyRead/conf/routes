@@ -40,7 +40,7 @@ GET         /acceptWord                           @controllers.SimplePassageCont
 GET         /replaceWord                          @controllers.SimplePassageController.replaceWord(passageId : Long, word : String, replacement : String)
 #GET     /viewAllPassageTags             controllers.SimplePassageController.viewAllPassageTags(tags : util.List[PassageTag])
 GET        /getSugg                               controllers.SimplePassageController.getSuggestions(word : String)
-GET        /getSB                                 controllers.SimplePassageController.beginSentenceBreakdown(passageId : Long)
+GET        /getSB                                 controllers.SimplePassageController.beginSentenceBreakdown(passageId : Long, grade : Int)
 GET        /savePT                                controllers.SimplePassageController.savePassagePlainText(passageId : Long, text : String)
 GET        /saveHt                                controllers.SimplePassageController.savePassageHtml(passageId : Long, html : String, grade : Int)
 
