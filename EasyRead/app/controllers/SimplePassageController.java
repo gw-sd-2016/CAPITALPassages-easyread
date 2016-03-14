@@ -378,12 +378,6 @@ public class SimplePassageController extends Controller {
         return redirect(routes.SimplePassageController.view(passageId, passage.grade));
     }
 
-
-    public String getFolderPath() {
-        return "public/passages";
-    }
-
-
     public Result editPassage(Long passageId, int grade) {
         SimplePassage passage = SimplePassage.byId(passageId);
         if (passage == null) {
@@ -504,12 +498,13 @@ public class SimplePassageController extends Controller {
 
 */
             p.htmlRepresentations = new HashSet<PassageText>();
-            for(int i = 0 ; i < 14; i++){
+            for(int i = 0 ; i < 1; i++){
                 generatePassageTextAtGrade(p.id, i);
                 beginSentenceBreakdown(p.id, i);
             }
 
             p.save();
+            break;
         }
 
         flash("success", "Passage Analysis Completed.");
@@ -521,6 +516,7 @@ public class SimplePassageController extends Controller {
     String[] split;
 
     public void generatePassageTextAtGrade(Long passageId, int grade){
+        System.out.println("gen text");
         SimplePassage p = SimplePassage.byId(passageId);
         PassageText current = new PassageText(grade, null);
         List<Suggestion> s = Suggestion.bySimplePassage(p.id);
@@ -549,9 +545,14 @@ public class SimplePassageController extends Controller {
             }
         }
 
+        for(PassageText t : p.htmlRepresentations){
+            t.delete(); 
+        }
+
         current.html = current.html.replace("</u> <u>", "</u>&nbsp<u>");
         p.htmlRepresentations.add(current);
         p.save();
+        System.out.println("GenText END");
     }
 
 
@@ -789,61 +790,99 @@ public class SimplePassageController extends Controller {
 
     }
 
+    public HashSet<Integer> getDifficulties(SimplePassage p){
+        PassageAnalysisController analysisController = new PassageAnalysisController();
+        HashSet<Integer> difficulties = new HashSet<Integer>();
+
+        for (int i = 0; i < p.sentences.size(); i++) { 
+            Double diff = analysisController.determineGradeLevelForString(p.sentences.get(i).text);
+    
+            if(diff > p.grade){
+                difficulties.add(i);
+            }
+        }
+        
+        return difficulties;
+    }
+
+
+    public String rebuildHTML(String[] split){
+        StringBuilder sb = new StringBuilder(); 
+
+        for(int i = 0; i < split.length; i++){
+            String s = split[i]; 
+
+            if(!s.contains("<i")){
+                 sb.append(s + " ");
+             } else {
+                sb.append(s); 
+             }
+
+           
+        }
+
+        return sb.toString(); 
+    }
 
 
     public Result beginSentenceBreakdown(Long passageId, int grade){
+        System.out.println("Begin");
         SimplePassage p = SimplePassage.byId(passageId);
 
-        PassageAnalysisController analysisController = new PassageAnalysisController();
-
-        HashSet<Integer> difficulties = new HashSet<Integer>();
-
-        if (p.sentences.size() > 2) {
-            for (int i = 2; i < p.sentences.size(); i++) {
-                if (i % 2 == 0) {
-
-                    if(!difficulties.contains(p.sentences.get(i - 1).text + " " + p.sentences.get(i).text)){
-                        Double diff = analysisController.determineGradeLevelForString(p.sentences.get(i - 1).text + " " + p.sentences.get(i).text);
-
-                        if(diff > grade){
-                            difficulties.add(i);
-                        }
-
-
-                    }
-                }
-            }
-        }
-
-
-        List<Integer> r = new ArrayList<Integer>();
-        r.addAll(difficulties);
-
+        HashSet<Integer> difficulties = getDifficulties(p);
+      
         PassageText current = PassageText.bySimplePassageAndGrade(passageId, grade);
 
-        String[] split = current.html.split(". ");
+        if(current.html != null && current.html.length() > 0){
+            System.out.println("in here");
 
-        StringBuilder hBuilder = new StringBuilder();
 
-        for(int i = 0; i <split.length; i++){
-            if(r.contains(i)){
-                hBuilder.append("&nbsp<span class='glyphicon glyphicon-exclamation-sign'></span>" + split[i] + ". ");
+            System.out.println("----" + current.html);
 
-            } else {
-                hBuilder.append(split[i] + ". ");
+            String[] split = current.html.split(" ");
+
+            int currentIndex = 0; 
+            int sentNumber = 0; 
+            boolean placed = false; 
+            for(int i = 0; i < split.length; i++){
+
+                if(difficulties.contains(sentNumber) && !placed){
+                    String curr = split[i]; 
+                    String[] arr = curr.split("&nbsp;"); 
+
+                    if(arr.length > 1){
+                        curr = "<i class='glyphicon glyphicon-exclamation-sign'>" + arr[0] + "</i> " + arr[1];  
+                    } else {
+                        curr = "<i class='glyphicon glyphicon-exclamation-sign'>" + curr + "</i> ";  
+                    }
+
+                    split[i] = curr; 
+                    System.out.println(split[i]); 
+                    placed = true;
+                }
+
+                if(split[i].indexOf(".") != -1){
+                    sentNumber++;
+                    placed = false; 
+                }
+             
+            
             }
-        }
 
+            current.html = rebuildHTML(split);
 
-        for(PassageText pt : p.htmlRepresentations){
-            if(pt.grade == current.grade){
-                pt.html = hBuilder.toString();
-                break;
+            // do i actually need to do this?
+            for(PassageText pt : p.htmlRepresentations){
+                if(pt.grade == current.grade){
+                    pt.html = current.html;
+                    break;
+                }
             }
-        }
 
+            System.out.println(current.html);
+            p.save();
+        } else System.out.println("null"); 
 
-        p.save();
 
         return ok();
     }
