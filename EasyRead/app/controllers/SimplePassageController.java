@@ -848,14 +848,21 @@ public class SimplePassageController extends Controller {
 
                 if(difficulties.contains(sentNumber) && !placed){
                     String curr = split[i]; 
-                    String[] arr = curr.split("&nbsp;"); 
+                    int spaceIndex = curr.indexOf("&nbsp"); 
 
-                    if(arr.length > 1){
-                        curr = "<i class='glyphicon glyphicon-exclamation-sign'>" + arr[0] + "</i> " + arr[1];  
+                    System.out.println("sp:" + spaceIndex);
+
+                    if(spaceIndex != -1){
+                        curr = "<i class='glyphicon glyphicon-exclamation-sign'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";  
                     } else {
-                        curr = "<i class='glyphicon glyphicon-exclamation-sign'>" + curr + "</i> ";  
+                         curr = "<i class='glyphicon glyphicon-exclamation-sign'>" + curr + "</i> ";  
                     }
 
+                    while(curr.indexOf(" <u>") != -1){
+                        curr = curr.substring(0, curr.indexOf(" <u>")) + "&nbsp" + curr.substring(curr.indexOf(" <u>") + 1);
+                    }
+
+                  
                     split[i] = curr; 
                     System.out.println(split[i]); 
                     placed = true;
@@ -869,7 +876,16 @@ public class SimplePassageController extends Controller {
             
             }
 
+
+
             current.html = rebuildHTML(split);
+
+            for(int c = 0; c < current.html.length() - 2; c++){
+                if(current.html.charAt(c) == ' ' && current.html.substring(c + 1, c + 3).equals("<u")){
+                     current.html = current.html.substring(0, c) + "&nbsp" + current.html.substring(c + 1);
+                }
+            }
+
 
             // do i actually need to do this?
             for(PassageText pt : p.htmlRepresentations){
