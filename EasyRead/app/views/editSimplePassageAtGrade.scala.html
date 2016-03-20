@@ -151,6 +151,7 @@
             <!-- Initialize Quill editor -->
         <script>
 
+                var capturedWord = "";
 
                 var configs = {
                     readOnly: false,
@@ -181,11 +182,75 @@
                     console.log("Called");
                     var element = document.getElementsByName("passageText")[0];
 
+                    if(delta.length() > 1){
+                        // send whole sentence back
+                    } else {
+                        // check if this word is too difficult
+                    }
 
                     element.setAttribute("value", quill.getText());
 
                     saveHtml(quill.getHTML())
                 });
+
+                quill.on('selection-change', function(range) {
+                    if (range) {
+                        if (range.start == range.end) {
+                            console.log('User cursor is on', range.start);
+                        } else {
+                            var text = editor.getText(range.start, range.end);
+                            console.log('User has highlighted', text);
+                        }
+                    } else {
+                        console.log('Cursor not in the editor');
+                    }
+                });
+
+                function findContainedWord(pos){
+                    var text = quill.getText();
+
+                    if(text.charAt(pos) == ' ') pos--;
+
+                    if(text.charAt(pos) == ' ') return null;
+
+                    var startOfWord = 0;
+                    var endOfWord = 0;
+                    for(endOfWord = pos; endOfWord < text.length; endOfWord++){
+                        if(text.charAt(endOfWord) == ' '){
+                            endOfWord--;
+                            break;
+                        }
+                    }
+                    for(startOfWord = pos; startOfWord >= 0; startOfWord--){
+                        if(text.charAt(startOfWord) == ' '){
+                            startOfWord++;
+                            break;
+                        }
+                    }
+
+                    capturedWord = quill.getText().substring(startOfWord, endOfWord);
+                    return quill.getText().substring(startOfWord, endOfWord);
+                }
+
+                function findContainingSentence(pos){
+                    var text = quill.getText();
+
+                    var startOfSen = 0;
+                    var endOfSen = 0;
+
+                    for(endOfSen = pos; endOfSen < text.length; endOfSen++){
+                        if(text.charAt(endOfSen) == '.'){
+                            break;
+                        }
+                    }
+                    for(startOfSen = pos; startOfSen >= 0; startOfSen--){
+                        if(text.charAt(startOfSen) == '.'){
+                            startOfSen += 2;
+                            break;
+                        }
+                    }
+                    return quill.getText().substring(startOfSen, endOfSen);
+                }
 
                 function saveHtml(html){
                     jsRoutes.controllers.SimplePassageController.savePassageHtml(@passageId, html, @grade ).ajax({

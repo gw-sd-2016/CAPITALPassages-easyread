@@ -27,6 +27,7 @@ public class SimplePassageController extends Controller {
 
     private ParsingController parsingController;
     private PassageAnalysisController analysisController;
+    private ArrayList<Double> difficultiesCache;
 
     // New Passage Methods
     public Result createSimplePassage() throws JWNLException {
@@ -477,34 +478,16 @@ public class SimplePassageController extends Controller {
     public Result analyzePassages() throws JWNLException {
         for (SimplePassage p : SimplePassage.all()) {
 
-            String[] sentences = p.text.split(" ");
-
-            String portion = "";
-
-            int sCounter = 0;
-/*
-            for (int i = 0; i < sentences.length; i++) {
-                portion += sentences[i] + " ";
-                if (sentences[i].indexOf(". ") >= 0) {
-                    sCounter++;
-                }
-                if (sCounter == 10 || (i + 1) == sentences.length) {
-                    if (parsingController == null) parsingController = new ParsingController();
-                    parsingController.parse(p, portion);
-                    portion = "";
-                    sCounter = 0;
-                }
-            }
-
-*/
             p.htmlRepresentations = new HashSet<PassageText>();
-            for(int i = 0 ; i < 1; i++){
+
+            this.difficultiesCache = getDifficulties(p);
+
+            for(int i = 0 ; i < 14; i++){
                 generatePassageTextAtGrade(p.id, i);
                 beginSentenceBreakdown(p.id, i);
             }
 
             p.save();
-            break;
         }
 
         flash("success", "Passage Analysis Completed.");
@@ -790,16 +773,16 @@ public class SimplePassageController extends Controller {
 
     }
 
-    public HashSet<Integer> getDifficulties(SimplePassage p){
+    public ArrayList<Double> getDifficulties(SimplePassage p){
         PassageAnalysisController analysisController = new PassageAnalysisController();
-        HashSet<Integer> difficulties = new HashSet<Integer>();
+        ArrayList<Double> difficulties = new ArrayList<Double>();
 
         for (int i = 0; i < p.sentences.size(); i++) { 
             Double diff = analysisController.determineGradeLevelForString(p.sentences.get(i).text);
     
-            if(diff > p.grade){
-                difficulties.add(i);
-            }
+
+                difficulties.add(diff);
+
         }
         
         return difficulties;
@@ -825,11 +808,15 @@ public class SimplePassageController extends Controller {
     }
 
 
+
+
+
+
     public Result beginSentenceBreakdown(Long passageId, int grade){
         System.out.println("Begin");
         SimplePassage p = SimplePassage.byId(passageId);
 
-        HashSet<Integer> difficulties = getDifficulties(p);
+
       
         PassageText current = PassageText.bySimplePassageAndGrade(passageId, grade);
 
@@ -841,21 +828,20 @@ public class SimplePassageController extends Controller {
 
             String[] split = current.html.split(" ");
 
-            int currentIndex = 0; 
             int sentNumber = 0; 
             boolean placed = false; 
             for(int i = 0; i < split.length; i++){
 
-                if(difficulties.contains(sentNumber) && !placed){
-                    String curr = split[i]; 
+                if(sentNumber < p.sentences.size() && this.difficultiesCache.get(sentNumber) > grade && !placed){
+                    String curr = split[i];
                     int spaceIndex = curr.indexOf("&nbsp"); 
 
                     System.out.println("sp:" + spaceIndex);
 
                     if(spaceIndex != -1){
-                        curr = "<i class='glyphicon glyphicon-exclamation-sign'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";  
+                        curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
                     } else {
-                         curr = "<i class='glyphicon glyphicon-exclamation-sign'>" + curr + "</i> ";  
+                         curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign'>" + curr + "</i> ";
                     }
 
                     while(curr.indexOf(" <u>") != -1){
@@ -903,6 +889,75 @@ public class SimplePassageController extends Controller {
         return ok();
     }
 
+
+
+    public Result singularSentenceBreakdown(Long passageId, int grade, String sentence){
+        System.out.println("Begin");
+        SimplePassage p = SimplePassage.byId(passageId);
+
+
+
+        PassageText current = PassageText.bySimplePassageAndGrade(passageId, grade);
+
+        String ogSentence = sentence;
+
+        if(current.html != null && current.html.length() > 0){
+            System.out.println("in here");
+
+
+
+            Double diff = analysisController.determineGradeLevelForString(sentence);
+
+
+
+                if(diff > grade){
+                    String curr = sentence;
+                    int spaceIndex = curr.indexOf("&nbsp");
+
+                    System.out.println("sp:" + spaceIndex);
+
+                    if(spaceIndex != -1){
+                        curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
+                    } else {
+                        curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign'>" + curr + "</i> ";
+                    }
+
+                    while(curr.indexOf(" <u>") != -1){
+                        curr = curr.substring(0, curr.indexOf(" <u>")) + "&nbsp" + curr.substring(curr.indexOf(" <u>") + 1);
+                    }
+
+
+                    sentence = curr;
+                    System.out.println(sentence);
+
+                }
+            }
+
+            current.html = current.html.replace(ogSentence, sentence);
+
+
+
+            for(int c = 0; c < current.html.length() - 2; c++){
+                if(current.html.charAt(c) == ' ' && current.html.substring(c + 1, c + 3).equals("<u")){
+                    current.html = current.html.substring(0, c) + "&nbsp" + current.html.substring(c + 1);
+                }
+            }
+
+
+            // do i actually need to do this?
+            for(PassageText pt : p.htmlRepresentations){
+                if(pt.grade == current.grade){
+                    pt.html = current.html;
+                    break;
+                }
+            }
+
+            System.out.println(current.html);
+            p.save();
+
+        return ok();
+    }
+
     public Result savePassagePlainText(Long passageId, String text){
         try{
             SimplePassage p = SimplePassage.byId(passageId);
@@ -933,6 +988,31 @@ public class SimplePassageController extends Controller {
         } catch(Exception e){
             return badRequest();
         }
+    }
+
+
+    public Result checkSentence(String sentence, int grade, Long passageId){
+        return singularSentenceBreakdown(passageId, grade, sentence);
+    }
+
+    public Result checkWord(String word, int grade, Long passageId){
+        Word enteredWord = Word.byRawString(word);
+
+       // (POS p, String word, String sentence, Long passageId, String ogText)
+        if(enteredWord != null){
+            if(enteredWord.ageOfAcquisition > grade){
+                if(Suggestion.byWord(enteredWord.lemma) == null){
+                    if(this.analysisController == null) analysisController = new PassageAnalysisController();
+                    try{
+                        analysisController.generateSuggestionsForWord(enteredWord.partsOfSpeech.get(0), enteredWord.lemma, word, passageId, enteredWord.lemma);
+                        return(getSuggestions(enteredWord.lemma));
+                    } catch(Exception e){
+                        return badRequest();
+                    }
+                }
+            }
+        }
+        return badRequest();
     }
 
 }
