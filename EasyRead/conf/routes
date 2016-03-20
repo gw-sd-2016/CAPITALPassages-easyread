@@ -42,7 +42,12 @@ GET         /replaceWord                          @controllers.SimplePassageCont
 GET        /getSugg                               controllers.SimplePassageController.getSuggestions(word : String)
 GET        /getSB                                 controllers.SimplePassageController.beginSentenceBreakdown(passageId : Long, grade : Int)
 GET        /savePT                                controllers.SimplePassageController.savePassagePlainText(passageId : Long, text : String)
-GET        /saveHt                                controllers.SimplePassageController.savePassageHtml(passageId : Long, html : String, grade : Int)
+POST        /saveHt                                controllers.SimplePassageController.savePassageHtml(passageId : Long, grade : Int)
+GET        /checkW                                   controllers.SimplePassageController.checkWord(word : String, grade : Int, passageId : Long)
+GET        /checkS                                   controllers.SimplePassageController.checkSentence(sentence : String, grade : Int, passageId : Long)
+
+
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                         controllers.Assets.at(path="/public", file)

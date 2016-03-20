@@ -152,6 +152,7 @@
         <script>
 
                 var capturedWord = "";
+                var capturedSentence = "";
 
                 var configs = {
                     readOnly: false,
@@ -195,12 +196,8 @@
 
                 quill.on('selection-change', function(range) {
                     if (range) {
-                        if (range.start == range.end) {
-                            console.log('User cursor is on', range.start);
-                        } else {
-                            var text = editor.getText(range.start, range.end);
-                            console.log('User has highlighted', text);
-                        }
+                            findContainedWord(range.start);
+                            findContainingSentence(range.start)
                     } else {
                         console.log('Cursor not in the editor');
                     }
@@ -229,6 +226,7 @@
                     }
 
                     capturedWord = quill.getText().substring(startOfWord, endOfWord);
+                    checkWord(capturedWord);
                     return quill.getText().substring(startOfWord, endOfWord);
                 }
 
@@ -249,11 +247,38 @@
                             break;
                         }
                     }
+
+                    capturedSentence = quill.getText().substring(startOfSen, endOfSen);
                     return quill.getText().substring(startOfSen, endOfSen);
                 }
 
                 function saveHtml(html){
-                    jsRoutes.controllers.SimplePassageController.savePassageHtml(@passageId, html, @grade ).ajax({
+                    $.post(
+                            'saveHt?passageId=' + @passageId + '&html=things&grade=' + @grade ,
+                            {'html' : JSON.stringify(html)},
+
+                            function(data) {
+                                console.log("saved");
+                    });
+
+                }
+
+                function checkWord(word){
+                    jsRoutes.controllers.SimplePassageController.checkWord(word, @grade, @passageId ).ajax({
+                        success : function(data) {
+                            console.log(data);
+                        },
+                        error : function(err) {
+                            //window.location = "";
+                        },
+                        complete : function() {
+
+                        }
+                    });
+                }
+
+                function checkSentence(sentence){
+                    jsRoutes.controllers.SimplePassageController.checkSentence(sentence, @grade, @passageId ).ajax({
                         success : function(data) {
                             console.log("saved");
                         },
@@ -265,7 +290,6 @@
                         }
                     });
                 }
-
 
 
 

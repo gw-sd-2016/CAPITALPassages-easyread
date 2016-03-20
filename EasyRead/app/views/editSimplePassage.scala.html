@@ -270,19 +270,18 @@
                     });
                 }
 
-                function saveHtml(html){
-                    jsRoutes.controllers.SimplePassageController.savePassageHtml(@passageId, html, -1 ).ajax({
-                        success : function(data) {
-                            console.log("saved");
-                        },
-                        error : function(err) {
-                            //window.location = "";
-                        },
-                        complete : function() {
 
-                        }
-                    });
+                function saveHtml(html){
+                    $.post(
+                            'saveHt?passageId=' + @passageId + '&html=things&grade=' + @grade ,
+                            {'html' : JSON.stringify(html)},
+
+                            function(data) {
+                                console.log("saved");
+                            });
+
                 }
+
 
 
                 function fetchSuggestions(){

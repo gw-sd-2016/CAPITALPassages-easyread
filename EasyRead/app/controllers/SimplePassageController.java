@@ -1,25 +1,17 @@
 package controllers;
 
 
-import com.avaje.ebeaninternal.server.lib.util.Str;
-import com.fasterxml.jackson.databind.JsonNode;
 import formdata.PassageQuestionAnswerData;
 import formdata.SimplePassageData;
 import formdata.SimplePassageNumQuestionsData;
 import models.*;
 import net.sf.extjwnl.JWNLException;
-import play.api.libs.json.JsArray;
 import play.data.Form;
-import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.*;
 
-import javax.json.JsonArray;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import static play.data.Form.form;
 
@@ -136,15 +128,15 @@ public class SimplePassageController extends Controller {
 
 		/*PassageQuestion[] arr = new PassageQuestion[passage.questions.size()];
 
-		int w = 0; 
+		int w = 0;
 		for(PassageQuestion q : passage.questions) {
 			arr[w] = q;
-			w++; 
+			w++;
 		}
 
 
 		for(int i = 0; i < arr.length; i++){
-			int maxPromptId = 0; 
+			int maxPromptId = 0;
 			for(PassageQuestionPrompt p : PassageQuestionPrompt.all()) maxPromptId = Math.max(maxPromptId, p.id.intValue());
 
 			System.out.println("prompt " + maxPromptId);
@@ -156,29 +148,29 @@ public class SimplePassageController extends Controller {
 
 			PassageQuestionPrompt thisOne = PassageQuestionPrompt.byId(Long.valueOf(thisId));
 
-			thisOne.questionId = arr[i].id; 
+			thisOne.questionId = arr[i].id;
 
 			thisOne.save();
 
-			PassageQuestionChoice[] choices = new PassageQuestionChoice[arr[i].choices.size()]; 
-			int e = 0; 
+			PassageQuestionChoice[] choices = new PassageQuestionChoice[arr[i].choices.size()];
+			int e = 0;
 			for(PassageQuestionChoice c : arr[i].choices) {
 				choices[e] = c;
-				e++; 
+				e++;
 			}
 
 
 
 
 			for(int c = 0; c < choices.length; c++){
-				int maxAnswerId = 0; 
+				int maxAnswerId = 0;
 				for(PassageQuestionAnswer a : PassageQuestionAnswer.all()) maxAnswerId = Math.max(maxAnswerId, a.id.intValue());
 
 				int thisChoiceId = maxAnswerId - (choices.length - 1) + choices[i].position - 1;
 
 				PassageQuestionAnswer thisAnswer = PassageQuestionAnswer.byId(Long.valueOf(thisChoiceId));
 
-				thisAnswer.choiceId = choices[i].id; 
+				thisAnswer.choiceId = choices[i].id;
 
 				thisAnswer.save();
 
@@ -482,7 +474,7 @@ public class SimplePassageController extends Controller {
 
             this.difficultiesCache = getDifficulties(p);
 
-            for(int i = 0 ; i < 14; i++){
+            for (int i = 0; i < 14; i++) {
                 generatePassageTextAtGrade(p.id, i);
                 beginSentenceBreakdown(p.id, i);
             }
@@ -498,15 +490,15 @@ public class SimplePassageController extends Controller {
     HashMap<String, String> sugMap = new HashMap<String, String>();
     String[] split;
 
-    public void generatePassageTextAtGrade(Long passageId, int grade){
+    public void generatePassageTextAtGrade(Long passageId, int grade) {
         System.out.println("gen text");
         SimplePassage p = SimplePassage.byId(passageId);
         PassageText current = new PassageText(grade, null);
         List<Suggestion> s = Suggestion.bySimplePassage(p.id);
 
-        if(split == null) split = p.text.split(" ");
-        if(sugMap.size() == 0){
-            for(Suggestion sugg : s){
+        if (split == null) split = p.text.split(" ");
+        if (sugMap.size() == 0) {
+            for (Suggestion sugg : s) {
                 sugMap.put(sugg.word, sugg.suggestedWord);
             }
         }
@@ -515,21 +507,21 @@ public class SimplePassageController extends Controller {
 
         HashSet<String> alreadySeen = new HashSet<String>();
 
-        for(String w : split){
-            if(!alreadySeen.contains(w.toLowerCase())){
+        for (String w : split) {
+            if (!alreadySeen.contains(w.toLowerCase())) {
                 alreadySeen.add(w.toLowerCase());
 
                 Word raw = Word.byRawString(w);
 
-                if(raw != null && raw.ageOfAcquisition > (grade + 6) && !w.contains("<u>")){
+                if (raw != null && raw.ageOfAcquisition > (grade + 6) && !w.contains("<u>")) {
                     current.html = current.html.replace(" " + w + " ", " <u>" + w + "</u> ");
                     current.html = current.html.replace(" " + w.toLowerCase() + " ", " <u>" + w + "</u> ");
                 }
             }
         }
 
-        for(PassageText t : p.htmlRepresentations){
-            t.delete(); 
+        for (PassageText t : p.htmlRepresentations) {
+            t.delete();
         }
 
         current.html = current.html.replace("</u> <u>", "</u>&nbsp<u>");
@@ -577,12 +569,12 @@ public class SimplePassageController extends Controller {
         return ret;
     }
 
-    public Result getSuggestions(String word){
+    public Result getSuggestions(String word) {
 
-        word = word.replace("<span>","");
-        word = word.replace("</span>","");
+        word = word.replace("<span>", "");
+        word = word.replace("</span>", "");
 
-        System.out.println("--" + word );
+        System.out.println("--" + word);
 
         List<String> res = new ArrayList<String>();
 
@@ -592,9 +584,9 @@ public class SimplePassageController extends Controller {
 
         List<Suggestion> sugg = Suggestion.byWord(word);
 
-        for(int i = 0; i < sugg.size(); i++){
+        for (int i = 0; i < sugg.size(); i++) {
             ret.append("\"" + sugg.get(i).suggestedWord + "\"");
-            if(i < sugg.size() - 1) ret.append(",");
+            if (i < sugg.size() - 1) ret.append(",");
             res.add(sugg.get(i).suggestedWord);
         }
         ret.append("]");
@@ -643,7 +635,7 @@ public class SimplePassageController extends Controller {
 		}
 
         for(PassageQuestionRecord p : PassageQuestionRecord.all()){
-            if(a.questions.contains(p.question)){  
+            if(a.questions.contains(p.question)){
 
             	p.delete("");
             }
@@ -773,54 +765,49 @@ public class SimplePassageController extends Controller {
 
     }
 
-    public ArrayList<Double> getDifficulties(SimplePassage p){
+    public ArrayList<Double> getDifficulties(SimplePassage p) {
         PassageAnalysisController analysisController = new PassageAnalysisController();
         ArrayList<Double> difficulties = new ArrayList<Double>();
 
-        for (int i = 0; i < p.sentences.size(); i++) { 
+        for (int i = 0; i < p.sentences.size(); i++) {
             Double diff = analysisController.determineGradeLevelForString(p.sentences.get(i).text);
-    
 
-                difficulties.add(diff);
+
+            difficulties.add(diff);
 
         }
-        
+
         return difficulties;
     }
 
 
-    public String rebuildHTML(String[] split){
-        StringBuilder sb = new StringBuilder(); 
+    public String rebuildHTML(String[] split) {
+        StringBuilder sb = new StringBuilder();
 
-        for(int i = 0; i < split.length; i++){
-            String s = split[i]; 
+        for (int i = 0; i < split.length; i++) {
+            String s = split[i];
 
-            if(!s.contains("<i")){
-                 sb.append(s + " ");
-             } else {
-                sb.append(s); 
-             }
+            if (!s.contains("<i")) {
+                sb.append(s + " ");
+            } else {
+                sb.append(s);
+            }
 
-           
+
         }
 
-        return sb.toString(); 
+        return sb.toString();
     }
 
 
-
-
-
-
-    public Result beginSentenceBreakdown(Long passageId, int grade){
+    public Result beginSentenceBreakdown(Long passageId, int grade) {
         System.out.println("Begin");
         SimplePassage p = SimplePassage.byId(passageId);
 
 
-      
         PassageText current = PassageText.bySimplePassageAndGrade(passageId, grade);
 
-        if(current.html != null && current.html.length() > 0){
+        if (current.html != null && current.html.length() > 0) {
             System.out.println("in here");
 
 
@@ -828,125 +815,53 @@ public class SimplePassageController extends Controller {
 
             String[] split = current.html.split(" ");
 
-            int sentNumber = 0; 
-            boolean placed = false; 
-            for(int i = 0; i < split.length; i++){
+            int sentNumber = 0;
+            boolean placed = false;
+            for (int i = 0; i < split.length; i++) {
 
-                if(sentNumber < p.sentences.size() && this.difficultiesCache.get(sentNumber) > grade && !placed){
+                if (sentNumber < p.sentences.size() && this.difficultiesCache.get(sentNumber) > grade && !placed) {
                     String curr = split[i];
-                    int spaceIndex = curr.indexOf("&nbsp"); 
-
-                    System.out.println("sp:" + spaceIndex);
-
-                    if(spaceIndex != -1){
-                        curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
-                    } else {
-                         curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign'>" + curr + "</i> ";
-                    }
-
-                    while(curr.indexOf(" <u>") != -1){
-                        curr = curr.substring(0, curr.indexOf(" <u>")) + "&nbsp" + curr.substring(curr.indexOf(" <u>") + 1);
-                    }
-
-                  
-                    split[i] = curr; 
-                    System.out.println(split[i]); 
-                    placed = true;
-                }
-
-                if(split[i].indexOf(".") != -1){
-                    sentNumber++;
-                    placed = false; 
-                }
-             
-            
-            }
-
-
-
-            current.html = rebuildHTML(split);
-
-            for(int c = 0; c < current.html.length() - 2; c++){
-                if(current.html.charAt(c) == ' ' && current.html.substring(c + 1, c + 3).equals("<u")){
-                     current.html = current.html.substring(0, c) + "&nbsp" + current.html.substring(c + 1);
-                }
-            }
-
-
-            // do i actually need to do this?
-            for(PassageText pt : p.htmlRepresentations){
-                if(pt.grade == current.grade){
-                    pt.html = current.html;
-                    break;
-                }
-            }
-
-            System.out.println(current.html);
-            p.save();
-        } else System.out.println("null"); 
-
-
-        return ok();
-    }
-
-
-
-    public Result singularSentenceBreakdown(Long passageId, int grade, String sentence){
-        System.out.println("Begin");
-        SimplePassage p = SimplePassage.byId(passageId);
-
-
-
-        PassageText current = PassageText.bySimplePassageAndGrade(passageId, grade);
-
-        String ogSentence = sentence;
-
-        if(current.html != null && current.html.length() > 0){
-            System.out.println("in here");
-
-
-
-            Double diff = analysisController.determineGradeLevelForString(sentence);
-
-
-
-                if(diff > grade){
-                    String curr = sentence;
                     int spaceIndex = curr.indexOf("&nbsp");
 
                     System.out.println("sp:" + spaceIndex);
 
-                    if(spaceIndex != -1){
+                    if (spaceIndex != -1) {
                         curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
                     } else {
                         curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign'>" + curr + "</i> ";
                     }
 
-                    while(curr.indexOf(" <u>") != -1){
+                    while (curr.indexOf(" <u>") != -1) {
                         curr = curr.substring(0, curr.indexOf(" <u>")) + "&nbsp" + curr.substring(curr.indexOf(" <u>") + 1);
                     }
 
 
-                    sentence = curr;
-                    System.out.println(sentence);
-
+                    split[i] = curr;
+                    System.out.println(split[i]);
+                    placed = true;
                 }
+
+                if (split[i].indexOf(".") != -1) {
+                    sentNumber++;
+                    placed = false;
+                }
+
+
             }
 
-            current.html = current.html.replace(ogSentence, sentence);
 
+            current.html = rebuildHTML(split);
 
-
-            for(int c = 0; c < current.html.length() - 2; c++){
-                if(current.html.charAt(c) == ' ' && current.html.substring(c + 1, c + 3).equals("<u")){
+            for (int c = 0; c < current.html.length() - 2; c++) {
+                if (current.html.charAt(c) == ' ' && current.html.substring(c + 1, c + 3).equals("<u")) {
                     current.html = current.html.substring(0, c) + "&nbsp" + current.html.substring(c + 1);
                 }
             }
 
 
             // do i actually need to do this?
-            for(PassageText pt : p.htmlRepresentations){
-                if(pt.grade == current.grade){
+            for (PassageText pt : p.htmlRepresentations) {
+                if (pt.grade == current.grade) {
                     pt.html = current.html;
                     break;
                 }
@@ -954,30 +869,104 @@ public class SimplePassageController extends Controller {
 
             System.out.println(current.html);
             p.save();
+        } else System.out.println("null");
+
 
         return ok();
     }
 
-    public Result savePassagePlainText(Long passageId, String text){
-        try{
+
+    public Result singularSentenceBreakdown(Long passageId, int grade, String sentence) {
+        System.out.println("Begin");
+        SimplePassage p = SimplePassage.byId(passageId);
+
+
+        PassageText current = PassageText.bySimplePassageAndGrade(passageId, grade);
+
+        String ogSentence = sentence;
+
+        if (current.html != null && current.html.length() > 0) {
+            System.out.println("in here");
+
+
+            Double diff = analysisController.determineGradeLevelForString(sentence);
+
+
+            if (diff > grade) {
+                String curr = sentence;
+                int spaceIndex = curr.indexOf("&nbsp");
+
+                System.out.println("sp:" + spaceIndex);
+
+                if (spaceIndex != -1) {
+                    curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
+                } else {
+                    curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign'>" + curr + "</i> ";
+                }
+
+                while (curr.indexOf(" <u>") != -1) {
+                    curr = curr.substring(0, curr.indexOf(" <u>")) + "&nbsp" + curr.substring(curr.indexOf(" <u>") + 1);
+                }
+
+
+                sentence = curr;
+                System.out.println(sentence);
+
+            }
+        }
+
+        current.html = current.html.replace(ogSentence, sentence);
+
+
+        for (int c = 0; c < current.html.length() - 2; c++) {
+            if (current.html.charAt(c) == ' ' && current.html.substring(c + 1, c + 3).equals("<u")) {
+                current.html = current.html.substring(0, c) + "&nbsp" + current.html.substring(c + 1);
+            }
+        }
+
+
+        // do i actually need to do this?
+        for (PassageText pt : p.htmlRepresentations) {
+            if (pt.grade == current.grade) {
+                pt.html = current.html;
+                break;
+            }
+        }
+
+        System.out.println(current.html);
+        p.save();
+
+        // since this is saving, in theory this will reload and come up with the corrections
+        return ok();
+    }
+
+    public Result savePassagePlainText(Long passageId, String text) {
+        try {
             SimplePassage p = SimplePassage.byId(passageId);
             p.text = text;
             p.save();
             return ok("true");
-        } catch(Exception e){
+        } catch (Exception e) {
             return badRequest();
         }
     }
 
-    public Result savePassageHtml(Long passageId, String html, int grade){
-        try{
+    public Result savePassageHtml(Long passageId, int grade) {
+        try {
             SimplePassage p = SimplePassage.byId(passageId);
 
-            if(grade == -1) grade = p.grade;
+            if (grade == -1) grade = p.grade;
+
+            Map<String, String[]> parameters = request().body().asFormUrlEncoded();
 
 
-            for(PassageText c : p.htmlRepresentations){
-                if(c.grade == grade){
+            String html = parameters.get("html")[0];
+
+
+            //https://dzone.com/articles/jquery-ajax-play-2
+            //http://stackoverflow.com/questions/16408867/send-post-json-with-ajax-and-play-framework-2
+            for (PassageText c : p.htmlRepresentations) {
+                if (c.grade == grade) {
                     c.html = html;
                     break;
                 }
@@ -985,28 +974,28 @@ public class SimplePassageController extends Controller {
 
             p.save();
             return ok("true");
-        } catch(Exception e){
+        } catch (Exception e) {
             return badRequest();
         }
     }
 
 
-    public Result checkSentence(String sentence, int grade, Long passageId){
+    public Result checkSentence(String sentence, int grade, Long passageId) {
         return singularSentenceBreakdown(passageId, grade, sentence);
     }
 
-    public Result checkWord(String word, int grade, Long passageId){
+    public Result checkWord(String word, int grade, Long passageId) {
         Word enteredWord = Word.byRawString(word);
 
-       // (POS p, String word, String sentence, Long passageId, String ogText)
-        if(enteredWord != null){
-            if(enteredWord.ageOfAcquisition > grade){
-                if(Suggestion.byWord(enteredWord.lemma) == null){
-                    if(this.analysisController == null) analysisController = new PassageAnalysisController();
-                    try{
+        // (POS p, String word, String sentence, Long passageId, String ogText)
+        if (enteredWord != null) {
+            if (enteredWord.ageOfAcquisition > grade) {
+                if (Suggestion.byWord(enteredWord.lemma) == null) {
+                    if (this.analysisController == null) analysisController = new PassageAnalysisController();
+                    try {
                         analysisController.generateSuggestionsForWord(enteredWord.partsOfSpeech.get(0), enteredWord.lemma, word, passageId, enteredWord.lemma);
-                        return(getSuggestions(enteredWord.lemma));
-                    } catch(Exception e){
+                        return (getSuggestions(enteredWord.lemma));
+                    } catch (Exception e) {
                         return badRequest();
                     }
                 }
