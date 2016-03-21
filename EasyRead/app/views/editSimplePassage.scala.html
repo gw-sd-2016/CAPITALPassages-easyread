@@ -273,7 +273,7 @@
 
                 function saveHtml(html){
                     $.post(
-                            'saveHt?passageId=' + @passageId + '&html=things&grade=' + @grade ,
+                            'saveHt?passageId=' + @passageId + '&html=things&grade=' + @SimplePassage.byId(passageId).grade ,
                             {'html' : JSON.stringify(html)},
 
                             function(data) {

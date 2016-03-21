@@ -555,6 +555,10 @@ public class SimplePassageController extends Controller {
         }
     }
 
+
+    private HashSet<Suggestion> suggestionCache;
+
+
     public HashSet<Suggestion> getSuggestionsList(SimplePassage p) {
         String[] split = p.text.split(" ");
 
@@ -566,6 +570,8 @@ public class SimplePassageController extends Controller {
                 ret.addAll(a);
             }
         }
+
+        suggestionCache = ret;
         return ret;
     }
 
@@ -960,7 +966,7 @@ public class SimplePassageController extends Controller {
             Map<String, String[]> parameters = request().body().asFormUrlEncoded();
 
 
-            String html = parameters.get("html")[0];
+            String html = parameters.get("html")[0].substring(1);
 
 
             //https://dzone.com/articles/jquery-ajax-play-2
@@ -989,19 +995,22 @@ public class SimplePassageController extends Controller {
 
         // (POS p, String word, String sentence, Long passageId, String ogText)
         if (enteredWord != null) {
-            if (enteredWord.ageOfAcquisition > grade) {
+            if (enteredWord.ageOfAcquisition - 6 > grade) {
                 if (Suggestion.byWord(enteredWord.lemma) == null) {
                     if (this.analysisController == null) analysisController = new PassageAnalysisController();
                     try {
                         analysisController.generateSuggestionsForWord(enteredWord.partsOfSpeech.get(0), enteredWord.lemma, word, passageId, enteredWord.lemma);
-                        return (getSuggestions(enteredWord.lemma));
+                        return ok("UNDERLINE");
                     } catch (Exception e) {
                         return badRequest();
                     }
                 }
+            } else {
+                return ok("REM");
             }
         }
-        return badRequest();
+        // instead of returning a bad request...shouldn't this word be underlined and it's suggestions added
+        return ok();
     }
 
 }

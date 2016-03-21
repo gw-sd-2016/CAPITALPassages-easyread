@@ -214,7 +214,7 @@
                     var endOfWord = 0;
                     for(endOfWord = pos; endOfWord < text.length; endOfWord++){
                         if(text.charAt(endOfWord) == ' '){
-                            endOfWord--;
+                            endOfWord;
                             break;
                         }
                     }
@@ -226,7 +226,7 @@
                     }
 
                     capturedWord = quill.getText().substring(startOfWord, endOfWord);
-                    checkWord(capturedWord);
+                    checkWord(capturedWord, startOfWord, endOfWord);
                     return quill.getText().substring(startOfWord, endOfWord);
                 }
 
@@ -263,10 +263,16 @@
 
                 }
 
-                function checkWord(word){
+                function checkWord(word, start, end){
                     jsRoutes.controllers.SimplePassageController.checkWord(word, @grade, @passageId ).ajax({
                         success : function(data) {
                             console.log(data);
+
+                            if(data.toString() == "UNDERLINE"){
+                                quill.formatText(start, end, 'underline', true);
+                            } else if(data.toString() == "REM"){
+                                quill.formatText(start, end, 'underline', false);
+                            }
                         },
                         error : function(err) {
                             //window.location = "";
