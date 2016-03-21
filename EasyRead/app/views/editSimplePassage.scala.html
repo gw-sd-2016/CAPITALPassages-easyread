@@ -153,6 +153,8 @@
             <!-- Initialize Quill editor -->
         <script>
 
+
+
                 var capturedWord = "";
                 var capturedSentence = "";
 
@@ -186,24 +188,24 @@
 
 
                 quill.on('text-change', function(delta, source) {
-                    // quill.formatText(0, quill.getText().length, "size", 20);
-                    console.log("Called");
-                    var element = document.getElementsByName("passageText")[0];
+                    if(source == "user") {
+                        // quill.formatText(0, quill.getText().length, "size", 20);
+                        console.log("Called");
+                        var element = document.getElementsByName("passageText")[0];
 
 
-                    element.setAttribute("value", quill.getText());
+                        element.setAttribute("value", quill.getText());
 
-                    var range = quill.getSelection();
+                        var range = quill.getSelection();
 
-                    if (range != null) findContainedWord(range.start);
+                        if (range != null) findContainedWord(range.start);
+                    }
                 });
 
                 quill.on('selection-change', function(range) {
-                    if (range) {
+                    if (range.start == range.end) {
                         findContainedWord(range.start);
                         findContainingSentence(range.start)
-                    } else {
-                        console.log('Cursor not in the editor');
                     }
                 });
 
@@ -328,12 +330,11 @@
                             function(data) {
                                 console.log("saved");
                             });
-
                 }
 
 
 
-                function trimUnecessary( html,  passageId) {
+                function trimUnecessary(html,  passageId) {
 
                     var passageText = "@SimplePassage.byId(passageId).text";
 
@@ -373,29 +374,7 @@
                             console.log("check " + word);
                             console.log(data);
 
-                            if(data.toString() == "UNDERLINE"){
-
-                                var html = quill.getHTML();
-
-                                quill.formatText(start, end, 'underline', true);
-                                // coalesscing underlines
-
-
-                                if(quill.getHTML().charAt(end + 1) == '.'){
-                                    html = html.substring(0, end + 2) + '&nbsp' + html.substring(end + 3);
-                                    quill.setHTML(html);
-                                }
-                            } else if(data.toString() == "REM"){
-                                quill.formatText(start, end, 'underline', false);
-
-                                if(quill.getHTML().charAt(end + 1) == '.'){
-                                    if(quill.getHTML().substring(start, end).contains("<u>")){
-                                        quill.setHTML(quill.getHTML().substring(0, end + 2) + '&nbsp' quill.getHTML().substring(end + 1));
-                                    }
-                                }
-
-
-                            }
+                            quill.formatText(start, end, 'underline', data.toString() == "UNDERLINE")
                         },
                         error : function(err) {
                             //window.location = "";
@@ -406,9 +385,25 @@
                     });
                 }
 
+                //http://www.creativejuiz.fr/blog/en/javascript-en/read-url-get-parameters-with-javascript
+                function $_GET(param) {
+                    var vars = {};
+                    window.location.href.replace(
+                            /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+                            function (m, key, value) { // callback
+                                vars[key] = value !== undefined ? value : '';
+                            }
+                    );
+
+                    if (param) {
+                        return vars[param] ? vars[param] : null;
+                    }
+                    return vars;
+
+                }
 
 
-                function fetchSuggestions(){
+                    function fetchSuggestions(){
                     underlineSpecificWords(@Html(Json.stringify(Json.toJson(SimplePassage.byId(passageId).text.split(" ").toList.distinct.filter(p => (Word.byLemma(p) != null && Word.byLemma(p).ageOfAcquisition > (SimplePassage.byId(passageId).grade + 6) && !SimplePassage.byId(passageId).getStopWords().contains(p)))))));
                 }
 
@@ -422,7 +417,6 @@
                         var index = text.indexOf(word);
 
                         while(index != -1){
-                            console.log(index);
                             var offset = text.length - currentText.length;
 
 
@@ -434,6 +428,8 @@
 
                     quill.formatText(0, quill.getText().length, "size", 20);
                 }
+
+
 
                 $( document ).ready(function() {
 
