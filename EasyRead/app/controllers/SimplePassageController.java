@@ -957,6 +957,12 @@ public class SimplePassageController extends Controller {
         }
     }
 
+
+
+
+
+
+
     public Result savePassageHtml(Long passageId, int grade) {
         try {
             SimplePassage p = SimplePassage.byId(passageId);
@@ -966,8 +972,7 @@ public class SimplePassageController extends Controller {
             Map<String, String[]> parameters = request().body().asFormUrlEncoded();
 
 
-            String html = parameters.get("html")[0].substring(1);
-
+            String html = parameters.get("html")[0];
 
             //https://dzone.com/articles/jquery-ajax-play-2
             //http://stackoverflow.com/questions/16408867/send-post-json-with-ajax-and-play-framework-2
@@ -984,6 +989,7 @@ public class SimplePassageController extends Controller {
             return badRequest();
         }
     }
+
 
 
     public Result checkSentence(String sentence, int grade, Long passageId) {

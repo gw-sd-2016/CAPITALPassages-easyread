@@ -197,19 +197,61 @@
 
                 quill.on('selection-change', function(range) {
                     if (range) {
-                        if (range.start == range.end) {
-                            console.log('User cursor is on', range.start);
-                        } else {
-                            var text = quill.getText(range.start, range.end);
-                            console.log('User has highlighted', text);
-
-                            var string = text;
-
-                        }
+                        findContainedWord(range.start);
+                        findContainingSentence(range.start)
                     } else {
                         console.log('Cursor not in the editor');
                     }
                 });
+
+                function findContainedWord(pos){
+                    var text = quill.getText();
+
+                    if(text.charAt(pos) == ' ') pos--;
+
+                    if(text.charAt(pos) == ' ') return null;
+
+                    var startOfWord = 0;
+                    var endOfWord = 0;
+                    for(endOfWord = pos; endOfWord < text.length; endOfWord++){
+                        if(text.charAt(endOfWord) == ' '){
+                            endOfWord;
+                            break;
+                        }
+                    }
+                    for(startOfWord = pos; startOfWord >= 0; startOfWord--){
+                        if(text.charAt(startOfWord) == ' '){
+                            startOfWord++;
+                            break;
+                        }
+                    }
+
+                    capturedWord = quill.getText().substring(startOfWord, endOfWord);
+                    checkWord(capturedWord, startOfWord, endOfWord);
+                    return quill.getText().substring(startOfWord, endOfWord);
+                }
+
+                function findContainingSentence(pos){
+                    var text = quill.getText();
+
+                    var startOfSen = 0;
+                    var endOfSen = 0;
+
+                    for(endOfSen = pos; endOfSen < text.length; endOfSen++){
+                        if(text.charAt(endOfSen) == '.'){
+                            break;
+                        }
+                    }
+                    for(startOfSen = pos; startOfSen >= 0; startOfSen--){
+                        if(text.charAt(startOfSen) == '.'){
+                            startOfSen += 2;
+                            break;
+                        }
+                    }
+
+                    capturedSentence = quill.getText().substring(startOfSen, endOfSen);
+                    return quill.getText().substring(startOfSen, endOfSen);
+                }
 
 
                 function updateSynonymnList(string, arr){
@@ -272,14 +314,73 @@
 
 
                 function saveHtml(html){
+
+                    var realText = trimUnecessary(html, @passageId);
+
                     $.post(
-                            'saveHt?passageId=' + @passageId + '&html=things&grade=' + @SimplePassage.byId(passageId).grade ,
-                            {'html' : JSON.stringify(html)},
+                            'saveHt?passageId=' + @passageId + '&grade=' + @SimplePassage.byId(passageId).grade ,
+                            {'html' : realText },
 
                             function(data) {
                                 console.log("saved");
                             });
 
+                }
+
+
+
+                function trimUnecessary( html,  passageId) {
+
+                    var passageText = "@SimplePassage.byId(passageId).text";
+
+
+                    var firstWord = passageText.substring(0, passageText.indexOf(" "));
+                     var lastWord = passageText.substring(passageText.lastIndexOf(" ") + 1, passageText.length);
+
+
+                    var foundFirst = false;
+                    var divIndex = 0;
+                    for (var i = 0; i < html.length; i++) {
+                        if (html.charAt(i) == '<' ) {
+                            if (html.charAt(i + 1) == 'd') {
+                                divIndex = i;
+                            }
+                        }
+
+                        if (!foundFirst && html.charAt(i) == firstWord.charAt(0) && html.substring(i, i + firstWord.length) == firstWord) {
+                            html = html.substring(divIndex, html.lastIndexOf(".") +  7);
+                            foundFirst = true;
+                        }
+
+                    }
+
+                    var i = html.length - 1;
+                    while(html.charAt(i) != ".") i--;
+                    html = html.substring(0, i + 1) + "</div>";
+
+
+
+                    return html;
+                }
+
+                function checkWord(word, start, end){
+                    jsRoutes.controllers.SimplePassageController.checkWord(word, @SimplePassage.byId(passageId).grade, @passageId ).ajax({
+                        success : function(data) {
+                            console.log(data);
+
+                            if(data.toString() == "UNDERLINE"){
+                                quill.formatText(start, end, 'underline', true);
+                            } else if(data.toString() == "REM"){
+                                quill.formatText(start, end, 'underline', false);
+                            }
+                        },
+                        error : function(err) {
+                            //window.location = "";
+                        },
+                        complete : function() {
+
+                        }
+                    });
                 }
 
 

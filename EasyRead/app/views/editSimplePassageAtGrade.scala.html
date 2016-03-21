@@ -175,6 +175,7 @@
 
                 var quill = new Quill('#editor', configs);
 
+
                 //http://stackoverflow.com/questions/9913971/scala-how-can-i-get-an-escaped-representation-of-a-string
                 quill.setHTML(@Html(Literal(Constant(PassageText.bySimplePassageAndGrade(passageId, grade).html)).toString));
 
@@ -253,14 +254,51 @@
                 }
 
                 function saveHtml(html){
+
+                    var realText = trimUnecessary(html, @passageId);
                     $.post(
-                            'saveHt?passageId=' + @passageId + '&html=things&grade=' + @grade ,
-                            {'html' : JSON.stringify(html)},
+                            'saveHt?passageId=' + @passageId + '&grade=' + @SimplePassage.byId(passageId).grade ,
+                            {'html' : realText },
 
                             function(data) {
                                 console.log("saved");
-                    });
+                            });
 
+                }
+
+
+
+                function trimUnecessary( html,  passageId) {
+
+                    var passageText = "@SimplePassage.byId(passageId).text";
+
+
+                    var firstWord = passageText.substring(0, passageText.indexOf(" "));
+                    var lastWord = passageText.substring(passageText.lastIndexOf(" ") + 1, passageText.length);
+
+                    var foundFirst = false;
+                    var divIndex = 0;
+                    for (var i = 0; i < html.length; i++) {
+                        if (html.charAt(i) == '<' ) {
+                            if (html.charAt(i + 1) == 'd') {
+                                divIndex = i;
+                            }
+                        }
+
+                        if (!foundFirst && html.charAt(i) == firstWord.charAt(0) && html.substring(i, i + firstWord.length) == firstWord) {
+                            html = html.substring(divIndex, html.lastIndexOf(".") +  7);
+                            foundFirst = true;
+                        }
+
+                    }
+
+                    var i = html.length - 1;
+                    while(html.charAt(i) != ".") i--;
+                    html = html.substring(0, i + 1) + "</div>";
+
+
+
+                    return html;
                 }
 
                 function checkWord(word, start, end){
