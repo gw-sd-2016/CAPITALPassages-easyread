@@ -882,9 +882,11 @@ public class SimplePassageController extends Controller {
     }
 
 
+    ArrayList<Double> diffCache;
+
     public Result singularSentenceBreakdown(Long passageId, int grade, String sentence) {
-        System.out.println("Begin");
         SimplePassage p = SimplePassage.byId(passageId);
+        if(diffCache == null) diffCache = getDifficulties(p);
 
 
         PassageText current = PassageText.bySimplePassageAndGrade(passageId, grade);
@@ -892,9 +894,9 @@ public class SimplePassageController extends Controller {
         String ogSentence = sentence;
 
         if (current.html != null && current.html.length() > 0) {
-            System.out.println("in here");
 
 
+            if(analysisController == null) analysisController = new PassageAnalysisController();
             Double diff = analysisController.determineGradeLevelForString(sentence);
 
 
@@ -914,20 +916,29 @@ public class SimplePassageController extends Controller {
                     curr = curr.substring(0, curr.indexOf(" <u>")) + "&nbsp" + curr.substring(curr.indexOf(" <u>") + 1);
                 }
 
-
                 sentence = curr;
                 System.out.println(sentence);
 
+                current.html = current.html.replace(ogSentence, sentence);
+
+
+                for (int c = 0; c < current.html.length() - 2; c++) {
+                    if (current.html.charAt(c) == ' ' && current.html.substring(c + 1, c + 3).equals("<u")) {
+                        current.html = current.html.substring(0, c) + "&nbsp" + current.html.substring(c + 1);
+                    }
+                }
+                if(ogSentence.indexOf("<i") != -1){
+                    return ok();
+                } else {
+                    return ok("!");
+                }
+
+
+            } else if(ogSentence.indexOf("<i") != -1){
+                return ok("REM");
             }
-        }
 
-        current.html = current.html.replace(ogSentence, sentence);
-
-
-        for (int c = 0; c < current.html.length() - 2; c++) {
-            if (current.html.charAt(c) == ' ' && current.html.substring(c + 1, c + 3).equals("<u")) {
-                current.html = current.html.substring(0, c) + "&nbsp" + current.html.substring(c + 1);
-            }
+            return ok();
         }
 
 
@@ -939,7 +950,6 @@ public class SimplePassageController extends Controller {
             }
         }
 
-        System.out.println(current.html);
         p.save();
 
         // since this is saving, in theory this will reload and come up with the corrections

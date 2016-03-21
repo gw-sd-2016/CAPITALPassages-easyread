@@ -180,27 +180,24 @@
                 quill.setHTML(@Html(Literal(Constant(PassageText.bySimplePassageAndGrade(passageId, grade).html)).toString));
 
                 quill.on('text-change', function(delta, source) {
-                    // quill.formatText(0, quill.getText().length, "size", 20);
-                    console.log("Called");
-                    var element = document.getElementsByName("passageText")[0];
+                    if(source == "user") {
+                        // quill.formatText(0, quill.getText().length, "size", 20);
+                        console.log("Called");
+                        var element = document.getElementsByName("passageText")[0];
 
-                    if(delta.length() > 1){
-                        // send whole sentence back
-                    } else {
-                        // check if this word is too difficult
+
+                        element.setAttribute("value", quill.getText());
+
+                        var range = quill.getSelection();
+
+                        if (range != null) findContainedWord(range.start);
                     }
-
-                    element.setAttribute("value", quill.getText());
-
-                    saveHtml(quill.getHTML())
                 });
 
                 quill.on('selection-change', function(range) {
-                    if (range) {
-                            findContainedWord(range.start);
-                            findContainingSentence(range.start)
-                    } else {
-                        console.log('Cursor not in the editor');
+                    if (range.start == range.end) {
+                        findContainedWord(range.start);
+                        findContainingSentence(range.start)
                     }
                 });
 
@@ -216,6 +213,7 @@
                     for(endOfWord = pos; endOfWord < text.length; endOfWord++){
                         if(text.charAt(endOfWord) == ' '){
                             endOfWord;
+                            if(text.charAt(endOfWord - 1) == '.') endOfWord--;
                             break;
                         }
                     }
@@ -230,6 +228,9 @@
                     checkWord(capturedWord, startOfWord, endOfWord);
                     return quill.getText().substring(startOfWord, endOfWord);
                 }
+
+
+
 
                 function findContainingSentence(pos){
                     var text = quill.getText();
@@ -302,15 +303,12 @@
                 }
 
                 function checkWord(word, start, end){
-                    jsRoutes.controllers.SimplePassageController.checkWord(word, @grade, @passageId ).ajax({
+                    jsRoutes.controllers.SimplePassageController.checkWord(word, @SimplePassage.byId(passageId).grade, @passageId ).ajax({
                         success : function(data) {
+                            console.log("check " + word);
                             console.log(data);
 
-                            if(data.toString() == "UNDERLINE"){
-                                quill.formatText(start, end, 'underline', true);
-                            } else if(data.toString() == "REM"){
-                                quill.formatText(start, end, 'underline', false);
-                            }
+                            quill.formatText(start, end, 'underline', data.toString() == "UNDERLINE")
                         },
                         error : function(err) {
                             //window.location = "";
@@ -334,8 +332,6 @@
                         }
                     });
                 }
-
-
 
                 //http://www.creativejuiz.fr/blog/en/javascript-en/read-url-get-parameters-with-javascript
                 function $_GET(param) {
@@ -367,8 +363,6 @@
                     });
                 }
 
-
-
                 function replaceWord(word, replacement){
                     jsRoutes.controllers.SimplePassageController.replaceWord(@passageId, word, replacement).ajax({
                         success : function(data) {
@@ -394,7 +388,6 @@
                         var index = text.indexOf(word);
 
                         while(index != -1){
-                            console.log(index);
                             var offset = text.length - currentText.length;
                             quill.formatText(index + offset, index + offset + word.length, 'underline', true);
                             currentText = currentText.substring(index + word.length);
@@ -415,10 +408,6 @@
                         $("#left-panel-link").click();
 
                     }
-
-
-
-
 
                     var upperDiv = '<div id="title"><h1>' + string + '</h1></div>';
                     var approvalDiv = "<div id='accept'><button class='btn btn-primary' onclick='acceptWord(" + string + ", " + $_GET('grade') + ");'>This is okay!</button></div><br>";
