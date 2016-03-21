@@ -1006,17 +1006,18 @@ public class SimplePassageController extends Controller {
                     if (this.analysisController == null) analysisController = new PassageAnalysisController();
                     try {
                         analysisController.generateSuggestionsForWord(enteredWord.partsOfSpeech.get(0), enteredWord.lemma, word, passageId, enteredWord.lemma);
-                        return ok("UNDERLINE");
+
                     } catch (Exception e) {
                         return badRequest();
                     }
                 }
+                return ok("UNDERLINE");
             } else {
                 return ok("REM");
             }
         }
         // instead of returning a bad request...shouldn't this word be underlined and it's suggestions added
-        return ok();
+        return ok("REM");
     }
 
 }
