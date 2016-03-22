@@ -185,6 +185,7 @@ public class WordNetController {
             WordElement word = xmlLexicon.getWord(w, LexicalCategory.NOUN);
             InflectedWordElement pluralWord = new InflectedWordElement(word);
             pluralWord.setPlural(true);
+            correct = realiser.realiseSentence(pluralWord).toString();
         }
         return correct;
     }

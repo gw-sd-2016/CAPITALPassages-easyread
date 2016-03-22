@@ -45,7 +45,7 @@ GET        /savePT                                controllers.SimplePassageContr
 POST        /saveHt                                controllers.SimplePassageController.savePassageHtml(passageId : Long, grade : Int)
 GET        /checkW                                   controllers.SimplePassageController.checkWord(word : String, grade : Int, passageId : Long)
 GET        /checkS                                   controllers.SimplePassageController.checkSentence(sentence : String, grade : Int, passageId : Long)
-
+POST       /createPHT                                   controllers.SimplePassageController.createPassageHTML(text : String, title : String, source : String)
 
 
 

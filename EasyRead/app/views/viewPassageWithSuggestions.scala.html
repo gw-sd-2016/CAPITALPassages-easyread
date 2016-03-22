@@ -167,6 +167,51 @@
 
     <script>
 
+            //http://quilljs.com/docs/configuration/
+            // http://stackoverflow.com/questions/15409429/how-to-limit-text-width
+            var configs = {
+                readOnly: true,
+                theme: 'snow',
+                styles: {
+                    '.ql-editor' : {
+                        'word-wrap': 'break-word',
+                        'word-spacing': 'normal',
+                        'text-align': 'left',
+                        'line-height': '250%',
+                        'width': '60%'
+                    }
+
+                },
+                formats: ['size', 'underline', 'background']
+            };
+
+            /*
+             if(passage.html.length == passage.text.length){
+             passage.text
+             } else{
+             Html(passage.html)
+             }
+             */
+
+            var quill = new Quill('#editor', configs);
+
+
+
+
+
+            quill.on('selection-change', function(range) {
+                console.log("in here");
+                if (range) {
+                    if (range.start == range.end) {
+                        console.log('User cursor is on', range.start);
+                    } else {
+                        var text = quill.getText(range.start, range.end);
+                        console.log('User has highlighted', text);
+                    }
+                } else {
+                    console.log('Cursor not in the editor');
+                }
+            });
 
             function alertSuggestions(){
                 alert("This word is too complicated for this grade level!");
@@ -344,7 +389,7 @@
 
 
 
-            $(document).ready(function(){
+
 
                 //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
                 // locate your element and add the Click Event Listener
@@ -355,74 +400,38 @@
 
 
 
-                //http://quilljs.com/docs/configuration/
-                // http://stackoverflow.com/questions/15409429/how-to-limit-text-width
-                var configs = {
-                    readOnly: true,
-                    theme: 'snow',
-                    styles: {
-                        '.ql-editor' : {
-                            'word-wrap': 'break-word',
-                            'word-spacing': 'normal',
-                            'text-align': 'left',
-                            'line-height': '250%',
-                            'width': '60%'
-                        }
 
-                    },
-                    formats: ['size', 'underline', 'background']
-                };
+
+
+
+                $(document).ready(function(){
+
+
+
+                    //http://stackoverflow.com/questions/9913971/scala-how-can-i-get-an-escaped-representation-of-a-string
+
+                    quill.setHTML(@Html(Literal(Constant(PassageText.bySimplePassageAndGrade(passage.id, passage.grade).html)).toString));
+
+
+
+                    //http://stackoverflow.com/questions/1206203/how-to-distinguish-between-left-and-right-mouse-click-with-jquery
+                    //http://jsfiddle.net/Kn9s7/5/
+                    $(document).on("contextmenu", "u", function(e){
+                        var string = $(this).html();
+                        getSuggestions(string);
+                        return false;
+                    });
+
+
+                });
 
                 /*
-                 if(passage.html.length == passage.text.length){
-                 passage.text
-                 } else{
-                 Html(passage.html)
-                 }
+                                $("u").click(function(){
+                                    var string = $(this).html();
+                                    getSuggestions(string);
+                                });
                  */
 
-                var quill = new Quill('#editor', configs);
-
-
-                //http://stackoverflow.com/questions/9913971/scala-how-can-i-get-an-escaped-representation-of-a-string
-                quill.setHTML(@Html(Literal(Constant(PassageText.bySimplePassageAndGrade(passage.id, passage.grade).html)).toString));
-
-
-
-
-
-                quill.on('selection-change', function(range) {
-                    console.log("in here");
-                    if (range) {
-                        if (range.start == range.end) {
-                            console.log('User cursor is on', range.start);
-                        } else {
-                            var text = quill.getText(range.start, range.end);
-                            console.log('User has highlighted', text);
-                        }
-                    } else {
-                        console.log('Cursor not in the editor');
-                    }
-                });
-
-
-
-                //http://stackoverflow.com/questions/1206203/how-to-distinguish-between-left-and-right-mouse-click-with-jquery
-                //http://jsfiddle.net/Kn9s7/5/
-                $(document).on("contextmenu", "u", function(e){
-                    var string = $(this).html();
-                    getSuggestions(string);
-                    return false;
-                });
-
-
-/*
-                $("u").click(function(){
-                    var string = $(this).html();
-                    getSuggestions(string);
-                });
- */
-            });
 
 
 

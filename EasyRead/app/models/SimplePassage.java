@@ -68,6 +68,9 @@ public class SimplePassage extends Model {
     public int numWords;
 
 
+    @Expose
+    public boolean analyzed = false;
+
     public List<String> getStopWords() {
         return stopWords;
     }

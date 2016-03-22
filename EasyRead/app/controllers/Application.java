@@ -85,7 +85,8 @@ public class Application extends Controller {
                         controllers.routes.javascript.SimplePassageController.savePassagePlainText(),
                         controllers.routes.javascript.SimplePassageController.savePassageHtml(),
                         controllers.routes.javascript.SimplePassageController.checkWord(),
-                        controllers.routes.javascript.SimplePassageController.checkSentence()
+                        controllers.routes.javascript.SimplePassageController.checkSentence(),
+                        controllers.routes.javascript.SimplePassageController.createPassageHTML()
                         /*,
                         controllers.routes.javascript.SimplePassageController.deletePassageQuestion()
                         controllers.routes.javascript.SimplePassageController.deletePassageQuestionChoice()*/

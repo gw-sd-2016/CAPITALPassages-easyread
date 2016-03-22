@@ -72,7 +72,7 @@
 
                             <td>@inst.firstName @inst.lastName</td>
 
-                            <td>@if(passage.sentences.size == 0) {
+                            <td>@if(!passage.analyzed) {
                                 Grade Level not available yet.
                             } else {
                                 @PassageAnalysisController.displayGrade(passage.grade)

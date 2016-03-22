@@ -26,6 +26,25 @@ public class SimplePassageController extends Controller {
         return ok(createSimplePassage.render(form(SimplePassageData.class)));
     }
 
+    public Result createPassageHTML(String text, String title, String source) {
+
+            SimplePassage p = new SimplePassage(text, title, source);
+
+            Map<String, String[]> parameters = request().body().asFormUrlEncoded();
+
+
+            String html = parameters.get("html")[0];
+
+
+            PassageText pt = new PassageText(0, html);
+
+            p.htmlRepresentations = new HashSet<PassageText>();
+            p.htmlRepresentations.add(pt);
+
+            p.save();
+            return ok("true");
+    }
+
     // QUESTION CREATION
     public Result setNumQuestions(Long passageId) {
         return ok(setNumberOfQuestionsForPassage.render(form(SimplePassageNumQuestionsData.class), passageId));
@@ -479,6 +498,7 @@ public class SimplePassageController extends Controller {
                 beginSentenceBreakdown(p.id, i);
             }
 
+            p.analyzed = true;
             p.save();
         }
 

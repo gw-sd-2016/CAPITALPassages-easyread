@@ -57,11 +57,16 @@
                         <div id="editor"></div>
 
 
+
+                        <button type="button" class="btn btn-primary" onclick="createHTML();">
+                            Test</button>
+
                         <br>
                         <p>
                             <button type="submit" class="btn btn-success">
                                 <i class="btn-icon-only icon-check"></i> Submit
                             </button>
+
                         </p>
                     </div>
                 </div>
@@ -74,6 +79,8 @@
         <script src="//cdn.quilljs.com/0.20.1/quill.js"></script>
 
             <!-- Initialize Quill editor -->
+
+        <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
         <script>
 
 
@@ -96,36 +103,83 @@
                     $(newTag).insertAfter(lastTag[lastTag.length - 1]);
                 }
 
-                $(document).ready(function() {
-                    var configs = {
-                        readOnly: false,
-                        theme: 'snow',
-                        styles: {
-                            '.ql-editor' : {
-                                'word-wrap': 'break-word',
-                                'word-spacing': 'normal',
-                                'text-align': 'left',
-                                'line-height': '250%',
-                                'width': '60%',
-                                'font-size': '24'
-                            }
+                var configs = {
+                    readOnly: false,
+                    theme: 'snow',
+                    styles: {
+                        '.ql-editor' : {
+                            'word-wrap': 'break-word',
+                            'word-spacing': 'normal',
+                            'text-align': 'left',
+                            'line-height': '250%',
+                            'width': '60%',
+                            'font-size': '24'
+                        }
 
-                        },
-                        formats: ['size', 'underline']
-                    };
-
+                    },
+                    formats: ['size', 'underline']
+                };
 
 
 
-                    var quill = new Quill('#editor', configs);
 
-                    quill.on('text-change', function(delta, source) {
-                        console.log("Called");
-                        var element = document.getElementsByName("passageText")[0];
-                        element.setAttribute("value", quill.getHTML());
-                    });
+                var quill = new Quill('#editor', configs);
+
+                quill.on('text-change', function(delta, source) {
+                    console.log("Called");
+                    var element = document.getElementsByName("passageText")[0];
+                    element.setAttribute("value", quill.getHTML());
                 });
 
+                function trimUnecessary(html) {
+
+                    var passageText = quill.getText();
+
+
+                    var firstWord = passageText.substring(0, passageText.indexOf(" "));
+                    var lastWord = passageText.substring(passageText.lastIndexOf(" ") + 1, passageText.length);
+
+
+                    var foundFirst = false;
+                    var divIndex = 0;
+                    for (var i = 0; i < html.length; i++) {
+                        if (html.charAt(i) == '<' ) {
+                            if (html.charAt(i + 1) == 'd') {
+                                divIndex = i;
+                            }
+                        }
+
+                        if (!foundFirst && html.charAt(i) == firstWord.charAt(0) && html.substring(i, i + firstWord.length) == firstWord) {
+                            html = html.substring(divIndex, html.lastIndexOf(".") +  7);
+                            foundFirst = true;
+                        }
+
+                    }
+
+                    var i = html.length - 1;
+                    while(html.charAt(i) != ".") i--;
+                    html = html.substring(0, i + 1) + "</div>";
+
+
+
+                    return html;
+                }
+
+                function createHTML(){
+
+
+                    var realText = quill.getHTML();
+
+                    console.log("here");
+
+                    $.post(
+                            'createPHT?text=' + quill.getText()  + '&title=' + document.getElementsByName("passageTitle")[0].value + "&source=" + document.getElementsByName("source")[0].value ,
+                            {'html' : realText },
+
+                            function(data) {
+                                console.log("saved");
+                            });
+                }
 
         </script>
 
