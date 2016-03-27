@@ -486,8 +486,32 @@ public class SimplePassageController extends Controller {
     }
 
 
+    public void parseAndAddSuggestions(SimplePassage p) throws JWNLException{
+        String[] sentences = p.text.split(" ");
+
+        String portion = "";
+
+        int sCounter = 0;
+
+        for (int i = 0; i < sentences.length; i++) {
+            portion += sentences[i] + " ";
+            if (sentences[i].indexOf(". ") >= 0) {
+                sCounter++;
+
+            }
+            if (sCounter == 10 || (i + 1) == sentences.length) {
+                if (parsingController == null) parsingController = new ParsingController();
+                parsingController.parse(p, portion);
+                portion = "";
+                sCounter = 0;
+            }
+        }
+    }
+
+
     public Result analyzePassages() throws JWNLException {
         for (SimplePassage p : SimplePassage.all()) {
+            parseAndAddSuggestions(p);
 
             p.htmlRepresentations = new HashSet<PassageText>();
 
@@ -498,6 +522,8 @@ public class SimplePassageController extends Controller {
                 beginSentenceBreakdown(p.id, i);
             }
 
+
+
             p.analyzed = true;
             p.save();
         }
@@ -507,13 +533,59 @@ public class SimplePassageController extends Controller {
     }
 
 
+    /*
+
+    public Result analyzePassages() throws JWNLException {
+        for (SimplePassage p : SimplePassage.all()) {
+            String[] sentences = p.text.split(" ");
+
+            String portion = "";
+
+            int sCounter = 0;
+
+            for (int i = 0; i < sentences.length; i++) {
+                portion += sentences[i] + " ";
+                if (sentences[i].indexOf(". ") >= 0) {
+                    sCounter++;
+
+                }
+                if (sCounter == 10 || (i + 1) == sentences.length) {
+                    if (parsingController == null) parsingController = new ParsingController();
+                    parsingController.parse(p, portion);
+                    portion = "";
+                    sCounter = 0;
+                }
+            }
+
+            p.save();
+        }
+
+        flash("success", "Passage Analysis Completed.");
+        return ok("true");
+    }
+     */
+
+
     HashMap<String, String> sugMap = new HashMap<String, String>();
     String[] split;
 
     public void generatePassageTextAtGrade(Long passageId, int grade) {
         System.out.println("gen text");
         SimplePassage p = SimplePassage.byId(passageId);
-        PassageText current = new PassageText(grade, null);
+
+
+        boolean isOverwriting = false;
+
+        PassageText current;
+
+        if(PassageText.bySimplePassageAndGrade(p.id, grade) != null){
+            current =  PassageText.bySimplePassageAndGrade(p.id, grade);
+            isOverwriting = true;
+        } else {
+            current = new PassageText(grade, null);
+        }
+
+
         List<Suggestion> s = Suggestion.bySimplePassage(p.id);
 
         if (split == null) split = p.text.split(" ");
@@ -531,7 +603,13 @@ public class SimplePassageController extends Controller {
             if (!alreadySeen.contains(w.toLowerCase())) {
                 alreadySeen.add(w.toLowerCase());
 
+                if(w.split(" ").length > 1){
+                    w = w.split(" ")[0];
+                }
+
                 Word raw = Word.byRawString(w);
+
+                // maybe need to deal with compound words here
 
                 if (raw != null && raw.ageOfAcquisition > (grade + 6) && !w.contains("<u>")) {
                     current.html = current.html.replace(" " + w + " ", " <u>" + w + "</u> ");
@@ -540,13 +618,16 @@ public class SimplePassageController extends Controller {
             }
         }
 
-        for (PassageText t : p.htmlRepresentations) {
-            t.delete();
-        }
 
         current.html = current.html.replace("</u> <u>", "</u>&nbsp<u>");
-        p.htmlRepresentations.add(current);
-        p.save();
+
+        if(!isOverwriting){
+            p.htmlRepresentations.add(current);
+            p.save();
+        } else {
+            current.save();
+        }
+
         System.out.println("GenText END");
     }
 
@@ -813,7 +894,7 @@ public class SimplePassageController extends Controller {
         for (int i = 0; i < split.length; i++) {
             String s = split[i];
 
-            if (!s.contains("<i")) {
+            if (!s.contains("<i") || s.indexOf(".") != 0) {
                 sb.append(s + " ");
             } else {
                 sb.append(s);
@@ -920,7 +1001,7 @@ public class SimplePassageController extends Controller {
             Double diff = analysisController.determineGradeLevelForString(sentence);
 
 
-            if (diff > grade) {
+            if (diff > grade && !ogSentence.contains("exclamation") && !current.html.contains(sentence)) {
                 String curr = sentence;
                 int spaceIndex = curr.indexOf("&nbsp");
 
@@ -954,7 +1035,7 @@ public class SimplePassageController extends Controller {
                 }
 
 
-            } else if(ogSentence.indexOf("<i") != -1){
+            } else if(ogSentence.contains("exclamation") && !current.html.contains(sentence)){
                 return ok("REM");
             }
 
@@ -986,12 +1067,6 @@ public class SimplePassageController extends Controller {
             return badRequest();
         }
     }
-
-
-
-
-
-
 
     public Result savePassageHtml(Long passageId, int grade) {
         try {

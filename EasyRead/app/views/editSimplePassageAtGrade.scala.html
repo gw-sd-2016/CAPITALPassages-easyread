@@ -11,14 +11,14 @@
         <style type="text/css">
         /*This entire example and the sliders are from  https://github.com/eduardomb/jquery-panelslider */
         .panel {
-        display: none ;
-        width: 20% ;
-        overflow-y: scroll ;
-        overflow-x:scroll ;
-        padding: 20px ;
-        background-color: #333 ;
-        color: #fff ;
-        box-shadow: inset 0 0 5px 5px #222 ;
+            display: none ;
+            width: 20% ;
+            overflow-y: scroll ;
+            overflow-x:scroll ;
+            padding: 20px ;
+            background-color: #333 ;
+            color: #fff ;
+            box-shadow: inset 0 0 5px 5px #222 ;
         }
         </style>
         <div id="left-panel" class="panel"></div>
@@ -171,6 +171,13 @@
                     formats: ['size', 'underline']
                 };
 
+                // timer code from http://stackoverflow.com/questions/4220126/run-javascript-function-when-user-finishes-typing-instead-of-on-key-up
+                var typingTimer;
+                var doneTypingInterval = 5000;
+
+                var ready = false;
+
+                var requests = [];
 
 
                 var quill = new Quill('#editor', configs);
@@ -181,8 +188,12 @@
 
                 quill.on('text-change', function(delta, source) {
                     if(source == "user") {
+
+                        clearTimeout(typingTimer);
+                        typingTimer = setTimeout(setFlag, doneTypingInterval);
+
                         // quill.formatText(0, quill.getText().length, "size", 20);
-                        console.log("Called");
+
                         var element = document.getElementsByName("passageText")[0];
 
 
@@ -190,68 +201,158 @@
 
                         var range = quill.getSelection();
 
-                        if (range != null) findContainedWord(range.start);
+                        if (range != null){
+                            console.log("request pushed");
+                            requests.push(range.start);
+                        }
                     }
                 });
 
-                quill.on('selection-change', function(range) {
-                    if (range.start == range.end) {
-                        findContainedWord(range.start);
-                        findContainingSentence(range.start)
-                    }
-                });
-
-                function findContainedWord(pos){
+                function areWithinSameSentence(a, b){
                     var text = quill.getText();
 
-                    if(text.charAt(pos) == ' ') pos--;
+                    var aLoc = 0;
+                    var bLoc = 0;
 
-                    if(text.charAt(pos) == ' ') return null;
+                    for(var i = a; i >= 0; i--){
+                        if(text.charAt(i) == '.'){
+                            aLoc++;
+                        }
+                    }
+
+                    for(var i = b; i >= 0; i--){
+                        if(text.charAt(i) == '.'){
+                            bLoc++;
+                        }
+                    }
+
+                    return aLoc == bLoc;
+                }
+
+
+                function getWordForPosition(pos, check){
+                    var text = quill.getText();
+
+                    if(text.charAt(pos) === ' ') pos--;
+
+                    if(text.charAt(pos) === ' ') return null;
 
                     var startOfWord = 0;
                     var endOfWord = 0;
                     for(endOfWord = pos; endOfWord < text.length; endOfWord++){
                         if(text.charAt(endOfWord) == ' '){
-                            endOfWord;
-                            if(text.charAt(endOfWord - 1) == '.') endOfWord--;
                             break;
                         }
                     }
-                    for(startOfWord = pos; startOfWord >= 0; startOfWord--){
-                        if(text.charAt(startOfWord) == ' '){
+                    for(startOfWord = endOfWord - 1; startOfWord >= 0; startOfWord--){
+// white space check from http://stackoverflow.com/questions/1496826/check-if-a-single-character-is-a-whitespace
+                        if(/\s/.test(text.charAt(startOfWord))){
                             startOfWord++;
                             break;
+                        } else {
+                            console.log("not a space --" + text.charAt(startOfWord) + "--");
                         }
                     }
 
-                    capturedWord = quill.getText().substring(startOfWord, endOfWord);
-                    checkWord(capturedWord, startOfWord, endOfWord);
+                    if(check == true) checkWord(capturedWord, startOfWord, endOfWord);
+
                     return quill.getText().substring(startOfWord, endOfWord);
+
+                }
+
+                function areWithinSameWord(a, b){
+                    return getWordForPosition(a, false) == getWordForPosition(b, false);
+                }
+
+                function removeDuplicateSentence(index){
+
+                    var toRemove = [];
+
+                    for(var i = index - 1; i >= 0; i--){
+                        if(areWithinSameSentence(requests[index], requests[i])){
+                            toRemove.push(i);
+                        }
+                    }
+
+                    for(var i = 0; i < toRemove.length; i++){
+                        requests.splice(toRemove[i], 1);
+                    }
+                }
+
+                function removeDuplicateWords(index){
+
+                    var toRemove = [];
+
+                    for(var i = index - 1; i >= 0; i--){
+                        if(areWithinSameWord(requests[index], requests[i])){
+                            toRemove.push(i);
+                        }
+                    }
+
+                    for(var i = 0; i < toRemove.length; i++){
+                        requests.splice(toRemove[i], 1);
+                    }
                 }
 
 
+                function setFlag(){
+                    for(var i = requests.length - 1; i > 0; i--){
+                        //removeDuplicateWords(requests[i]);
+                        //removeDuplicateSentence(requests[i]);
+                    }
 
+                    for(var i = 0; i < requests.length; i++){
+                        findContainedWord(requests[i]);
+                        findContainingSentence(requests[i]);
+                    }
+
+                    requests = [];
+                }
+
+                function findContainedWord(pos){
+                    console.log("here");
+                    capturedWord = getWordForPosition(pos, true);
+                    console.log(capturedWord);
+                }
 
                 function findContainingSentence(pos){
                     var text = quill.getText();
+                    var html = quill.getHTML();
+
+                    if(text.length < 0) console.log("not working");
 
                     var startOfSen = 0;
                     var endOfSen = 0;
+                    var sentenceCount = 0;
 
-                    for(endOfSen = pos; endOfSen < text.length; endOfSen++){
-                        if(text.charAt(endOfSen) == '.'){
-                            break;
-                        }
-                    }
                     for(startOfSen = pos; startOfSen >= 0; startOfSen--){
                         if(text.charAt(startOfSen) == '.'){
-                            startOfSen += 2;
-                            break;
+                            sentenceCount++;
                         }
                     }
 
-                    capturedSentence = quill.getText().substring(startOfSen, endOfSen);
-                    return quill.getText().substring(startOfSen, endOfSen);
+                    var sNum = 0;
+                    var posi = 0;
+
+                    while(sNum < sentenceCount){
+                        if(html.charAt(posi) == '.'){
+                            sNum++;
+                        }
+                        posi++;
+                    }
+
+                    for(var endOfSen = pos; endOfSen < html.length; endOfSen++){
+                        if(html.charAt(endOfSen) == ".") break;
+                    }
+
+
+
+                    capturedSentence = quill.getHTML().substring(posi, endOfSen);
+
+
+                    console.log("sentence is: " + capturedSentence );
+                    checkSentence(capturedSentence, sentenceCount);
+                    return capturedSentence;
                 }
 
                 function saveHtml(html){
@@ -266,8 +367,6 @@
                             });
 
                 }
-
-
 
                 function trimUnecessary( html,  passageId) {
 
@@ -305,9 +404,6 @@
                 function checkWord(word, start, end){
                     jsRoutes.controllers.SimplePassageController.checkWord(word, @SimplePassage.byId(passageId).grade, @passageId ).ajax({
                         success : function(data) {
-                            console.log("check " + word);
-                            console.log(data);
-
                             quill.formatText(start, end, 'underline', data.toString() == "UNDERLINE")
                         },
                         error : function(err) {
@@ -319,10 +415,41 @@
                     });
                 }
 
-                function checkSentence(sentence){
+                function checkSentence(sentence, sentenceNum){
                     jsRoutes.controllers.SimplePassageController.checkSentence(sentence, @grade, @passageId ).ajax({
                         success : function(data) {
-                            console.log("saved");
+                            if(data.toString() == "REM"){
+                                var html = quill.getHTML();
+
+                                var index = html.indexOf(sentence);
+
+
+                                var start = 0;
+                                var firstEnd = 0;
+                                var secondEnd = 0;
+
+
+                                var l = "<span class=\"glyphicon glyphicon-exclamation-sign\">".length;
+
+
+                                for(var i = index; i < html.length; i++){
+                                    if(html.charAt(i) == '<' && html.substring(i, i + 5) == "<span" && start == 0) {
+                                        start = i;
+                                        firstEnd = start + l;
+
+                                    }
+                                    if(firstEnd != 0 && html.charAt(i) == '>' && html.substring(i - 1, i) == "n"){
+                                        secondEnd = i;
+                                        break;
+                                    }
+                                }
+
+                               // html = html.replace(sentence, html.substring(firstEnd, secondEnd - 6) + html.substring(secondEnd + 1, start + sentence.length));
+
+
+                                html = html.substring(0, start) + html.substring(firstEnd, secondEnd - 6) + html.substring(secondEnd + 2);
+                                quill.setHTML(html);
+                            }
                         },
                         error : function(err) {
                             //window.location = "";
