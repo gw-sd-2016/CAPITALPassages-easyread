@@ -5,12 +5,13 @@ import net.davidashen.text.Hyphenator;
 import net.sf.extjwnl.JWNLException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class PassageAnalysisController {
 
     private PhraseValidator secondaryValidator = new MashapeController();
-    private PhraseValidator tertiaryValidator = new GoogleNGramsValidator();
+    private GoogleNGramsValidator tertiaryValidator = new GoogleNGramsValidator();
     private WordNetController c;
 
 
@@ -260,7 +261,21 @@ public class PassageAnalysisController {
         return 1.0430 * Math.sqrt(polysyllables * (30 / sentences)) + 3.1291;
     }
 
+
+
+    public boolean suggestionIsGood(String oldSentence, String word, String sugg){
+        double diffOne = determineGradeLevelForString(oldSentence);
+        double diffTwo = determineGradeLevelForString(oldSentence.replace(word, sugg));
+
+        return diffTwo < diffOne;
+    }
+
+
+    public HashMap<Suggestion, String> suggestionMapping;
+
     public void generateSuggestionsForWord(POS p, String word, String sentence, Long passageId, String ogText) throws JWNLException {
+
+        if(suggestionMapping == null) suggestionMapping = new HashMap<Suggestion, String>();
 
         if (p != null && POS.isSignificant(p.name)) {
             if (c == null) c = new WordNetController();
@@ -282,21 +297,28 @@ public class PassageAnalysisController {
                             && !isProperNoun(w)) {
 
 
-                        Suggestion s = new Suggestion();
-                        s.word = ogText;
 
-                        String threeGram = "";
-                        String[] splitS = sentence.split(" ");
+                        if(suggestionIsGood(sentence, ogText, root)){
+                            Suggestion s = new Suggestion();
+                            s.word = ogText;
 
-                        String iPOS = "";
-                        s.suggestedWord = root;
-                        threeGram = buildThreeGram(splitS, sentence, ogText, root);
-                        s.simple_passage_id = passageId;
-                        s.save();
+                            String threeGram = "";
+                            String[] splitS = sentence.split(" ");
+
+                            String iPOS = "";
+                            s.suggestedWord = root;
+                            threeGram = buildThreeGram(splitS, sentence, ogText, root);
+                            s.simple_passage_id = passageId;
+                            s.save();
 
 
-                        //validator.fetchFrequencies(s, threeGram.toLowerCase());
-                        tertiaryValidator.fetchFrequencies(s, root);
+                            //validator.fetchFrequencies(s, threeGram.toLowerCase());
+                            tertiaryValidator.fetchFrequencies(s, threeGram);
+                            suggestionMapping.put(s, threeGram);
+
+                           // tertiaryValidator.checkOriginal(s, threeGram);
+                        }
+
                     }
 
                 }
@@ -343,5 +365,16 @@ public class PassageAnalysisController {
 
         }
         return threeGram;
+    }
+
+
+    public void reviseSuggestions(){
+
+        if(suggestionMapping != null){
+            for(Suggestion s: suggestionMapping.keySet()){
+                tertiaryValidator.checkOriginal(s, suggestionMapping.get(s));
+            }
+        }
+
     }
 }

@@ -206,18 +206,6 @@ public class SimplePassageController extends Controller {
     }
 
 
-    public Result edit(Long passageId) {
-        SimplePassage passage = SimplePassage.byId(passageId);
-        if (passage == null) {
-            return redirect(routes.SimplePassageController.viewAllPassages());
-        }
-
-        SimplePassageData data = new SimplePassageData(passage.text, passage.title, 1, "category", passage.source);
-        Form<SimplePassageData> form = Form.form(SimplePassageData.class);
-        form = form.fill(data);
-        return ok(editSimplePassage.render(form, passageId));
-    }
-
     public Result editQuestions(Long passageId) {
         SimplePassage passage = SimplePassage.byId(passageId);
         if (passage == null) {
@@ -364,7 +352,7 @@ public class SimplePassageController extends Controller {
         Form<SimplePassageData> form = Form.form(SimplePassageData.class).bindFromRequest();
 
         if (form.hasErrors()) {
-            return badRequest(editSimplePassage.render(form, passageId));
+            return badRequest(editSimplePassageAtGrade.render(form, passageId, SimplePassage.byId(passageId).grade));
         }
 
 
@@ -525,6 +513,10 @@ public class SimplePassageController extends Controller {
 
 
             p.analyzed = true;
+
+
+            parsingController.reviseSuggestions();
+
             p.save();
         }
 
@@ -692,9 +684,12 @@ public class SimplePassageController extends Controller {
         List<Suggestion> sugg = Suggestion.byWord(word);
 
         for (int i = 0; i < sugg.size(); i++) {
-            ret.append("\"" + sugg.get(i).suggestedWord + "\"");
-            if (i < sugg.size() - 1) ret.append(",");
-            res.add(sugg.get(i).suggestedWord);
+
+            if(sugg.get(i).frequency != 0){
+                ret.append("\"" + sugg.get(i).suggestedWord + "\"");
+                if (i < sugg.size() - 1) ret.append(",");
+                res.add(sugg.get(i).suggestedWord);
+            }
         }
         ret.append("]");
 

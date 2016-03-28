@@ -18,7 +18,6 @@ GET         /logout                               controllers.Application.logout
 GET         /createSimplePassage                  controllers.SimplePassageController.createSimplePassage()
 POST        /createSimplePassage                  controllers.SimplePassageController.createSimplePassage_submit()
 GET         /viewAllPassages                      controllers.SimplePassageController.viewAllPassages()
-GET         /editSimplePassage                    controllers.SimplePassageController.edit(passageId : Long)
 POST        /editSimplePassage_submit             controllers.SimplePassageController.edit_submit(passageId : Long)
 GET         /editPassageAtGrade                   controllers.SimplePassageController.editPassage(passageId : Long, grade : Int)
 POST        /deletePassage                        controllers.SimplePassageController.deletePassage(passageId: Long)

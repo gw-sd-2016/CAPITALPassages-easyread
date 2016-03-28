@@ -30,6 +30,10 @@ public class ParsingController {
 
     }
 
+    public void reviseSuggestions(){
+        a.reviseSuggestions();
+    }
+
 
     // code from: http://nlp.stanford.edu/software/corenlp.shtml
     /*
