@@ -8,6 +8,7 @@ import play.libs.ws.WSResponse;
 import play.mvc.Result;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by malcolmgoldiner on 1/19/16.
@@ -16,17 +17,21 @@ public class GoogleNGramsValidator implements PhraseValidator {
 
     String url = "https://books.google.com/ngrams/graph?content=FIRST&year_start=2000&year_end=2004&corpus=15&smoothing=3&share=&direct_url=t1%3B%2CINSERT%3B%2Cc0";
 
-    class DiffHolder{
-        double diff = 0;
-
-    }
 
 
-    private final DiffHolder diff = new DiffHolder();
+
+    private final HashMap<String, Double> diffs = new HashMap<String, Double>();
+
+    public final ArrayList<Integer> count = new ArrayList<Integer>();
+
+
+    public int outterCount = 0;
+
 
     public void checkOriginal(Suggestion s, String p){
 
-        if(diff.diff == 0){
+
+        if(!diffs.containsKey(s.word)){
             String insert = "";
 
             String currentURL = url;
@@ -44,11 +49,13 @@ public class GoogleNGramsValidator implements PhraseValidator {
 
             p = p.replace(" ", "%20");
 
+            p = p.replace(s.suggestedWord, s.word);
 
-            System.out.println(p.replace(s.word, s.suggestedWord));
+
+            System.out.println(p);
 
 
-            WSRequest holderTwo = WS.url(currentURL.replace("INSERT", p.replace(s.word, s.suggestedWord)));
+            WSRequest holderTwo = WS.url(currentURL.replace("INSERT", p));
 
             holderTwo.get().map(
                     new F.Function<WSResponse, Result>() {
@@ -102,7 +109,8 @@ public class GoogleNGramsValidator implements PhraseValidator {
 
                             double oFrequency = total / freq.size();
 
-                            diff.diff = oFrequency;
+                            diffs.put(s.word, oFrequency);
+
 
                             if(oFrequency > s.frequency){
                                 System.out.println("\n\n----CAUGHT BAD SUGGESTION---\n\n");
@@ -116,11 +124,14 @@ public class GoogleNGramsValidator implements PhraseValidator {
                         }
                     });
         } else {
-            if(s.frequency < diff.diff){
+            if(s.frequency < diffs.get(s.word)){
                 s.frequency = 0;
                 s.save();
             }
         }
+
+
+
 
 
     }
@@ -150,6 +161,7 @@ public class GoogleNGramsValidator implements PhraseValidator {
 
         p = p.replace(" ", "%20");
 
+        outterCount++;
 
         WSRequest holder = WS.url(currentURL.replace("INSERT", p));
 
@@ -206,6 +218,8 @@ public class GoogleNGramsValidator implements PhraseValidator {
                         for (Double a : freq) total += a;
 
                         s.frequency = total / freq.size();
+
+                        count.add(0);
 
                         s.save();
 

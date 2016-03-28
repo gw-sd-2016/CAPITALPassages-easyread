@@ -370,6 +370,8 @@ public class PassageAnalysisController {
 
     public void reviseSuggestions(){
 
+       // while(tertiaryValidator.count.size() < suggestionMapping.keySet().size());
+
         if(suggestionMapping != null){
             for(Suggestion s: suggestionMapping.keySet()){
                 tertiaryValidator.checkOriginal(s, suggestionMapping.get(s));
