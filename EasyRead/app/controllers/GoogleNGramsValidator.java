@@ -15,17 +15,13 @@ import java.util.HashMap;
  */
 public class GoogleNGramsValidator implements PhraseValidator {
 
-    String url = "https://books.google.com/ngrams/graph?content=FIRST&year_start=2000&year_end=2004&corpus=15&smoothing=3&share=&direct_url=t1%3B%2CINSERT%3B%2Cc0";
+    String url = "https://books.google.com/ngrams/graph?content=FIRST&year_start=2000&year_end=2008&corpus=15&smoothing=3&share=&direct_url=";
 
 
 
 
     private final HashMap<String, Double> diffs = new HashMap<String, Double>();
 
-    public final ArrayList<Integer> count = new ArrayList<Integer>();
-
-
-    public int outterCount = 0;
 
 
     public void checkOriginal(Suggestion s, String p){
@@ -38,6 +34,8 @@ public class GoogleNGramsValidator implements PhraseValidator {
 
             final String oSentence = p;
 
+            p = p.replace(s.suggestedWord,s.word);
+
             for (String substring : p.split(" ")) {
                 insert += substring + "+";
             }
@@ -47,20 +45,14 @@ public class GoogleNGramsValidator implements PhraseValidator {
             currentURL = currentURL.replace("FIRST", insert);
 
 
-            p = p.replace(" ", "%20");
+            WSRequest holder = WS.url(currentURL);
 
-            p = p.replace(s.suggestedWord, s.word);
-
-
-            System.out.println(p);
-
-
-            WSRequest holderTwo = WS.url(currentURL.replace("INSERT", p));
-
-            holderTwo.get().map(
+            holder.get().map(
                     new F.Function<WSResponse, Result>() {
                         public Result apply(WSResponse response) {
                             String body = response.getBody();
+
+
 
                             int startIndex = body.indexOf("  var data = [{\"ngram\"");
 
@@ -80,7 +72,7 @@ public class GoogleNGramsValidator implements PhraseValidator {
                             StringBuilder sb = new StringBuilder();
 
                             for (int i = 0; i < arr.length; i++) {
-                                if (arr[i] != 'e') {
+                                if (arr[i] != ',') {
                                     sb.append(arr[i]);
                                 } else {
                                     double number = Double.valueOf(sb.toString());
@@ -92,13 +84,13 @@ public class GoogleNGramsValidator implements PhraseValidator {
                                     if (arr.length - 4 <= i) {
                                         exp = body.substring(previousI, body.length());
                                         i = arr.length;
-                                    } else {
-                                        while (arr[i] != ',' && i < arr.length) i++;
-                                        exp = body.substring(previousI, i);
-                                    }
+                                    } /* else {
+                                    while (arr[i] != ',' && i < arr.length) i++;
+                                    exp = body.substring(previousI, i);
+                                } */
 
-                                    exponent = Integer.parseInt(exp);
-                                    freq.add(number * Math.pow(10, exponent));
+                                    // exponent = Integer.parseInt(exp);
+                                    freq.add(number /* Math.pow(10, exponent)*/);
 
                                 }
 
@@ -159,11 +151,7 @@ public class GoogleNGramsValidator implements PhraseValidator {
         currentURL = currentURL.replace("FIRST", insert);
 
 
-        p = p.replace(" ", "%20");
-
-        outterCount++;
-
-        WSRequest holder = WS.url(currentURL.replace("INSERT", p));
+        WSRequest holder = WS.url(currentURL);
 
         holder.get().map(
                 new F.Function<WSResponse, Result>() {
@@ -171,6 +159,8 @@ public class GoogleNGramsValidator implements PhraseValidator {
 
 
                         String body = response.getBody();
+
+
 
                         int startIndex = body.indexOf("  var data = [{\"ngram\"");
 
@@ -190,7 +180,7 @@ public class GoogleNGramsValidator implements PhraseValidator {
                         StringBuilder sb = new StringBuilder();
 
                         for (int i = 0; i < arr.length; i++) {
-                            if (arr[i] != 'e') {
+                            if (arr[i] != ',') {
                                 sb.append(arr[i]);
                             } else {
                                 double number = Double.valueOf(sb.toString());
@@ -202,13 +192,13 @@ public class GoogleNGramsValidator implements PhraseValidator {
                                 if (arr.length - 4 <= i) {
                                     exp = body.substring(previousI, body.length());
                                     i = arr.length;
-                                } else {
+                                } /* else {
                                     while (arr[i] != ',' && i < arr.length) i++;
                                     exp = body.substring(previousI, i);
-                                }
+                                } */
 
-                                exponent = Integer.parseInt(exp);
-                                freq.add(number * Math.pow(10, exponent));
+                               // exponent = Integer.parseInt(exp);
+                                freq.add(number /* Math.pow(10, exponent)*/);
 
                             }
 
@@ -218,8 +208,6 @@ public class GoogleNGramsValidator implements PhraseValidator {
                         for (Double a : freq) total += a;
 
                         s.frequency = total / freq.size();
-
-                        count.add(0);
 
                         s.save();
 

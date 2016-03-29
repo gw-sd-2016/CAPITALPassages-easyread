@@ -263,9 +263,27 @@ public class PassageAnalysisController {
 
 
 
+    private HashMap<String, Double> foundGradeLevels;
     public boolean suggestionIsGood(String oldSentence, String word, String sugg){
-        double diffOne = determineGradeLevelForString(oldSentence);
-        double diffTwo = determineGradeLevelForString(oldSentence.replace(word, sugg));
+        if(foundGradeLevels == null) foundGradeLevels = new HashMap<String, Double>();
+        double diffOne;
+
+
+        if(foundGradeLevels.containsKey(oldSentence)){
+            diffOne = foundGradeLevels.get(oldSentence);
+        } else{
+            diffOne = determineGradeLevelForString(oldSentence);
+            foundGradeLevels.put(oldSentence, diffOne);
+        }
+
+        double diffTwo;
+
+        if(foundGradeLevels.containsKey(oldSentence.replace(word, sugg))){
+            diffTwo = foundGradeLevels.get(oldSentence.replace(word, sugg));
+        } else {
+            diffTwo =  determineGradeLevelForString(oldSentence.replace(word, sugg));
+            foundGradeLevels.put(oldSentence.replace(word, sugg), diffTwo);
+        }
 
         return diffTwo < diffOne;
     }

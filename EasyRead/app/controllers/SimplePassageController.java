@@ -668,6 +668,16 @@ public class SimplePassageController extends Controller {
         return ret;
     }
 
+
+    private class SuggestionComp implements Comparator<Suggestion>{
+        @Override
+        public int compare(Suggestion o1, Suggestion o2) {
+            if(o1.frequency > o2.frequency) return -1;
+            else if (o1.frequency == o2.frequency) return 0;
+            else return 1;
+        }
+    }
+
     public Result getSuggestions(String word) {
 
         word = word.replace("<span>", "");
@@ -683,6 +693,8 @@ public class SimplePassageController extends Controller {
 
         List<Suggestion> sugg = Suggestion.byWord(word);
 
+        sugg.sort(new SuggestionComp());
+
         for (int i = 0; i < sugg.size(); i++) {
 
             if(sugg.get(i).frequency != 0){
@@ -691,6 +703,9 @@ public class SimplePassageController extends Controller {
                 res.add(sugg.get(i).suggestedWord);
             }
         }
+
+        if(ret.charAt(ret.length() - 1) == ',') ret.deleteCharAt(ret.length() - 1);
+
         ret.append("]");
 
         return ok(ret.toString());
