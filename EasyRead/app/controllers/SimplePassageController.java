@@ -1121,7 +1121,23 @@ public class SimplePassageController extends Controller {
         return singularSentenceBreakdown(passageId, grade, sentence);
     }
 
+    public String trimHTMLChars(String a){
+        a = a.replace("&nbsp;","");
+        a = a.replace("<div>","");
+        a = a.replace("</div>", "");
+        a = a.replace("<u>","");
+        return a.replace("</u>","");
+
+    }
+
+
     public Result checkWord(String word, int grade, Long passageId) {
+
+
+        word = trimHTMLChars(word);
+
+        System.out.println(word);
+
         Word enteredWord = Word.byRawString(word);
 
         // (POS p, String word, String sentence, Long passageId, String ogText)

@@ -231,16 +231,17 @@
 
 
                 function getWordForPosition(pos, check){
-                    var text = quill.getText();
+                    var text = quill.getHTML();
 
-                    if(text.charAt(pos) === ' ') pos--;
+                    // white space check from http://stackoverflow.com/questions/1496826/check-if-a-single-character-is-a-whitespace
+                    if(/\s/.test(text.charAt(pos))) pos--;
 
-                    if(text.charAt(pos) === ' ') return null;
+                    if(/\s/.test(text.charAt(pos))) return null;
 
                     var startOfWord = 0;
                     var endOfWord = 0;
-                    for(endOfWord = pos; endOfWord < text.length; endOfWord++){
-                        if(text.charAt(endOfWord) == ' '){
+                    for(endOfWord = pos; endOfWord < text.length - 5; endOfWord++){
+                        if(/\s/.test(text.charAt(endOfWord)) || text.substring(endOfWord, endOfWord + 5) == "&nbsp" || text.substring(endOfWord, endOfWord + 2) == ".<"){
                             break;
                         }
                     }
@@ -249,14 +250,17 @@
                         if(/\s/.test(text.charAt(startOfWord))){
                             startOfWord++;
                             break;
-                        } else {
-                            console.log("not a space --" + text.charAt(startOfWord) + "--");
                         }
                     }
 
-                    if(check == true) checkWord(capturedWord, startOfWord, endOfWord);
+                    capturedWord = text.substring(startOfWord, endOfWord);
 
-                    return quill.getText().substring(startOfWord, endOfWord);
+                    if(check == true) {
+                        console.log("Sending " + capturedWord);
+                        checkWord(capturedWord, startOfWord, endOfWord);
+                    }
+
+                    return quill.getHTML().substring(startOfWord, endOfWord);
 
                 }
 
@@ -296,6 +300,8 @@
 
 
                 function setFlag(){
+                    console.log("begin count " + requests.length);
+
                     for(var i = requests.length - 1; i > 0; i--){
                         //removeDuplicateWords(requests[i]);
                         //removeDuplicateSentence(requests[i]);
@@ -306,11 +312,11 @@
                         findContainingSentence(requests[i]);
                     }
 
+                    console.log("end count " + requests.length);
                     requests = [];
                 }
 
                 function findContainedWord(pos){
-                    console.log("here");
                     capturedWord = getWordForPosition(pos, true);
                     console.log(capturedWord);
                 }
@@ -437,8 +443,8 @@
                                 }
 
 
-                                console.log("sentence really is: " + sentence);
-                                console.log("full - " + html);
+                               // console.log("sentence really is: " + sentence);
+                               // console.log("full - " + html);
                                 var start = 0;
                                 var firstEnd = 0;
                                 var secondEnd = 0;
@@ -446,7 +452,7 @@
 
                                 var l = "<span class=\"glyphicon glyphicon-exclamation-sign\">".length;
 
-                                console.log("index of first <: " + index);
+                                //console.log("index of first <: " + index);
 
                                 for(var i = index; i < html.length; i++){
                                     if(html.charAt(i) == '<' && html.substring(i, i + 5) == "<span" && start == 0) {
@@ -460,45 +466,86 @@
                                     }
                                 }
 
-                                console.log("start: " + start + " firstEnd " + firstEnd + " secondEnd: " + secondEnd);
+                                //console.log("start: " + start + " firstEnd " + firstEnd + " secondEnd: " + secondEnd);
 
-                               // html = html.replace(sentence, html.substring(firstEnd, secondEnd - 6) + html.substring(secondEnd + 1, start + sentence.length));
+                                // html = html.replace(sentence, html.substring(firstEnd, secondEnd - 6) + html.substring(secondEnd + 1, start + sentence.length));
 
-                                console.log("first part: " + html.substring(0, start));
+                                //console.log("first part: " + html.substring(0, start));
 
 
                                 if(start != 0 && firstEnd != 0 && secondEnd != 0){
                                     html = html.substring(0, start) + html.substring(firstEnd, secondEnd - 6) + html.substring(secondEnd + 2);
 
+
+
+
+                                    quill.setHTML(html);
+
+
+                                    html = quill.getHTML();
+
+                                    console.log("text: " + html);
+
                                     var currentS = 0;
-                                    for(var e = 0; e < html.length - 2; e++){
-                                        if(html.substring(e, e +2) == ". " ) currentS++;
+                                    for(var e = 0; e < html.length - 5; e++){
+                                        if(html.substring(e, e +2) == ". " || html.substring(e, e + 5) == ".&nbs" || html.substring(e, e +2) == ".<" ) {
+                                            currentS++;
+                                        }
                                         if(currentS == sentenceNum){
+                                            console.log("caught sentnece");
                                             index = e + 2;
                                             break;
                                         }
                                     }
 
-                                    var nextS = index;
-                                    for(var c = nextS; c < html.length; c++){
-                                        if(html.charAt(c) == '.'){
+                                    var nextS = 0;
+                                    for(var c = index; c < html.length; c++) {
+                                        if (html.substring(c, c + 2) == ". " || html.substring(c, c + 5) == ".&nbs" || html.substring(c, c + 2) == ".<") {
                                             nextS = c;
                                             break;
                                         }
                                     }
 
-                                    var current = html.substring(e, nextS);
+                                    console.log("Current: " + index + " next: " + nextS);
 
-                                    //quill.formatText(e, nextS, 'underline', false);
 
-                                    var splitC = current.split(" ");
+                                    quill.formatText(index, nextS, 'underline', false);
 
-                                    for(var i = 0; i < splitC.length; i++){
-                                        checkWord(splitC[i], e + current.indexOf(splitC[i]), e + current.indexOf(splitC[i]) + splitC[i].length);
+
+                                    html = quill.getHTML();
+
+                                    currentS = 0;
+                                    for(var e = 0; e < html.length - 5; e++){
+                                        if(html.substring(e, e +2) == ". " || html.substring(e, e + 5) == ".&nbs" || html.substring(e, e +2) == ".<" ) {
+                                            currentS++;
+                                        }
+                                        if(currentS == sentenceNum){
+                                            console.log("caught sentnece");
+                                            index = e + 2;
+                                            break;
+                                        }
                                     }
 
+                                    nextS = 0;
+                                    for(var c = index; c < html.length; c++) {
+                                        if (html.substring(c, c + 2) == ". " || html.substring(c, c + 5) == ".&nbs" || html.substring(c, c + 2) == ".<") {
+                                            nextS = c;
+                                            break;
+                                        }
+                                    }
 
-                                    quill.setHTML(html);
+                                    console.log("--sen search");
+                                    console.log("new Current: " + index + " next: " + nextS);
+
+                                    for(var i = index; i < nextS; i++){
+                                        // white space check from http://stackoverflow.com/questions/1496826/check-if-a-single-character-is-a-whitespace
+                                        if(i > index && /\s/.test(html.charAt(i)) || i + 1 == nextS){
+                                            findContainedWord(i - 1);
+                                        }
+                                    }
+
+                                    console.log("end sen search");
+
                                 }
 
                             }
