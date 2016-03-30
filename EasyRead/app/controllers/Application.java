@@ -2,10 +2,7 @@ package controllers;
 
 import formdata.LoginForm;
 import formdata.UserForm;
-import models.PassageTag;
-import models.SimplePassage;
-import models.Suggestion;
-import models.User;
+import models.*;
 import net.sf.extjwnl.JWNLException;
 import play.Routes;
 import play.data.Form;

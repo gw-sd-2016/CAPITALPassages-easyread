@@ -10,7 +10,7 @@ import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
 import play.mvc.Result;
 
-public class MashapeController implements PhraseValidator {
+public class MashapeController {
 
     private Hyphenator h = new Hyphenator();
 
@@ -117,28 +117,5 @@ public class MashapeController implements PhraseValidator {
                     });
         } else return null;
 
-    }
-
-    @Override
-    public void fetchFrequencies(Suggestion s, String p) {
-
-
-        String url = "https://wordsapiv1.p.mashape.com/words/" + p + "/frequency";
-        //System.out.println(url);
-        WS.url(url).setHeader("X-Mashape-Key", "0qln9a1q5Hmsh7DpS3ttXRqx4nGCp1dmYowjsna9AhhZ2xMAbi").get().map(
-                new F.Function<WSResponse, Object>() {
-                    public Result apply(WSResponse response) {
-                        //System.out.println("response:" + response.asJson());
-                        JsonNode res = response.asJson().get("frequency").get("perMillion");
-                        System.out.println("response: " + res);
-
-
-                        //System.out.println("num:" + res.findValue("syllables").findValue("count"));
-
-                        s.frequency = res.asDouble();
-                        s.save();
-                        return null;
-                    }
-                });
     }
 }

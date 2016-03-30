@@ -110,7 +110,7 @@ public class Word extends Model {
 
         w = Word.byLemma(lc);
 
-        if (w == null && lc.length() - 1 > 0) Word.byLemma(lc.substring(0, lc.length() - 1));
+        if (w == null && lc.length() - 1 > 0) w = Word.byLemma(lc.substring(0, lc.length() - 1));
 
         return w;
     }

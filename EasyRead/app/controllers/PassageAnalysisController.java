@@ -10,8 +10,7 @@ import java.util.HashSet;
 
 public class PassageAnalysisController {
 
-    private PhraseValidator secondaryValidator = new MashapeController();
-    private GoogleNGramsValidator tertiaryValidator = new GoogleNGramsValidator();
+    private PhraseValidator tertiaryValidator = new GoogleNGramsValidator();
     private WordNetController c;
 
 
@@ -295,7 +294,7 @@ public class PassageAnalysisController {
 
         if(suggestionMapping == null) suggestionMapping = new HashMap<Suggestion, String>();
 
-        if (p != null && POS.isSignificant(p.name)) {
+        if (p != null && POS.isSignificant(p.name) || Word.byLemma(word) != null && !Word.isStopWord(Word.byLemma(word))) {
             if (c == null) c = new WordNetController();
 
             Word w = Word.byLemma(word);

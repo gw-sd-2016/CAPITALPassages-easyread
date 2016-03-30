@@ -501,31 +501,34 @@ public class SimplePassageController extends Controller {
 
     public Result analyzePassages() throws JWNLException {
         for (SimplePassage p : SimplePassage.all()) {
-            parseAndAddSuggestions(p);
 
-            if(p.htmlRepresentations != null){
-                for(PassageText pt : p.htmlRepresentations) p.delete("");
+            if(!p.analyzed){
+                parseAndAddSuggestions(p);
+
+                if(p.htmlRepresentations != null){
+                    for(PassageText pt : p.htmlRepresentations) pt.delete();
+                }
+
+
+
+                p.htmlRepresentations = new HashSet<PassageText>();
+
+                this.difficultiesCache = getDifficulties(p);
+
+                for (int i = 0; i < 14; i++) {
+                    generatePassageTextAtGrade(p.id, i);
+                    beginSentenceBreakdown(p.id, i);
+                }
+
+
+
+                p.analyzed = true;
+
+
+                parsingController.reviseSuggestions();
+
+                p.save();
             }
-
-
-
-            p.htmlRepresentations = new HashSet<PassageText>();
-
-            this.difficultiesCache = getDifficulties(p);
-
-            for (int i = 0; i < 14; i++) {
-                generatePassageTextAtGrade(p.id, i);
-                beginSentenceBreakdown(p.id, i);
-            }
-
-
-
-            p.analyzed = true;
-
-
-            parsingController.reviseSuggestions();
-
-            p.save();
         }
 
         flash("success", "Passage Analysis Completed.");
@@ -943,7 +946,6 @@ public class SimplePassageController extends Controller {
             int sentNumber = 0;
             boolean placed = false;
             for (int i = 0; i < split.length; i++) {
-
                 if (sentNumber < p.sentences.size() && this.difficultiesCache.get(sentNumber) > grade && !placed) {
                     String curr = split[i];
                     int spaceIndex = curr.indexOf("&nbsp");
@@ -966,7 +968,7 @@ public class SimplePassageController extends Controller {
                     placed = true;
                 }
 
-                if (split[i].indexOf(".") != -1) {
+                if (split[i].charAt(split[i].length() - 1) == '.') {
                     sentNumber++;
                     placed = false;
                 }
