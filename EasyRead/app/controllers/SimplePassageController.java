@@ -614,7 +614,7 @@ public class SimplePassageController extends Controller {
 
                 // maybe need to deal with compound words here
 
-                if (raw != null && raw.ageOfAcquisition > (grade + 6) && !w.contains("<u>")) {
+                if (raw != null && raw.ageOfAcquisition > (grade + 6) && !w.contains("<u>") && !Word.isStopWord(raw)) {
                     current.html = current.html.replace(" " + w + " ", " <u>" + w + "</u> ");
                     current.html = current.html.replace(" " + w.toLowerCase() + " ", " <u>" + w + "</u> ");
                 }

@@ -294,7 +294,7 @@ public class PassageAnalysisController {
 
         if(suggestionMapping == null) suggestionMapping = new HashMap<Suggestion, String>();
 
-        if (p != null && POS.isSignificant(p.name) || Word.byLemma(word) != null && !Word.isStopWord(Word.byLemma(word))) {
+        if (p != null && POS.isSignificant(p.name) && Word.byLemma(word) != null && !Word.isStopWord(Word.byLemma(word)) || Word.byLemma(word) != null && !Word.isStopWord(Word.byLemma(word))) {
             if (c == null) c = new WordNetController();
 
             Word w = Word.byLemma(word);

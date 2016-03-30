@@ -351,7 +351,11 @@
 
 
                     console.log("sentence is: " + capturedSentence );
-                    checkSentence(capturedSentence, sentenceCount);
+
+                    if(capturedSentence.split(" ").length > 2){
+                        checkSentence(capturedSentence, sentenceCount);
+                    }
+
                     return capturedSentence;
                 }
 
@@ -423,7 +427,18 @@
 
                                 var index = html.indexOf(sentence);
 
+                                var currentS = 0;
+                                for(var e = 0; e < html.length - 2; e++){
+                                    if(html.substring(e, e +2) == ". " ) currentS++;
+                                    if(currentS == sentenceNum){
+                                        index = e + 2;
+                                        break;
+                                    }
+                                }
 
+
+                                console.log("sentence really is: " + sentence);
+                                console.log("full - " + html);
                                 var start = 0;
                                 var firstEnd = 0;
                                 var secondEnd = 0;
@@ -431,6 +446,7 @@
 
                                 var l = "<span class=\"glyphicon glyphicon-exclamation-sign\">".length;
 
+                                console.log("index of first <: " + index);
 
                                 for(var i = index; i < html.length; i++){
                                     if(html.charAt(i) == '<' && html.substring(i, i + 5) == "<span" && start == 0) {
@@ -444,11 +460,47 @@
                                     }
                                 }
 
+                                console.log("start: " + start + " firstEnd " + firstEnd + " secondEnd: " + secondEnd);
+
                                // html = html.replace(sentence, html.substring(firstEnd, secondEnd - 6) + html.substring(secondEnd + 1, start + sentence.length));
 
+                                console.log("first part: " + html.substring(0, start));
 
-                                html = html.substring(0, start) + html.substring(firstEnd, secondEnd - 6) + html.substring(secondEnd + 2);
-                                quill.setHTML(html);
+
+                                if(start != 0 && firstEnd != 0 && secondEnd != 0){
+                                    html = html.substring(0, start) + html.substring(firstEnd, secondEnd - 6) + html.substring(secondEnd + 2);
+
+                                    var currentS = 0;
+                                    for(var e = 0; e < html.length - 2; e++){
+                                        if(html.substring(e, e +2) == ". " ) currentS++;
+                                        if(currentS == sentenceNum){
+                                            index = e + 2;
+                                            break;
+                                        }
+                                    }
+
+                                    var nextS = index;
+                                    for(var c = nextS; c < html.length; c++){
+                                        if(html.charAt(c) == '.'){
+                                            nextS = c;
+                                            break;
+                                        }
+                                    }
+
+                                    var current = html.substring(e, nextS);
+
+                                    //quill.formatText(e, nextS, 'underline', false);
+
+                                    var splitC = current.split(" ");
+
+                                    for(var i = 0; i < splitC.length; i++){
+                                        checkWord(splitC[i], e + current.indexOf(splitC[i]), e + current.indexOf(splitC[i]) + splitC[i].length);
+                                    }
+
+
+                                    quill.setHTML(html);
+                                }
+
                             }
                         },
                         error : function(err) {
