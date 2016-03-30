@@ -41,8 +41,10 @@ public class SimplePassageController extends Controller {
             p.htmlRepresentations = new HashSet<PassageText>();
             p.htmlRepresentations.add(pt);
 
+            p.instructorID = Long.valueOf(session("userId"));
+
             p.save();
-            return ok("true");
+            return viewAllPassages();
     }
 
     // QUESTION CREATION
@@ -500,6 +502,12 @@ public class SimplePassageController extends Controller {
     public Result analyzePassages() throws JWNLException {
         for (SimplePassage p : SimplePassage.all()) {
             parseAndAddSuggestions(p);
+
+            if(p.htmlRepresentations != null){
+                for(PassageText pt : p.htmlRepresentations) p.delete("");
+            }
+
+
 
             p.htmlRepresentations = new HashSet<PassageText>();
 

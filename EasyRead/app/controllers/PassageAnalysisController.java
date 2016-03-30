@@ -382,6 +382,18 @@ public class PassageAnalysisController {
 
 
         }
+
+        int lastIndex = threeGram.length() - 1;
+
+        for(int i = threeGram.length() - 1; i >= 0; i--){
+            if(!Character.isLetter(threeGram.charAt(i))){
+                lastIndex--;
+            } else break;
+        }
+
+        if(lastIndex != -1) threeGram = threeGram.substring(0, lastIndex + 1);
+
+
         return threeGram;
     }
 
