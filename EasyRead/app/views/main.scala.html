@@ -57,7 +57,10 @@
                     <ul class="nav navbar-nav">
                         @if(session.get("userFirstName") != null) {
                             <li><a href="@routes.SimplePassageController.viewAllPassages">All Passages</a></li>
-                            <li><a href="@routes.SimplePassageController.createSimplePassage()">Add a Passage</a></li>
+                            @if(User.byId(session.get("userId")).creatorId == 0) {
+                                <li><a href="@routes.SimplePassageController.createSimplePassage()">Add a Passage</a></li>
+                            }
+
                             <li><a href="@routes.Application.logout">Logout</a></li>
                         } else {
                             <li><a href="@routes.Application.login()">Log In</a></li>

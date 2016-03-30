@@ -54,6 +54,21 @@
                             <input type="password" class="form-control" name="password" placeholder="Password" value='@form("password").value'>
                             <input type="password" class="form-control" name="passwordRepeat" placeholder="Confirm Password" value='@form("passwordRepeat").value'>
 
+                            <br>
+                            <label>STUDENTS ONLY, ENTER TEACHERS USERNAME</label>
+                            <input type="text" class="form-control" name="instUsername" placeholder="" value='@form("instUsername").value'>
+
+
+                            <br>
+
+                            <strong>Check for a student account (All Users are instructors by default)</strong> &nbsp; <input type="checkbox" name="isStudent" value='@form("isStudent").value()' onclick="setBox();">
+
+
+
+
+
+                            <br>
+
 
                             <div class="text-center">
                                 <button type="submit" class="button medium semiround">Submit</button>
@@ -65,6 +80,16 @@
 
                     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
                     <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+
+                    <script>
+                        function setBox(){
+                            var elem = document.getElementsByName("isStudent")[0];
+                            if(elem.checked == true) elem.value = true;
+                            else elem.value = false;
+                        }
+
+
+                    </script>
                 </body>
             </html>
         }

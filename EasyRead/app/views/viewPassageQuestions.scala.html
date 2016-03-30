@@ -13,24 +13,36 @@
                 </div>
                 <div>
 
-                    <a class="btn btn-primary" id="add" href="@routes.SimplePassageController.answerPassageQuestions(passageId)" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
-                        <i class="glyphicon glyphicon-check"></i><i class="glyphicon glyphicon-group"></i>
-                        Answer These Questions
-                    </a>
+            @if(SimplePassage.byId(passageId).questions.toList.size > 0){
+                <a class="btn btn-primary" id="add" href="@routes.SimplePassageController.answerPassageQuestions(passageId)" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
+                    <i class="glyphicon glyphicon-check"></i><i class="glyphicon glyphicon-group"></i>
+                    Answer These Questions
+                </a>
+            } else {
+                <strong>Try adding some questions first!</strong>
+            }
+
+
 
                     <p>
                 <h3> Multiple Choice Question for @SimplePassage.byId(passageId).title</h3>
                     @for(q <- SimplePassage.byId(passageId).questions.toList.sortWith { (o, p) => o.position < p.position }) {
                         <h3></h3>
                         <strong> @PassageQuestionPrompt.byPassageQuestion(q.id).get(0).text </strong>
+                        <ul>
                         @for(c <- q.choices.toList.sortWith { (w, v) => w.position < v.position }) {
                             <div class="radio">
                                 <label>
 
-                                    <input type="radio" name="optradio">@PassageQuestionAnswer.byPassageQuestionChoice(c.id).get(0).text
+                                <li>  @if(c.correct){
+                                    <i class="glyphicon glyphicon-check"></i>
+                                } @PassageQuestionAnswer.byPassageQuestionChoice(c.id).get(0).text</li>
                                 </label>
                             </div>
                         }
+
+                        </ul>
+
                         <br>
                         <br>
                         }

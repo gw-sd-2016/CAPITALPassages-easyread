@@ -417,11 +417,14 @@ public class SimplePassageController extends Controller {
         form = form.fill(data);
         return ok(editSimplePassageAtGrade.render(form, passageId, grade));
     }
-    
+
 
     public Result viewS(Long passageId, int grade) {
         if(session("userFirstName") == null) return ok(index.render(null));
         User user = User.byId(session("userId"));
+
+
+        if(user.type == User.Role.STUDENT) return viewAsStudent(passageId, grade);
         if (user == null) {
             return ok(index.render(session("userFirstName")));
         }
@@ -436,18 +439,29 @@ public class SimplePassageController extends Controller {
     }
 
 
-/*
+
+    public Result viewAsStudent(Long passageId, int grade) {
+        if(session("userFirstName") == null) return ok(index.render(null));
+        User user = User.byId(session("userId"));
+        if (user == null) {
+            return ok(index.render(session("userFirstName")));
+        }
+
+        SimplePassage passage = SimplePassage.byId(passageId);
+
+        if (grade >= 0) {
+            passage.grade = grade;
+        } else passage.grade = 0;
+
+        return ok(viewPassageAsStudent.render(passage, user));
+    }
+
+
     public Result viewPassageQuestions(Long passageId) {
-		User user = User.byId(session("userId"));
-		if (user == null) {
-			return redirect(routes.UserController.index(request().uri()));
-		}
-
-
-
+        if(session("userFirstName") == null) return ok(index.render(null));
 		return ok(viewPassageQuestions.render(passageId));
 	}
-*/
+
 
     public Result viewAllPassageTags(List<PassageTag> tags) {
         if(session("userFirstName") == null) return ok(index.render(null));
@@ -711,7 +725,11 @@ public class SimplePassageController extends Controller {
         if(session("userFirstName") == null) return ok(index.render(null));
         Long instId = Long.valueOf((session("userId")));
         User inst = User.byId(instId);
-        List<SimplePassage> pList = SimplePassage.byInstructorId(instId);
+
+        if(inst.type == User.Role.STUDENT){
+            inst = User.byId(inst.creatorId);
+        }
+        List<SimplePassage> pList = SimplePassage.byInstructorId(inst.id);
 
         return ok(viewAllPassages.render(pList, inst));
     }
@@ -808,6 +826,9 @@ public class SimplePassageController extends Controller {
 
     public Result answerPassageQuestions_submit(Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
+
+
+        Long userID = Long.valueOf(session("userId"));
         SimplePassage passage = SimplePassage.byId(passageId);
         if (passage == null) {
             return redirect(routes.SimplePassageController.answerPassageQuestions(passageId));
@@ -827,6 +848,7 @@ public class SimplePassageController extends Controller {
         for (int i = 0; i < data.answers.size(); i++) {
             if (data.answers.get(i) != "") {
                 PassageQuestionRecord thisQ = null;
+                //thisQ.user = User.byId(userID);
                 for (PassageQuestionRecord r : records) {
                     if (r.question.position == i && r.question.basis_id == passageId) thisQ = r;
                 }

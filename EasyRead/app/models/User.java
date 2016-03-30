@@ -130,6 +130,17 @@ public class User extends Model {
         this.firstName = formData.get("firstName");
         this.lastName = formData.get("lastName");
         this.type = Role.INSTRUCTOR;
+
+        if(formData.get("isStudent").equals("true")){
+            try {
+                this.creatorId = User.byUsername(formData.get("instUsername")).id;
+            } catch(Exception e) {
+                this.creatorId = null;
+            }
+
+        } else this.creatorId = Long.valueOf(0);
+
+
         //   this.creatorId = Long.valueOf(formData.get("creatorId"));
         // this.institution = User.byId(userForm.creatorId).institution;
     }

@@ -1,0 +1,166 @@
+@import play.api.libs.json.Json
+@import scala.reflect.runtime.universe._
+
+@(passage: models.SimplePassage, instructor: models.User)
+
+
+
+    @main("Viewing Passage") {
+
+
+
+
+        <div class="container">
+
+            <div class="pull-left">
+
+                <div class="btn-group">
+
+
+                    @if(passage.questions.size > 0) {
+
+                        <a class="btn btn-primary" id="view" href="/answerPassageQuestions?passageId=@passage.id" style="margin-bottom: 20px ;">
+                            <i class="glyphicon glyphicon-book"></i>
+                            Answer Passage Questions
+                        </a>
+                    }
+
+
+                    @for(tag <- passage.tags) {
+
+
+                        <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px ;">
+                            <i class="glyphicon glyphicon-tag"> @tag.name</i>
+
+                        </a>
+                    }
+
+                </div>
+            </div>
+
+            <div class="pull-right">
+
+
+
+
+
+                </div>
+
+
+
+
+
+        </div>
+
+
+
+        <div class="container-fluid">
+
+
+            <div>
+
+                <span class="label label-default" id="Suggestions"></span>
+
+
+                <div class="container">
+                    <h1> @passage.title </h1>
+
+                    <strong> Added By: </strong> @instructor.firstName @instructor.lastName <br>
+                    <strong> Displaying at Grade Level:  </strong>  @passage.grade
+                    <br>
+                    <strong> Source:  </strong> @passage.source <br><br>
+
+
+                </div>
+
+
+               <div id="editor">
+               </div>
+            </div>
+        </div>
+
+
+
+
+    <script src="//cdn.quilljs.com/0.20.1/quill.js"></script>
+
+
+
+
+    <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+
+    <script>
+
+            //http://quilljs.com/docs/configuration/
+            // http://stackoverflow.com/questions/15409429/how-to-limit-text-width
+            var configs = {
+                readOnly: true,
+                theme: 'snow',
+                styles: {
+                    '.ql-editor' : {
+                        'word-wrap': 'break-word',
+                        'word-spacing': 'normal',
+                        'text-align': 'left',
+                        'line-height': '250%',
+                        'width': '60%'
+                    }
+
+                },
+                formats: ['size', 'underline', 'background']
+            };
+
+            /*
+             if(passage.html.length == passage.text.length){
+             passage.text
+             } else{
+             Html(passage.html)
+             }
+             */
+
+            var quill = new Quill('#editor', configs);
+
+
+
+
+
+
+            //http://www.creativejuiz.fr/blog/en/javascript-en/read-url-get-parameters-with-javascript
+            function $_GET(param) {
+                var vars = {};
+                window.location.href.replace(
+                        /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+                        function( m, key, value ) { // callback
+                            vars[key] = value !== undefined ? value : '';
+                        }
+                );
+
+                if ( param ) {
+                    return vars[param] ? vars[param] : null;
+                }
+                return vars;
+            }
+
+
+
+
+                //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
+                // locate your element and add the Click Event Listener
+
+                function isEmpty( el ){
+                    return !$.trim(el.html())
+                }
+
+
+
+
+
+
+
+                $(document).ready(function(){
+                    //http://stackoverflow.com/questions/9913971/scala-how-can-i-get-an-escaped-representation-of-a-string
+                    quill.setText("@passage.text");
+                });
+        </script>
+
+
+    }

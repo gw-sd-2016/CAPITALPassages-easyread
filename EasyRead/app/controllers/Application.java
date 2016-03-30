@@ -33,7 +33,14 @@ public class Application extends Controller {
             return badRequest(signup.render(newUserForm));
         } else {
             User newUser = new User(newUserForm);
-            User.create(newUser);
+            if(newUser.creatorId != null){
+                if(newUser.creatorId != 0) newUser.type = User.Role.STUDENT;
+                User.create(newUser);
+            } else {
+                flash("failure", "Try signing up again, something went wrong.");
+                return ok(signup.render(form(UserForm.class)));
+            }
+
         }
         return ok(login.render(form(LoginForm.class)));
     }

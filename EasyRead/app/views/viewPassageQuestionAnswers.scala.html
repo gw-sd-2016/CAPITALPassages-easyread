@@ -26,6 +26,7 @@
                                 <th>Question</th>
                                 <th>Your Answer</th>
                                 <th>Correct?</th>
+                                <th>Real Answer</th>
                             </tr>
                         </thead>
 
@@ -40,7 +41,7 @@
                                     <td><strong> @PassageQuestionPrompt.byPassageQuestion(q.id).get(0).text </strong></td>
 
                                     @for(rec <- PassageQuestionRecord.byPassageQuestionId(q.id)) {
-                                        @if(inst.id == rec.user.id) {
+                                        @if(inst.id == rec.user.id || User.byId(inst.id).creatorId == rec.user.id) {
 
 
                                             <td>@PassageQuestionAnswer.byPassageQuestionChoice(PassageQuestionChoice.byId(rec.responses.toList.reverse.head.entity_id).id).get(0).text</td>
@@ -48,7 +49,14 @@
 
                                         }
                                     }
+
+                                    <td>
+                                    @q.correctAnswer
+                                    </td>
                                 </tr>
+
+
+
                             }
 
 

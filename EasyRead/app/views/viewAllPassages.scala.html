@@ -12,10 +12,14 @@
         <div>
 
 
-            <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
-                <span class="spinner"><i class="glyphicon glyphicon-spin fa-refresh"></i></span>
-                <i class="glyphicon glyphicon-flash"></i> Analyze
-            </button>
+            @if(Long.valueOf(session().get("userId")) == inst.id){
+                <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
+                    <span class="spinner"><i class="glyphicon glyphicon-spin fa-refresh"></i></span>
+                    <i class="glyphicon glyphicon-flash"></i> Analyze
+                </button>
+            }
+
+
         </div>
 
         <div id="students" class="box">
@@ -98,9 +102,13 @@
 
 
                             <td style="width: 10%">
+
+                            @if(Long.valueOf(session().get("userId")) == inst.id){
                                 <a href="@routes.SimplePassageController.editPassage(passage.id, passage.grade)" class="btn btn-small btn-info" style="width: 50px ;">
                                     <i class="fa fa-edit"></i> Edit
                                 </a>
+                            }
+
 
                                     <!--  <button type="button" class="btn btn-small btn-danger has-spinner" id="deletePassage" name=" @passage.id:|:@passage.title" style="width: 75px;">
                                 <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
