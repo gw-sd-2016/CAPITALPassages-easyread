@@ -32,23 +32,27 @@
                     </div>
                     -->
 
-                        <form class="form-inline">
-                            <div class="form-group">
-                                <br>
-                                <strong>Tag 1</strong>
-                                <div class="input-group">
-                                    <input type="text" name="names[0]" placeholder="Tag Name" value="names[0]">
+                        <!--
+                        <div class="tag">
+                            <form class="form-inline">
+                                <div class="form-group">
+                                    <br>
+                                    <strong>Tag 1</strong>
+                                    <div class="input-group">
+                                        <input type="text" name="names[0]" placeholder="Tag Name" value="names[0]">
 
-                                    <input type="text" name="descriptions[0]" placeholder="Tag Description" value="descriptions[0]">
+                                        <input type="text" name="descriptions[0]" placeholder="Tag Description" value="descriptions[0]">
 
-                                    <input type="text" name="types[0]" placeholder="Tag Type" value="types[0]">
+                                        <input type="text" name="types[0]" placeholder="Tag Type" value="types[0]">
 
 
+                                    </div>
                                 </div>
-                            </div>
 
-                        </form>
+                            </form>
+                        </div>
 
+-->
                         <h4>Passage Body</h4>
 
                         <input type="text" name="passageText" value="@Html(form("passageText").value)" style="display: none ;">
@@ -94,12 +98,25 @@
                             numTags + '<input type="text" name="names[' + numTags + ']" placeholder="Tag Name" value="names[' + numTags + ']"><label>Anything you want</label><input type="text" name="descriptions[' + numTags + ']" placeholder="Tag Description" value="descriptions[' + numTags + ']"><label>Ex: Grade, Source, Etc</label><input type="text" name="types[' + numTags + ']" placeholder="Tag Type" value="types[' + numTags + ']"></div>';
 
 
+                    realAddTag(document.getElementsByName("names["+ numTags +"]")[0].value, document.getElementsByName("descriptions["+ numTags +"]")[0].value, document.getElementsByName("types["+ numTags +"]")[0].value);
+
+
                     var lastTag = document.getElementsByClassName('tag');
 
 
                     var $this = $(lastTag);
                     $(newTag).insertAfter(lastTag[lastTag.length - 1]);
                 }
+
+
+
+                var jnames = [];
+                var jdescs = [];
+                var jtypes = [];
+
+
+
+
 
                 var configs = {
                     readOnly: false,
@@ -128,6 +145,16 @@
                     var element = document.getElementsByName("passageText")[0];
                     element.setAttribute("value", quill.getHTML());
                 });
+
+                function realAddTag(name, desc, tag){
+                    console.log("desc :" + desc);
+
+                    jnames = jnames.concat(name);
+                    jdescs = jdescs.concat(desc);
+                    jtypes = jtypes.concat(tag);
+                    console.log(jnames[0]);
+                }
+
 
                 function trimUnecessary(html) {
 
@@ -168,11 +195,26 @@
 
                     var realText = quill.getHTML();
 
+                    //http://stackoverflow.com/questions/3001474/how-to-get-caller-element-using-javascript
+                    var numTags = document.getElementsByClassName('tag').length;
+
+                    console.log('tag' + numTags);
+
+
+
+                    if(numTags == 1) realAddTag(document.getElementsByName("names[0]")[0].value, document.getElementsByName("descriptions[0]")[0].value, document.getElementsByName("types[0]")[0].value);
+
+
+
                     console.log("here");
 
                     $.post(
                             'createPHT?text=' + quill.getText()  + '&title=' + document.getElementsByName("passageTitle")[0].value + "&source=" + document.getElementsByName("source")[0].value ,
-                            {'html' : realText },
+                            {'html' : realText,
+                              'names' : JSON.stringify(jnames) ,
+                              'descs' : JSON.stringify(jdescs),
+                              'jtags' : JSON.stringify(jtypes)
+                            },
 
                             function(data) {
                                 console.log("saved");

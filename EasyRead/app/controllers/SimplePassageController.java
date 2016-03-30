@@ -1,16 +1,21 @@
 package controllers;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
 import formdata.PassageQuestionAnswerData;
 import formdata.SimplePassageData;
 import formdata.SimplePassageNumQuestionsData;
 import models.*;
 import net.sf.extjwnl.JWNLException;
 import play.data.Form;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import scala.util.parsing.json.JSONArray$;
 import views.html.*;
 
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 import java.util.*;
 
 import static play.data.Form.form;
@@ -23,17 +28,33 @@ public class SimplePassageController extends Controller {
 
     // New Passage Methods
     public Result createSimplePassage() throws JWNLException {
+        if(session("userFirstName") == null) return ok(index.render(null));
         return ok(createSimplePassage.render(form(SimplePassageData.class)));
     }
 
     public Result createPassageHTML(String text, String title, String source) {
+        if(session("userFirstName") == null) return ok(index.render(null));
 
-            SimplePassage p = new SimplePassage(text, title, source);
+        SimplePassage p = new SimplePassage(text, title, source);
 
             Map<String, String[]> parameters = request().body().asFormUrlEncoded();
 
 
             String html = parameters.get("html")[0];
+
+
+
+
+
+            for(int count = 0; count < parameters.get("names").length; count++){
+                JsonNode names = Json.parse(parameters.get("names")[count]);
+
+
+                PassageTag newTag = new PassageTag(parameters.get("names")[count].substring(5, parameters.get("names")[count].lastIndexOf("<")), parameters.get("descs")[count].substring(5, parameters.get("descs")[count].lastIndexOf("<")), parameters.get("jtags")[count].substring(5, parameters.get("jtags")[count].lastIndexOf("<")));
+                p.tags = new HashSet<PassageTag>();
+                p.tags.add(newTag);
+                p.save();
+            }
 
 
             PassageText pt = new PassageText(0, html);
@@ -49,11 +70,13 @@ public class SimplePassageController extends Controller {
 
     // QUESTION CREATION
     public Result setNumQuestions(Long passageId) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         return ok(setNumberOfQuestionsForPassage.render(form(SimplePassageNumQuestionsData.class), passageId));
     }
 
     public Result setNumQuestions_submit() {
 
+        if(session("userFirstName") == null) return ok(index.render(null));
         Form<SimplePassageNumQuestionsData> createSPForm = form(SimplePassageNumQuestionsData.class).bindFromRequest();
 
         if (createSPForm.hasErrors()) {
@@ -209,6 +232,7 @@ public class SimplePassageController extends Controller {
 
 
     public Result editQuestions(Long passageId) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         SimplePassage passage = SimplePassage.byId(passageId);
         if (passage == null) {
             return redirect(routes.SimplePassageController.viewAllPassages());
@@ -239,7 +263,7 @@ public class SimplePassageController extends Controller {
     }
 
     public Result editQuestions_submit(Long passageId) {
-
+        if(session("userFirstName") == null) return ok(index.render(null));
         Form<SimplePassageNumQuestionsData> createSPForm = form(SimplePassageNumQuestionsData.class).bindFromRequest();
 
         if (createSPForm.hasErrors()) {
@@ -346,6 +370,7 @@ public class SimplePassageController extends Controller {
 
 
     public Result edit_submit(Long passageId) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         SimplePassage passage = SimplePassage.byId(passageId);
         if (passage == null) {
             return redirect(routes.SimplePassageController.viewAllPassages());
@@ -377,10 +402,11 @@ public class SimplePassageController extends Controller {
         passage.save();
 
         flash("success", "Modified Passage details have been saved.");
-        return redirect(routes.SimplePassageController.view(passageId, passage.grade));
+        return redirect(routes.SimplePassageController.viewS(passageId, passage.grade));
     }
 
     public Result editPassage(Long passageId, int grade) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         SimplePassage passage = SimplePassage.byId(passageId);
         if (passage == null) {
             return redirect(routes.SimplePassageController.viewAllPassages());
@@ -391,24 +417,10 @@ public class SimplePassageController extends Controller {
         form = form.fill(data);
         return ok(editSimplePassageAtGrade.render(form, passageId, grade));
     }
-
-
-    public Result view(Long passageId, int grade) {
-        User user = User.byId(session("userId"));
-        if (user == null) {
-            return ok(index.render(session("userFirstName")));
-        }
-
-        SimplePassage passage = SimplePassage.byId(passageId);
-
-        if (grade >= 0) {
-            passage.grade = grade;
-        } else passage.grade = 0;
-
-        return ok(viewPassage.render(passage, User.byId(passage.instructorID), false));
-    }
+    
 
     public Result viewS(Long passageId, int grade) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         User user = User.byId(session("userId"));
         if (user == null) {
             return ok(index.render(session("userFirstName")));
@@ -438,11 +450,13 @@ public class SimplePassageController extends Controller {
 */
 
     public Result viewAllPassageTags(List<PassageTag> tags) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         return ok(viewAllPassageTags.render(PassageTag.all()));
     }
 
 
     public Result createSimplePassage_submit() {
+        if(session("userFirstName") == null) return ok(index.render(null));
         Form<SimplePassageData> createSPForm = form(SimplePassageData.class).bindFromRequest();
 
         if (createSPForm.hasErrors()) {
@@ -500,6 +514,7 @@ public class SimplePassageController extends Controller {
 
 
     public Result analyzePassages() throws JWNLException {
+        if(session("userFirstName") == null) return ok(index.render(null));
         for (SimplePassage p : SimplePassage.all()) {
 
             if(!p.analyzed){
@@ -534,39 +549,6 @@ public class SimplePassageController extends Controller {
         flash("success", "Passage Analysis Completed.");
         return ok("true");
     }
-
-
-    /*
-
-    public Result analyzePassages() throws JWNLException {
-        for (SimplePassage p : SimplePassage.all()) {
-            String[] sentences = p.text.split(" ");
-
-            String portion = "";
-
-            int sCounter = 0;
-
-            for (int i = 0; i < sentences.length; i++) {
-                portion += sentences[i] + " ";
-                if (sentences[i].indexOf(". ") >= 0) {
-                    sCounter++;
-
-                }
-                if (sCounter == 10 || (i + 1) == sentences.length) {
-                    if (parsingController == null) parsingController = new ParsingController();
-                    parsingController.parse(p, portion);
-                    portion = "";
-                    sCounter = 0;
-                }
-            }
-
-            p.save();
-        }
-
-        flash("success", "Passage Analysis Completed.");
-        return ok("true");
-    }
-     */
 
 
     HashMap<String, String> sugMap = new HashMap<String, String>();
@@ -636,6 +618,7 @@ public class SimplePassageController extends Controller {
 
 
     public Result acceptWord(String word, int grade) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         Word thisWord = Word.byLemma(word);
         if (thisWord != null) {
             thisWord.ageOfAcquisition = grade + 6;
@@ -647,6 +630,7 @@ public class SimplePassageController extends Controller {
     }
 
     public Result replaceWord(Long passageId, String word, String replacement) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         SimplePassage p = SimplePassage.byId(passageId);
 
         try {
@@ -690,6 +674,7 @@ public class SimplePassageController extends Controller {
     }
 
     public Result getSuggestions(String word) {
+        if(session("userFirstName") == null) return ok(index.render(null));
 
         word = word.replace("<span>", "");
         word = word.replace("</span>", "");
@@ -723,7 +708,7 @@ public class SimplePassageController extends Controller {
     }
 
     public Result viewAllPassages() {
-
+        if(session("userFirstName") == null) return ok(index.render(null));
         Long instId = Long.valueOf((session("userId")));
         User inst = User.byId(instId);
         List<SimplePassage> pList = SimplePassage.byInstructorId(instId);
@@ -732,6 +717,7 @@ public class SimplePassageController extends Controller {
     }
 
     public Result viewAllPassagesWithTag(String name) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         Long instId = Long.valueOf((session("userId")));
         User inst = User.byId(instId);
         List<SimplePassage> pList = SimplePassage.byInstructorId(instId);
@@ -740,6 +726,7 @@ public class SimplePassageController extends Controller {
     }
 
     public Result deletePassage(Long passageId) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         SimplePassage a = SimplePassage.byId(passageId);
 
         System.out.println("PASSAGEID: " + passageId);
@@ -772,7 +759,7 @@ public class SimplePassageController extends Controller {
 
     	System.out.println("Records should be deleted");
 		 */
-        a.delete("");
+        a.delete();
 
 
         return ok("true");
@@ -780,6 +767,7 @@ public class SimplePassageController extends Controller {
 
     // do we possible need to clean up response here?? are they unreachable
     public Result deletePassageQuestion(Long questionId) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         PassageQuestion a = PassageQuestion.byId(questionId);
 
         if (a == null) {
@@ -796,6 +784,7 @@ public class SimplePassageController extends Controller {
     }
 
     public Result deletePassageQuestionChoice(Long choiceId) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         PassageQuestionChoice a = PassageQuestionChoice.byId(choiceId);
 
         if (a == null) {
@@ -812,11 +801,13 @@ public class SimplePassageController extends Controller {
     }
 
     public Result answerPassageQuestions(Long passageId) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         return ok(answerPassageQuestions.render(form(PassageQuestionAnswerData.class), passageId));
     }
 
 
     public Result answerPassageQuestions_submit(Long passageId) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         SimplePassage passage = SimplePassage.byId(passageId);
         if (passage == null) {
             return redirect(routes.SimplePassageController.answerPassageQuestions(passageId));
@@ -886,6 +877,7 @@ public class SimplePassageController extends Controller {
     }
 
     public Result viewPassageQuestionAnswers(Long passageId) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         Long instId = Long.valueOf((session("userId")));
         User inst = User.byId(instId);
 
@@ -929,6 +921,7 @@ public class SimplePassageController extends Controller {
 
 
     public Result beginSentenceBreakdown(Long passageId, int grade) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         System.out.println("Begin");
         SimplePassage p = SimplePassage.byId(passageId);
 
@@ -1006,6 +999,7 @@ public class SimplePassageController extends Controller {
     ArrayList<Double> diffCache;
 
     public Result singularSentenceBreakdown(Long passageId, int grade, String sentence) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         SimplePassage p = SimplePassage.byId(passageId);
         if(diffCache == null) diffCache = getDifficulties(p);
 
@@ -1118,6 +1112,7 @@ public class SimplePassageController extends Controller {
 
 
     public Result checkSentence(String sentence, int grade, Long passageId) {
+        if(session("userFirstName") == null) return ok(index.render(null));
         return singularSentenceBreakdown(passageId, grade, sentence);
     }
 
@@ -1132,7 +1127,7 @@ public class SimplePassageController extends Controller {
 
 
     public Result checkWord(String word, int grade, Long passageId) {
-
+        if(session("userFirstName") == null) return ok(index.render(null));
 
         word = trimHTMLChars(word);
 
