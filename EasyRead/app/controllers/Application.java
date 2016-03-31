@@ -54,6 +54,11 @@ public class Application extends Controller {
         return ok(index.render(null));
     }
 
+    public void setAnalyzing(){
+        session("analyzing", "true");
+
+    }
+
     public Result login_submit() throws NoSuchAlgorithmException, InvalidKeySpecException {
         Form<LoginForm> loginForm = form(LoginForm.class).bindFromRequest();
 
@@ -90,7 +95,8 @@ public class Application extends Controller {
                         controllers.routes.javascript.SimplePassageController.savePassageHtml(),
                         controllers.routes.javascript.SimplePassageController.checkWord(),
                         controllers.routes.javascript.SimplePassageController.checkSentence(),
-                        controllers.routes.javascript.SimplePassageController.createPassageHTML()
+                        controllers.routes.javascript.SimplePassageController.createPassageHTML(),
+                        controllers.routes.javascript.SimplePassageController.isAnalyzing()
                         /*,
                         controllers.routes.javascript.SimplePassageController.deletePassageQuestion()
                         controllers.routes.javascript.SimplePassageController.deletePassageQuestionChoice()*/

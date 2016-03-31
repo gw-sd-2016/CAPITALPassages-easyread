@@ -41,13 +41,12 @@
                                     <td><strong> @PassageQuestionPrompt.byPassageQuestion(q.id).get(0).text </strong></td>
 
                                     @for(rec <- PassageQuestionRecord.byPassageQuestionId(q.id)) {
-                                        @if(inst.id == rec.user.id || User.byId(inst.id).creatorId == rec.user.id) {
-
-
-                                            <td>@PassageQuestionAnswer.byPassageQuestionChoice(PassageQuestionChoice.byId(rec.responses.toList.reverse.head.entity_id).id).get(0).text</td>
-                                            <td>@q.correctAnswer.equals(PassageQuestionAnswer.byPassageQuestionChoice(PassageQuestionChoice.byId(rec.responses.toList.reverse.head.entity_id).id).get(0).text) </td>
-
-                                        }
+                                        <td>@PassageQuestionAnswer.byPassageQuestionChoice(PassageQuestionChoice.byId(rec.responses.filterNot(x => x.submitter == inst.id).toList.reverse.head.entity_id).id).get(0).text</td>
+                                        <td>@if(q.correctAnswer.equals(PassageQuestionAnswer.byPassageQuestionChoice(PassageQuestionChoice.byId(rec.responses.filterNot(x => x.submitter == inst.id).toList.reverse.head.entity_id).id).get(0).text)){
+                                            Correct
+                                        } else {
+                                            Incorrect
+                                        }</td>
                                     }
 
                                     <td>

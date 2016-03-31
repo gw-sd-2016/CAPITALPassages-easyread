@@ -25,6 +25,7 @@ public class SimplePassageController extends Controller {
     private ParsingController parsingController;
     private PassageAnalysisController analysisController;
     private ArrayList<Double> difficultiesCache;
+    public boolean inProgress = false;
 
     // New Passage Methods
     public Result createSimplePassage() throws JWNLException {
@@ -527,8 +528,14 @@ public class SimplePassageController extends Controller {
     }
 
 
+    public Result isAnalyzing(){
+        if(inProgress) return ok("prog");
+        else return ok("fine");
+    }
+
     public Result analyzePassages() throws JWNLException {
         if(session("userFirstName") == null) return ok(index.render(null));
+        this.inProgress = true;
         for (SimplePassage p : SimplePassage.all()) {
 
             if(!p.analyzed){
@@ -558,8 +565,9 @@ public class SimplePassageController extends Controller {
 
                 p.save();
             }
-        }
 
+        }
+        this.inProgress = false;
         flash("success", "Passage Analysis Completed.");
         return ok("true");
     }
@@ -862,8 +870,8 @@ public class SimplePassageController extends Controller {
                         }
                     }
 
-
                     PassageQuestionResponse res = new PassageQuestionResponse(Long.valueOf(id), null);
+                    res.submitter = User.byId(userID);
                     thisQ.responses.add(res);
                     thisQ.save();
                 } else {
@@ -885,7 +893,10 @@ public class SimplePassageController extends Controller {
                         }
                     }
 
-                    thisQ.responses.add(new PassageQuestionResponse(Long.valueOf(id), null));
+
+                    PassageQuestionResponse newPQRes = new PassageQuestionResponse(Long.valueOf(id), null);
+                    newPQRes.submitter = User.byId(session("userId"));
+                    thisQ.responses.add(newPQRes);
                     thisQ.save();
                 }
             }
