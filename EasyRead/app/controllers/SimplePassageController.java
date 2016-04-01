@@ -52,7 +52,8 @@ public class SimplePassageController extends Controller {
             int begin = str.indexOf("[") + 1;
             for(int i = begin ; i < arr.length; i++){
                 if(arr[i] == ',' || i + 1 == arr.length){
-                    tags.add(str.substring(begin, i));
+                    tags.add(str.substring(begin, i).replace("\"", ""));
+                    begin = i + 1;
                 }
             }
 
