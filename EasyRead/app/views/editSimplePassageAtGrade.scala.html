@@ -27,7 +27,12 @@
         <div class="pull-right">
 
 
+
+
+
+
             <div class="btn-group">
+
                 <h5>Choose The Grade Level this passage should be edited at</h5>
                 <div class="dropdown">
                     <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
@@ -92,6 +97,21 @@
                                 This page shows Suggestions to make this passage readable for a @if(grade == 0) { Kindergarten } @if(grade >= 12) { College Level } else {
                                 @if(grade > 0) { Grade @grade}
                             }reader</strong>
+
+
+                            <div>
+                        @if(!routes.SimplePassageController.isAnalyzing.equals("prog")){
+                            <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
+                                <i id="spinner" class="glyphicon glyphicon-refresh"></i> Analyze
+                            </button>
+                        } else {
+                            <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
+                                <i id="spinner" class="glyphicon glyphicon-refresh glyphicon-spin"></i> Analyze
+                            </button>
+                        }
+
+                    </div>
+
 
                     <h4>Title</h4>
                         <input type="text" name="passageTitle" placeholder="Passage Title" value="@form("passageTitle").value">
@@ -677,6 +697,40 @@
 
                         }
                     });
+                }
+
+                $('button#analyzePassages').click(function() {
+                    var button = $(this);
+                    button.toggleClass('active');
+
+
+                    var result = confirm("Are you sure you want to analyze this passage? This may take a couple minutes");
+
+                    if (result) {
+                        switchSpinner();
+                        jsRoutes.controllers.SimplePassageController.analyzeSingularPassage(@passageId).ajax({
+                            success : function(data) {
+                                window.location.reload();
+                            },
+                            error : function(err) {
+                                //window.location = "";
+                            }
+                        });
+                    }
+
+                });
+
+
+                function switchSpinner(){
+                    var on = "glyphicon glyphicon-refresh glyphicon-spin";
+                    var off = "glyphicon glyphicon-refresh";
+
+
+                    document.getElementsByTagName()
+                    var elem = document.getElementById("spinner");
+
+                    if(elem.className.substring(elem.className.length - 4) == "spin") elem.className = off;
+                    else elem.className = on;
                 }
 
 

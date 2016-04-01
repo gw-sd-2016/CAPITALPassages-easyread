@@ -46,7 +46,8 @@ GET        /checkW                                   controllers.SimplePassageCo
 GET        /checkS                                   controllers.SimplePassageController.checkSentence(sentence : String, grade : Int, passageId : Long)
 POST       /createPHT                              controllers.SimplePassageController.createPassageHTML(text : String, title : String, source : String)
 GET        /inProg                                controllers.SimplePassageController.isAnalyzing()
-
+GET        /analyzeS                                controllers.SimplePassageController.analyzeSingularPassage(passageId : Long)
+GET        /loggedInId                              controllers.Application.getLoggedInUserId()
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                         controllers.Assets.at(path="/public", file)

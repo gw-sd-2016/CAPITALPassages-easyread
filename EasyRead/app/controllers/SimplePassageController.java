@@ -36,7 +36,9 @@ public class SimplePassageController extends Controller {
     public Result createPassageHTML(String text, String title, String source) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
-        SimplePassage p = new SimplePassage(text, title, source);
+
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            SimplePassage p = new SimplePassage(text, title, source);
 
             Map<String, String[]> parameters = request().body().asFormUrlEncoded();
 
@@ -73,107 +75,121 @@ public class SimplePassageController extends Controller {
 
             p.save();
             return viewAllPassages();
+        } else {
+            return ok(index.render(session("userFirstName")));
+        }
+
+
     }
 
     // QUESTION CREATION
     public Result setNumQuestions(Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
-        return ok(setNumberOfQuestionsForPassage.render(form(SimplePassageNumQuestionsData.class), passageId));
+
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            return ok(setNumberOfQuestionsForPassage.render(form(SimplePassageNumQuestionsData.class), passageId));
+        } else {
+            return ok(index.render(session("userFirstName")));
+        }
+
     }
 
     public Result setNumQuestions_submit() {
 
         if(session("userFirstName") == null) return ok(index.render(null));
-        Form<SimplePassageNumQuestionsData> createSPForm = form(SimplePassageNumQuestionsData.class).bindFromRequest();
-
-        if (createSPForm.hasErrors()) {
-            return badRequest(setNumberOfQuestionsForPassage.render(createSPForm, createSPForm.get().passageId));
-        }
-
-        SimplePassage passage = SimplePassage.byId(createSPForm.get().passageId);
-
-        if (passage.questions == null) passage.questions = new HashSet<PassageQuestion>();
 
 
-        // getting what the next questionId will be
-        Long qID = Long.valueOf("0");
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            Form<SimplePassageNumQuestionsData> createSPForm = form(SimplePassageNumQuestionsData.class).bindFromRequest();
 
-        for (PassageQuestion pq : PassageQuestion.find.all()) {
-            if (pq.id > qID) qID = pq.id;
+            if (createSPForm.hasErrors()) {
+                return badRequest(setNumberOfQuestionsForPassage.render(createSPForm, createSPForm.get().passageId));
+            }
 
-        }
+            SimplePassage passage = SimplePassage.byId(createSPForm.get().passageId);
 
-
-        // getting what the next choiceId Will be.
-        Long cID = Long.valueOf("0");
-        for (PassageQuestionChoice c : PassageQuestionChoice.find.all()) {
-            if (c.id > cID) cID = c.id;
-        }
-        cID++;
-        qID++;
-
-        System.out.println("Question ID: " + qID);
+            if (passage.questions == null) passage.questions = new HashSet<PassageQuestion>();
 
 
-        for (int i = 0; i < createSPForm.get().questions.size(); i++) {
-            if (i != 0) cID++;
+            // getting what the next questionId will be
+            Long qID = Long.valueOf("0");
 
-            String a = createSPForm.get().questions.get(i);
-
-            PassageQuestion q = new PassageQuestion(createSPForm.get().passageId, true);
-
-            q.position = passage.questions.size();
-
-            PassageQuestionPrompt testPrompt = new PassageQuestionPrompt(q, a);
-            testPrompt.questionId = qID + i;
-
-            testPrompt.save();
-
-            q.prompt = testPrompt;
-
-            q.choices = new HashSet<PassageQuestionChoice>();
-
-            for (int c = 0; c < createSPForm.get().choices.get(i).size(); c++) {
-                PassageQuestionChoice w = new PassageQuestionChoice();
-
-
-                if (createSPForm.get().correctAnswers.size() > 0 && createSPForm.get().correctAnswers.get(i).equals(String.valueOf(c))) {
-                    w.correct = true;
-                    q.correctAnswer = createSPForm.get().choices.get(i).get(c);
-                } else {
-                    w.correct = createSPForm.get().correctAnswers.size() == 0 && createSPForm.get().choices.get(i).size() == 1;
-                }
-                w.active = true;
-                w.position = c;
-
-                PassageQuestionAnswer answer = new PassageQuestionAnswer(w, createSPForm.get().choices.get(i).get(c));
-                if (c == 0) {
-                    cID = cID + c;
-                    answer.choiceId = cID;
-                } else answer.choiceId = ++cID;
-
-                answer.save();
-                w.answer = answer;
-
-                q.choices.add(w);
+            for (PassageQuestion pq : PassageQuestion.find.all()) {
+                if (pq.id > qID) qID = pq.id;
 
             }
 
 
-            passage.questions.add(q);
+            // getting what the next choiceId Will be.
+            Long cID = Long.valueOf("0");
+            for (PassageQuestionChoice c : PassageQuestionChoice.find.all()) {
+                if (c.id > cID) cID = c.id;
+            }
+            cID++;
+            qID++;
+
+            System.out.println("Question ID: " + qID);
 
 
-        }
+            for (int i = 0; i < createSPForm.get().questions.size(); i++) {
+                if (i != 0) cID++;
+
+                String a = createSPForm.get().questions.get(i);
+
+                PassageQuestion q = new PassageQuestion(createSPForm.get().passageId, true);
+
+                q.position = passage.questions.size();
+
+                PassageQuestionPrompt testPrompt = new PassageQuestionPrompt(q, a);
+                testPrompt.questionId = qID + i;
+
+                testPrompt.save();
+
+                q.prompt = testPrompt;
+
+                q.choices = new HashSet<PassageQuestionChoice>();
+
+                for (int c = 0; c < createSPForm.get().choices.get(i).size(); c++) {
+                    PassageQuestionChoice w = new PassageQuestionChoice();
 
 
-        System.out.println("Size : " + passage.questions.size());
+                    if (createSPForm.get().correctAnswers.size() > 0 && createSPForm.get().correctAnswers.get(i).equals(String.valueOf(c))) {
+                        w.correct = true;
+                        q.correctAnswer = createSPForm.get().choices.get(i).get(c);
+                    } else {
+                        w.correct = createSPForm.get().correctAnswers.size() == 0 && createSPForm.get().choices.get(i).size() == 1;
+                    }
+                    w.active = true;
+                    w.position = c;
+
+                    PassageQuestionAnswer answer = new PassageQuestionAnswer(w, createSPForm.get().choices.get(i).get(c));
+                    if (c == 0) {
+                        cID = cID + c;
+                        answer.choiceId = cID;
+                    } else answer.choiceId = ++cID;
+
+                    answer.save();
+                    w.answer = answer;
+
+                    q.choices.add(w);
+
+                }
 
 
-        passage.save();
+                passage.questions.add(q);
 
 
-        // resolve question ids
-        // if there were 3 questions created then get the last 3 prompts
+            }
+
+
+            System.out.println("Size : " + passage.questions.size());
+
+
+            passage.save();
+
+
+            // resolve question ids
+            // if there were 3 questions created then get the last 3 prompts
 
 
 
@@ -234,215 +250,253 @@ public class SimplePassageController extends Controller {
 		 */
 
 
-        return ok(viewPassageQuestions.render(passage.id));
+            return ok(viewPassageQuestions.render(passage.id));
+
+        } else {
+            return ok(index.render(session("userFirstName")));
+        }
+
     }
 
 
     public Result editQuestions(Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
-        SimplePassage passage = SimplePassage.byId(passageId);
-        if (passage == null) {
-            return redirect(routes.SimplePassageController.viewAllPassages());
-        }
-
-        //questions, choices, corect answers
-        ArrayList<String> q = new ArrayList<String>();
-        ArrayList<ArrayList<String>> c = new ArrayList<ArrayList<String>>();
-        ArrayList<String> ca = new ArrayList<String>();
 
 
-        for (PassageQuestion pq : passage.questions) {
-            q.add(PassageQuestionPrompt.byPassageQuestion(pq.id).get(0).text);
-            ArrayList<String> thisQList = new ArrayList<String>();
-            for (PassageQuestionChoice pqc : pq.choices) {
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
 
-                thisQList.add(PassageQuestionAnswer.byPassageQuestionChoice(pqc.id).get(0).text);
-                if (pqc.correct) ca.add(String.valueOf(pqc.position));
+
+            SimplePassage passage = SimplePassage.byId(passageId);
+            if (passage == null) {
+                return redirect(routes.SimplePassageController.viewAllPassages());
             }
+
+            //questions, choices, corect answers
+            ArrayList<String> q = new ArrayList<String>();
+            ArrayList<ArrayList<String>> c = new ArrayList<ArrayList<String>>();
+            ArrayList<String> ca = new ArrayList<String>();
+
+
+            for (PassageQuestion pq : passage.questions) {
+                q.add(PassageQuestionPrompt.byPassageQuestion(pq.id).get(0).text);
+                ArrayList<String> thisQList = new ArrayList<String>();
+                for (PassageQuestionChoice pqc : pq.choices) {
+
+                    thisQList.add(PassageQuestionAnswer.byPassageQuestionChoice(pqc.id).get(0).text);
+                    if (pqc.correct) ca.add(String.valueOf(pqc.position));
+                }
+            }
+
+            SimplePassageNumQuestionsData data = new SimplePassageNumQuestionsData(passageId, q, c, ca);
+            Form<SimplePassageNumQuestionsData> form = Form.form(SimplePassageNumQuestionsData.class);
+            form = form.fill(data);
+
+            return ok(editPassageQuestions.render(form, passageId));
+        } else {
+            return ok(index.render(session("userFirstName")));
         }
 
-        SimplePassageNumQuestionsData data = new SimplePassageNumQuestionsData(passageId, q, c, ca);
-        Form<SimplePassageNumQuestionsData> form = Form.form(SimplePassageNumQuestionsData.class);
-        form = form.fill(data);
 
-        return ok(editPassageQuestions.render(form, passageId));
 
     }
 
     public Result editQuestions_submit(Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
-        Form<SimplePassageNumQuestionsData> createSPForm = form(SimplePassageNumQuestionsData.class).bindFromRequest();
-
-        if (createSPForm.hasErrors()) {
-            return badRequest(setNumberOfQuestionsForPassage.render(createSPForm, createSPForm.get().passageId));
-        }
-
-        SimplePassage passage = SimplePassage.byId(createSPForm.get().passageId);
 
 
-        // cleanup previous Qs
-        for (PassageQuestion pq : passage.questions) {
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            Form<SimplePassageNumQuestionsData> createSPForm = form(SimplePassageNumQuestionsData.class).bindFromRequest();
 
-            for (PassageQuestionChoice pqc : pq.choices) {
-                PassageQuestionAnswer.byPassageQuestionChoice(pqc.id).get(0).delete("");
+            if (createSPForm.hasErrors()) {
+                return badRequest(setNumberOfQuestionsForPassage.render(createSPForm, createSPForm.get().passageId));
             }
 
-            PassageQuestionPrompt.byPassageQuestion(pq.id).get(0).delete("");
+            SimplePassage passage = SimplePassage.byId(createSPForm.get().passageId);
 
 
-            pq.delete(""); // takes care of questions and choices
+            // cleanup previous Qs
+            for (PassageQuestion pq : passage.questions) {
 
-        }
-
-
-        passage.questions = new HashSet<PassageQuestion>();
-
-
-        // getting what the next questionId will be
-        Long qID = Long.valueOf("0");
-
-        for (PassageQuestion pq : PassageQuestion.find.all()) {
-            if (pq.id > qID) qID = pq.id;
-
-        }
-
-
-        // getting what the next choiceId Will be.
-        Long cID = Long.valueOf("0");
-        for (PassageQuestionChoice c : PassageQuestionChoice.find.all()) {
-            if (c.id > cID) cID = c.id;
-        }
-        cID++;
-        qID++;
-
-        System.out.println("Question ID: " + qID);
-
-        for (int i = 0; i < createSPForm.get().questions.size(); i++) {
-            if (i != 0) cID++;
-
-            String a = createSPForm.get().questions.get(i);
-
-            PassageQuestion q = new PassageQuestion(createSPForm.get().passageId, true);
-
-            q.position = passage.questions.size();
-
-            PassageQuestionPrompt testPrompt = new PassageQuestionPrompt(q, a);
-            testPrompt.questionId = qID + i;
-
-            testPrompt.save();
-
-            q.prompt = testPrompt;
-
-            q.choices = new HashSet<PassageQuestionChoice>();
-
-            for (int c = 0; c < createSPForm.get().choices.get(i).size(); c++) {
-                PassageQuestionChoice w = new PassageQuestionChoice();
-
-
-                if (createSPForm.get().correctAnswers.size() > 0 && createSPForm.get().correctAnswers.get(i).equals(String.valueOf(c))) {
-                    w.correct = true;
-                } else {
-                    w.correct = createSPForm.get().correctAnswers.size() == 0 && createSPForm.get().choices.get(i).size() == 1;
+                for (PassageQuestionChoice pqc : pq.choices) {
+                    PassageQuestionAnswer.byPassageQuestionChoice(pqc.id).get(0).delete("");
                 }
-                w.active = true;
-                w.position = c;
 
-                PassageQuestionAnswer answer = new PassageQuestionAnswer(w, createSPForm.get().choices.get(i).get(c));
-                if (c == 0) {
-                    cID = cID + c;
-                    answer.choiceId = cID;
-                } else answer.choiceId = ++cID;
+                PassageQuestionPrompt.byPassageQuestion(pq.id).get(0).delete("");
 
-                answer.save();
-                w.answer = answer;
 
-                q.choices.add(w);
+                pq.delete(""); // takes care of questions and choices
 
             }
 
 
-            passage.questions.add(q);
+            passage.questions = new HashSet<PassageQuestion>();
 
 
+            // getting what the next questionId will be
+            Long qID = Long.valueOf("0");
+
+            for (PassageQuestion pq : PassageQuestion.find.all()) {
+                if (pq.id > qID) qID = pq.id;
+
+            }
+
+
+            // getting what the next choiceId Will be.
+            Long cID = Long.valueOf("0");
+            for (PassageQuestionChoice c : PassageQuestionChoice.find.all()) {
+                if (c.id > cID) cID = c.id;
+            }
+            cID++;
+            qID++;
+
+            System.out.println("Question ID: " + qID);
+
+            for (int i = 0; i < createSPForm.get().questions.size(); i++) {
+                if (i != 0) cID++;
+
+                String a = createSPForm.get().questions.get(i);
+
+                PassageQuestion q = new PassageQuestion(createSPForm.get().passageId, true);
+
+                q.position = passage.questions.size();
+
+                PassageQuestionPrompt testPrompt = new PassageQuestionPrompt(q, a);
+                testPrompt.questionId = qID + i;
+
+                testPrompt.save();
+
+                q.prompt = testPrompt;
+
+                q.choices = new HashSet<PassageQuestionChoice>();
+
+                for (int c = 0; c < createSPForm.get().choices.get(i).size(); c++) {
+                    PassageQuestionChoice w = new PassageQuestionChoice();
+
+
+                    if (createSPForm.get().correctAnswers.size() > 0 && createSPForm.get().correctAnswers.get(i).equals(String.valueOf(c))) {
+                        w.correct = true;
+                    } else {
+                        w.correct = createSPForm.get().correctAnswers.size() == 0 && createSPForm.get().choices.get(i).size() == 1;
+                    }
+                    w.active = true;
+                    w.position = c;
+
+                    PassageQuestionAnswer answer = new PassageQuestionAnswer(w, createSPForm.get().choices.get(i).get(c));
+                    if (c == 0) {
+                        cID = cID + c;
+                        answer.choiceId = cID;
+                    } else answer.choiceId = ++cID;
+
+                    answer.save();
+                    w.answer = answer;
+
+                    q.choices.add(w);
+
+                }
+
+
+                passage.questions.add(q);
+
+
+            }
+
+
+            System.out.println("Size : " + passage.questions.size());
+
+
+            passage.save();
+
+            return ok(viewPassageQuestions.render(passage.id));
+        } else {
+            return ok(index.render(session("userFirstName")));
         }
-
-
-        System.out.println("Size : " + passage.questions.size());
-
-
-        passage.save();
-
-        return ok(viewPassageQuestions.render(passage.id));
     }
 
 
     public Result edit_submit(Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
-        SimplePassage passage = SimplePassage.byId(passageId);
-        if (passage == null) {
-            return redirect(routes.SimplePassageController.viewAllPassages());
+
+
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+
+            SimplePassage passage = SimplePassage.byId(passageId);
+            if (passage == null) {
+                return redirect(routes.SimplePassageController.viewAllPassages());
+            }
+
+            Form<SimplePassageData> form = Form.form(SimplePassageData.class).bindFromRequest();
+
+            if (form.hasErrors()) {
+                return badRequest(editSimplePassageAtGrade.render(form, passageId, SimplePassage.byId(passageId).grade));
+            }
+
+
+            SimplePassageData data = form.get();
+
+            PassageText current = PassageText.bySimplePassageAndGrade(passageId, data.grade);
+            current.html = data.passageText;
+
+
+            passage.text = data.passageText;
+            passage.grade = data.grade;
+            passage.source = data.source;
+
+            passage.title = data.passageTitle;
+
+
+            passage.sentences = null;
+
+
+            passage.save();
+
+            flash("success", "Modified Passage details have been saved.");
+            return redirect(routes.SimplePassageController.viewS(passageId, passage.grade));
+        } else {
+            return ok(index.render(session("userFirstName")));
         }
 
-        Form<SimplePassageData> form = Form.form(SimplePassageData.class).bindFromRequest();
-
-        if (form.hasErrors()) {
-            return badRequest(editSimplePassageAtGrade.render(form, passageId, SimplePassage.byId(passageId).grade));
-        }
-
-
-        SimplePassageData data = form.get();
-
-        PassageText current = PassageText.bySimplePassageAndGrade(passageId, data.grade);
-        current.html = data.passageText;
-
-
-        passage.text = data.passageText;
-        passage.grade = data.grade;
-        passage.source = data.source;
-
-        passage.title = data.passageTitle;
-
-
-        passage.sentences = null;
-
-
-        passage.save();
-
-        flash("success", "Modified Passage details have been saved.");
-        return redirect(routes.SimplePassageController.viewS(passageId, passage.grade));
     }
 
     public Result editPassage(Long passageId, int grade) {
         if(session("userFirstName") == null) return ok(index.render(null));
-        SimplePassage passage = SimplePassage.byId(passageId);
-        if (passage == null) {
-            return redirect(routes.SimplePassageController.viewAllPassages());
-        }
 
-        SimplePassageData data = new SimplePassageData(passage.text, passage.title, 1, "category", passage.source);
-        Form<SimplePassageData> form = Form.form(SimplePassageData.class);
-        form = form.fill(data);
-        return ok(editSimplePassageAtGrade.render(form, passageId, grade));
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            SimplePassage passage = SimplePassage.byId(passageId);
+            if (passage == null) {
+                return redirect(routes.SimplePassageController.viewAllPassages());
+            }
+
+            SimplePassageData data = new SimplePassageData(passage.text, passage.title, 1, "category", passage.source);
+            Form<SimplePassageData> form = Form.form(SimplePassageData.class);
+            form = form.fill(data);
+            return ok(editSimplePassageAtGrade.render(form, passageId, grade));
+        } else {
+            return ok(index.render(session("userFirstName")));
+        }
     }
 
 
     public Result viewS(Long passageId, int grade) {
         if(session("userFirstName") == null) return ok(index.render(null));
-        User user = User.byId(session("userId"));
 
 
-        if(user.type == User.Role.STUDENT) return viewAsStudent(passageId, grade);
-        if (user == null) {
-            return ok(index.render(session("userFirstName")));
-        }
+            User user = User.byId(session("userId"));
 
-        SimplePassage passage = SimplePassage.byId(passageId);
 
-        if (grade >= 0) {
-            passage.grade = grade;
-        } else passage.grade = 0;
+            if(user.type == User.Role.STUDENT) return viewAsStudent(passageId, grade);
+            if (user == null) {
+                return ok(index.render(session("userFirstName")));
+            }
 
-        return ok(viewPassageWithSuggestions.render(passage, User.byId(passage.instructorID), true));
+            SimplePassage passage = SimplePassage.byId(passageId);
+
+            if (grade >= 0) {
+                passage.grade = grade;
+            } else passage.grade = 0;
+
+            return ok(viewPassageWithSuggestions.render(passage, User.byId(passage.instructorID), true));
+
+
     }
 
 
@@ -555,6 +609,53 @@ public class SimplePassageController extends Controller {
     }
 
 
+    public Result analyzeSingularPassage(Long passageId) throws JWNLException {
+        if(session("userFirstName") == null) return ok(index.render(null));
+
+        this.inProgress = true;
+
+        SimplePassage p = SimplePassage.byId(passageId);
+
+        if(p != null) {
+            if(!p.analyzed){
+                parseAndAddSuggestions(p);
+
+                if(p.htmlRepresentations != null){
+                    for(PassageText pt : p.htmlRepresentations) pt.delete();
+                }
+
+
+
+                p.htmlRepresentations = new HashSet<PassageText>();
+
+                this.difficultiesCache = getDifficulties(p);
+
+                for (int i = 0; i < 14; i++) {
+                    generatePassageTextAtGrade(p.id, i);
+                    beginSentenceBreakdown(p.id, i);
+                }
+
+
+
+                p.analyzed = true;
+
+
+                parsingController.reviseSuggestions();
+
+                p.save();
+
+            }
+            this.inProgress = false;
+            flash("success", "Passage Analysis Completed.");
+            return ok("true");
+        } else {
+            this.inProgress = false;
+            return badRequest();
+        }
+
+
+    }
+
     HashMap<String, String> sugMap = new HashMap<String, String>();
     String[] split;
 
@@ -623,28 +724,39 @@ public class SimplePassageController extends Controller {
 
     public Result acceptWord(String word, int grade) {
         if(session("userFirstName") == null) return ok(index.render(null));
-        Word thisWord = Word.byLemma(word);
-        if (thisWord != null) {
-            thisWord.ageOfAcquisition = grade + 6;
-            thisWord.save();
-            flash("success", "We'll remember that word is okay!");
-            return ok();
+
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            Word thisWord = Word.byLemma(word);
+            if (thisWord != null) {
+                thisWord.ageOfAcquisition = grade + 6;
+                thisWord.save();
+                flash("success", "We'll remember that word is okay!");
+                return ok();
+            }
         }
+
         return badRequest();
     }
 
     public Result replaceWord(Long passageId, String word, String replacement) {
         if(session("userFirstName") == null) return ok(index.render(null));
-        SimplePassage p = SimplePassage.byId(passageId);
 
-        try {
-            p.text = p.text.replace(word, replacement);
-            p.save();
-            flash("success", "We replaced that word for you!");
-            return ok();
-        } catch (Exception e) {
-            return badRequest();
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+
+            SimplePassage p = SimplePassage.byId(passageId);
+
+            try {
+                p.text = p.text.replace(word, replacement);
+                p.save();
+                flash("success", "We replaced that word for you!");
+                return ok();
+            } catch (Exception e) {
+                return badRequest();
+            }
+        } else {
+            return ok(index.render(session("userFirstName")));
         }
+
     }
 
 
@@ -680,35 +792,41 @@ public class SimplePassageController extends Controller {
     public Result getSuggestions(String word) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
-        word = word.replace("<span>", "");
-        word = word.replace("</span>", "");
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
 
-        System.out.println("--" + word);
+            word = word.replace("<span>", "");
+            word = word.replace("</span>", "");
 
-        List<String> res = new ArrayList<String>();
+            System.out.println("--" + word);
+
+            List<String> res = new ArrayList<String>();
 
 
-        StringBuilder ret = new StringBuilder("[");
+            StringBuilder ret = new StringBuilder("[");
 
 
-        List<Suggestion> sugg = Suggestion.byWord(word);
+            List<Suggestion> sugg = Suggestion.byWord(word);
 
-        sugg.sort(new SuggestionComp());
+            sugg.sort(new SuggestionComp());
 
-        for (int i = 0; i < sugg.size(); i++) {
+            for (int i = 0; i < sugg.size(); i++) {
 
-            if(sugg.get(i).frequency != 0){
-                ret.append("\"" + sugg.get(i).suggestedWord + "\"");
-                if (i < sugg.size() - 1) ret.append(",");
-                res.add(sugg.get(i).suggestedWord);
+                if(sugg.get(i).frequency != 0){
+                    ret.append("\"" + sugg.get(i).suggestedWord + "\"");
+                    if (i < sugg.size() - 1) ret.append(",");
+                    res.add(sugg.get(i).suggestedWord);
+                }
             }
+
+            if(ret.charAt(ret.length() - 1) == ',') ret.deleteCharAt(ret.length() - 1);
+
+            ret.append("]");
+
+            return ok(ret.toString());
+        } else {
+            return ok(index.render(session("userFirstName")));
         }
 
-        if(ret.charAt(ret.length() - 1) == ',') ret.deleteCharAt(ret.length() - 1);
-
-        ret.append("]");
-
-        return ok(ret.toString());
     }
 
     public Result viewAllPassages() {
@@ -728,21 +846,24 @@ public class SimplePassageController extends Controller {
         if(session("userFirstName") == null) return ok(index.render(null));
         Long instId = Long.valueOf((session("userId")));
         User inst = User.byId(instId);
-        List<SimplePassage> pList = SimplePassage.byInstructorId(instId);
+        List<SimplePassage> pList = SimplePassage.byPassageTagKeyword(name);
 
         return ok(viewAllPassagesWithTag.render(pList, inst, name));
     }
 
     public Result deletePassage(Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
-        SimplePassage a = SimplePassage.byId(passageId);
 
-        System.out.println("PASSAGEID: " + passageId);
 
-        if (a == null) {
-            flash("error", "Couldn't find a passage matching this id to delete");
-            return ok("false");
-        }
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            SimplePassage a = SimplePassage.byId(passageId);
+
+            System.out.println("PASSAGEID: " + passageId);
+
+            if (a == null) {
+                flash("error", "Couldn't find a passage matching this id to delete");
+                return ok("false");
+            }
 
 		/*
 
@@ -767,45 +888,62 @@ public class SimplePassageController extends Controller {
 
     	System.out.println("Records should be deleted");
 		 */
-        a.delete();
+            a.delete();
 
 
-        return ok("true");
+            return ok("true");
+        } else {
+            return ok(index.render(session("userFirstName")));
+        }
+
+
     }
 
     // do we possible need to clean up response here?? are they unreachable
     public Result deletePassageQuestion(Long questionId) {
         if(session("userFirstName") == null) return ok(index.render(null));
-        PassageQuestion a = PassageQuestion.byId(questionId);
 
-        if (a == null) {
-            flash("error", "Couldn't find a question matching this id to delete");
-            return ok("false");
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            PassageQuestion a = PassageQuestion.byId(questionId);
+
+            if (a == null) {
+                flash("error", "Couldn't find a question matching this id to delete");
+                return ok("false");
+            }
+
+            a.delete("");
+
+            System.out.println("Should be deleted");
+
+
+            return ok("true");
+        } else {
+            return ok(index.render(session("userFirstName")));
         }
 
-        a.delete("");
 
-        System.out.println("Should be deleted");
-
-
-        return ok("true");
     }
 
     public Result deletePassageQuestionChoice(Long choiceId) {
         if(session("userFirstName") == null) return ok(index.render(null));
-        PassageQuestionChoice a = PassageQuestionChoice.byId(choiceId);
 
-        if (a == null) {
-            flash("error", "Couldn't find a choice matching this id to delete");
-            return ok("false");
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            PassageQuestionChoice a = PassageQuestionChoice.byId(choiceId);
+
+            if (a == null) {
+                flash("error", "Couldn't find a choice matching this id to delete");
+                return ok("false");
+            }
+
+            a.delete("");
+
+            System.out.println("Should be deleted");
+
+
+            return ok("true");
+        } else {
+            return ok(index.render(session("userFirstName")));
         }
-
-        a.delete("");
-
-        System.out.println("Should be deleted");
-
-
-        return ok("true");
     }
 
     public Result answerPassageQuestions(Long passageId) {
@@ -893,11 +1031,11 @@ public class SimplePassageController extends Controller {
 
     public Result viewPassageQuestionAnswers(Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
-        Long instId = Long.valueOf((session("userId")));
-        User inst = User.byId(instId);
 
-        return ok(viewPassageQuestionAnswers.render(passageId, inst));
+            Long instId = Long.valueOf((session("userId")));
+            User inst = User.byId(instId);
 
+            return ok(viewPassageQuestionAnswers.render(passageId, inst));
     }
 
     public ArrayList<Double> getDifficulties(SimplePassage p) {

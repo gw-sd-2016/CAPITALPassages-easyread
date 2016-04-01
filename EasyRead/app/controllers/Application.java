@@ -20,6 +20,8 @@ import static play.data.Form.form;
 
 public class Application extends Controller {
 
+    public User loggedInUser;
+
     public Result index() throws JWNLException {
         return ok(index.render(session("userFirstName")));
     }
@@ -49,6 +51,7 @@ public class Application extends Controller {
     }
 
     public Result logout() {
+        this.loggedInUser = null;
         session().clear();
         return ok(index.render(null));
     }
@@ -71,8 +74,13 @@ public class Application extends Controller {
 
             session("userId", loggedInUser.id.toString());
             session("userFirstName", loggedInUser.firstName);
+            this.loggedInUser = loggedInUser;
             return ok(index.render(session("userFirstName")));
         }
+    }
+
+    public Result getLoggedInUserId(){
+        return ok(String.valueOf(this.loggedInUser.id));
     }
 
     public Result signup() throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -95,7 +103,8 @@ public class Application extends Controller {
                         controllers.routes.javascript.SimplePassageController.checkWord(),
                         controllers.routes.javascript.SimplePassageController.checkSentence(),
                         controllers.routes.javascript.SimplePassageController.createPassageHTML(),
-                        controllers.routes.javascript.SimplePassageController.isAnalyzing()
+                        controllers.routes.javascript.SimplePassageController.isAnalyzing(),
+                        controllers.routes.javascript.SimplePassageController.analyzeSingularPassage()
                         /*,
                         controllers.routes.javascript.SimplePassageController.deletePassageQuestion()
                         controllers.routes.javascript.SimplePassageController.deletePassageQuestionChoice()*/

@@ -16,9 +16,17 @@
 
 
             @if(Long.valueOf(session().get("userId")) == inst.id){
-                <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages" onclick="switchSpinner();" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
-                    <i id="spinner" class="glyphicon glyphicon-refresh"></i> Analyze
-                </button>
+
+                @if(!routes.SimplePassageController.isAnalyzing.equals("prog")){
+                    <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
+                        <i id="spinner" class="glyphicon glyphicon-refresh"></i> Analyze
+                    </button>
+                } else {
+                    <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
+                        <i id="spinner" class="glyphicon glyphicon-refresh glyphicon-spin"></i> Analyze
+                    </button>
+                }
+
             }
 
 
@@ -47,7 +55,10 @@
                             <th>Grade</th>
                             <th>Source</th>
                             <th>Tag</th>
-                            <th>Actions</th>
+                            @if(Long.valueOf(session().get("userId")) == inst.id){
+                                <th>Actions</th>
+                            }
+
 
                         </tr>
                     </thead>
@@ -55,7 +66,12 @@
                     @for(passage <- passages) {
                         <tr>
 
-                            <td><a href="/viewPassageWithSuggestions?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
+                        @if(Long.valueOf(session().get("userId")) == inst.id){
+                            <td><a href="/editPassageAtGrade?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
+                        } else {
+                            <td><a href="/viewPassageAsStudent?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
+                        }
+
                             @if(passage.text.length >= 200) {
                                 <td>
                                     @passage.text.substring(0, 200)
@@ -95,24 +111,23 @@
                                 </a>
                             }
                             </td>
+                            @if(Long.valueOf(session().get("userId")) == inst.id) {
+
+                                <td style="width : 10%">
 
 
-                            <td style="width: 10%">
+                                    <a href="@routes.SimplePassageController.editPassage(passage.id, passage.grade)" class="btn btn-small btn-info" style="width : 50px ;">
+                                        <i class="fa fa-edit"></i> Edit
+                                    </a>
 
-                            @if(Long.valueOf(session().get("userId")) == inst.id){
-                                <a href="@routes.SimplePassageController.editPassage(passage.id, passage.grade)" class="btn btn-small btn-info" style="width: 50px ;">
-                                    <i class="fa fa-edit"></i> Edit
-                                </a>
+
+                                        <!--  <button type="button" class="btn btn-small btn-danger has-spinner" id="deletePassage" name=" @passage.id:|:@passage.title" style="width: 75px;">
+                                    <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
+                                    <i class="fa fa-trash"></i> Delete
+                                    </button>
+                                    -->
+                                </td>
                             }
-
-
-                                    <!--  <button type="button" class="btn btn-small btn-danger has-spinner" id="deletePassage" name=" @passage.id:|:@passage.title" style="width: 75px;">
-                                <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
-                                <i class="fa fa-trash"></i> Delete
-                                </button>
-                                -->
-                            </td>
-
                         </tr>
                     }
                     </tbody>
@@ -154,12 +169,12 @@
                         var button = $(this);
                         button.toggleClass('active');
 
-                        switchSpinner();
+
 
                         var result = confirm("Are you sure you want to analyze passages? This may take a couple minutes");
 
                         if (result) {
-                            button.prop("disabled", true);
+                            switchSpinner();
                             jsRoutes.controllers.SimplePassageController.analyzePassages().ajax({
                                 success : function(data) {
                                     window.location.reload();
@@ -168,24 +183,9 @@
                                     //window.location = "";
                                 }
                             });
-                        } else {
-                            button.toggleClass('active');
                         }
 
                     });
-
-                    function isAnalyzing(){
-                        jsRoutes.controllers.SimplePassageController.isAnalyzing().ajax({
-                            success : function(data) {
-                                if(data.toString() == "prog"){
-                                    switchSpinner();
-                                }
-                            },
-                            error : function(err) {
-                                //window.location = "";
-                            }
-                        });
-                    }
 
                     function switchSpinner(){
                         var on = "glyphicon glyphicon-refresh glyphicon-spin";
@@ -199,9 +199,6 @@
                         else elem.className = on;
                     }
 
-                    $(document).ready(function(){
-                        isAnalyzing();
-                    });
 
             </script>
 
