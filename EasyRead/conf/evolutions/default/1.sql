@@ -74,13 +74,11 @@ create table passage_question_response (
 
 create table passage_tag (
   id                        bigint auto_increment not null,
-  name                      varchar(255),
-  description               varchar(255),
-  type                      varchar(255),
+  keyword                   varchar(255),
   disavowed                 tinyint(1) default 0,
   created_time              datetime(6) not null,
   updated_time              datetime(6) not null,
-  constraint uq_passage_tag_name unique (name),
+  constraint uq_passage_tag_keyword unique (keyword),
   constraint pk_passage_tag primary key (id))
 ;
 
@@ -107,7 +105,6 @@ create table simple_passage (
   source                    varchar(255),
   grade                     integer,
   instructor_id             bigint,
-  tag_id                    bigint,
   num_characters            integer,
   num_syllables             integer,
   num_words                 integer,

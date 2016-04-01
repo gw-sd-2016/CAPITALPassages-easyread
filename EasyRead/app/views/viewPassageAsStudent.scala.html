@@ -29,8 +29,8 @@
                     @for(tag <- passage.tags) {
 
 
-                        <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px ;">
-                            <i class="glyphicon glyphicon-tag"> @tag.name</i>
+                        <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.keyword)" style="margin-bottom: 20px ;">
+                            <i class="glyphicon glyphicon-tag"> @tag.keyword</i>
 
                         </a>
                     }

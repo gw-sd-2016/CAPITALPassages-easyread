@@ -25,13 +25,8 @@ public class PassageTag extends Model {
     @Required
     @Column(unique = true)
     @Expose
-    public String name;
+    public String keyword;
 
-    @Expose
-    public String description;
-
-    @Expose
-    public String type;
 
     @CreatedTimestamp
     Timestamp createdTime;
@@ -43,10 +38,8 @@ public class PassageTag extends Model {
     public boolean disavowed = false;
 
     // Constructors
-    public PassageTag(String name, String description, String type) {
-        this.name = name;
-        this.description = description;
-        this.type = type;
+    public PassageTag(String keyword) {
+        this.keyword = keyword;
     }
 
     // Getters / Setters
@@ -56,34 +49,12 @@ public class PassageTag extends Model {
         return find.where().ne("disavowed", true).findList();
     }
 
-    public static List<String> allTypes() {
-        List<String> types = new ArrayList<String>();
-        for (PassageTag p : all()) {
-            if (!types.contains(p.type)) types.add(p.type);
-        }
-        return types;
-    }
-
-    public static List<String> allNames() {
-        List<String> names = new ArrayList<String>();
-        for (PassageTag p : all()) {
-            if (!names.contains(p.name)) names.add(p.name);
-        }
-        return names;
-    }
 
     public static PassageTag create(PassageTag tag) {
         tag.save();
         return tag;
     }
 
-
-    public static void delete(Long id) {
-//		find.ref(id).delete();
-        PassageTag phonemeTag = find.ref(id);
-        phonemeTag.disavowed = true;
-        phonemeTag.save();
-    }
 
     public static PassageTag byId(Long id) {
         return find.where().ne("disavowed", true).eq("id", id).findUnique();
@@ -101,31 +72,11 @@ public class PassageTag extends Model {
         return byId(Long.parseLong(id));
     }
 
-    public static PassageTag byName(String name) {
+    public static PassageTag byKeyword(String keyword) {
         return find.where()
                 .ne("disavowed", true)
-                .eq("name", name)
+                .eq("keyword", keyword)
                 .findUnique();
-    }
-
-    public static List<PassageTag> byType(String type) {
-        return find.where()
-                .ne("disavowed", true)
-                .eq("type", type)
-                .orderBy("name")
-                .findList();
-    }
-
-    public static List<PassageTag> byType_number(String type) {
-        return find.where()
-                .ne("disavowed", true)
-                .eq("type", type)
-                .orderBy("name+0")
-                .findList();
-    }
-
-    public String getType() {
-        return this.type;
     }
 
 }

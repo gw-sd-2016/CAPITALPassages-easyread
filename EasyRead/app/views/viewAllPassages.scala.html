@@ -17,7 +17,7 @@
 
             @if(Long.valueOf(session().get("userId")) == inst.id){
                 <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages" onclick="switchSpinner();" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
-                    <i class="glyphicon glyphicon-refresh glyphicon-spin"></i>Analyze
+                    <i id="spinner" class="glyphicon glyphicon-refresh"></i> Analyze
                 </button>
             }
 
@@ -46,7 +46,6 @@
                             <th>Instructor</th>
                             <th>Grade</th>
                             <th>Source</th>
-                            <th>Tag Type</th>
                             <th>Tag</th>
                             <th>Actions</th>
 
@@ -86,17 +85,12 @@
 
                             </td>
                             <td>@passage.source</td>
-                            <td>
-                            @for(tag <- passage.tags) {
-                                @tag.getType()
 
-                            }
-                            </td>
 
                             <td>
                             @for(tag <- passage.tags) {
-                                <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px ;">
-                                    <i class="fa fa-tag"> @tag.name</i>
+                                <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.keyword)" style="margin-bottom: 20px ;">
+                                    <i class="fa fa-tag"> @tag.keyword</i>
 
                                 </a>
                             }
@@ -199,7 +193,7 @@
 
 
                         document.getElementsByTagName()
-                        var elem = document.getElementsByClassName("glyphicon glyphicon-refresh glyphicon-spin")[0];
+                        var elem = document.getElementById("spinner");
 
                         if(elem.className.substring(elem.className.length - 4) == "spin") elem.className = off;
                         else elem.className = on;

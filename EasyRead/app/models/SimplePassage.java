@@ -52,9 +52,6 @@ public class SimplePassage extends Model {
     public Set<PassageText> htmlRepresentations = new HashSet<PassageText>();
 
     @Expose
-    public Long tagId;
-
-    @Expose
     @ManyToMany(cascade = CascadeType.ALL)
     public Set<PassageTag> tags = new HashSet<PassageTag>();
 
@@ -94,11 +91,11 @@ public class SimplePassage extends Model {
         return find.where().eq("grade", grade).findList();
     }
 
-    public static List<SimplePassage> byPassageTagName(String name) {
+    public static List<SimplePassage> byPassageTagKeyword(String keyword) {
         List<SimplePassage> res = new ArrayList<SimplePassage>();
         for (SimplePassage p : all()) {
             for (PassageTag t : p.tags) {
-                if (t.name.equals(name)) res.add(p);
+                if (t.keyword.equals(keyword)) res.add(p);
             }
         }
         return res;

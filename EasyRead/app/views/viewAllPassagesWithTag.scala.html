@@ -37,14 +37,13 @@
                                 <th>Instructor</th>
                                 <th>Grade</th>
                                 <th>Source</th>
-                                <th>Type</th>
                                 <th>Tag</th>
                                 <th>Actions</th>
 
                             </tr>
                         </thead>
                         <tbody>
-                        @for(passage <- SimplePassage.byPassageTagName(name)) {
+                        @for(passage <- SimplePassage.byPassageTagKeyword(name)) {
                             <tr>
 
                                 <td><a href="/view?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
@@ -66,19 +65,13 @@
 
                                 </td>
                                 <td>@passage.source</td>
-                                <td>
-                                @for(tag <- passage.tags) {
-                                    @tag.getType()
-
-                                }
-                                </td>
 
                                 <td>
                                 @for(tag <- passage.tags) {
 
 
-                                    <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.name)" style="margin-bottom: 20px ;">
-                                        <i class="glyphicon glyphicon-tag"> @tag.name</i>
+                                    <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.keyword)" style="margin-bottom: 20px ;">
+                                        <i class="glyphicon glyphicon-tag"> @tag.keyword</i>
 
                                     </a>
 

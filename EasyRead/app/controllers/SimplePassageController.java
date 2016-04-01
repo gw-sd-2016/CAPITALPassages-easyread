@@ -43,20 +43,25 @@ public class SimplePassageController extends Controller {
 
             String html = parameters.get("html")[0];
 
+            String str = parameters.get("tags")[0];
 
+            char[] arr = str.toCharArray();
 
+            ArrayList<String> tags = new ArrayList<String>();
 
-
-            for(int count = 0; count < parameters.get("names").length; count++){
-                JsonNode names = Json.parse(parameters.get("names")[count]);
-
-
-                PassageTag newTag = new PassageTag(parameters.get("names")[count].substring(5, parameters.get("names")[count].lastIndexOf("<")), parameters.get("descs")[count].substring(5, parameters.get("descs")[count].lastIndexOf("<")), parameters.get("jtags")[count].substring(5, parameters.get("jtags")[count].lastIndexOf("<")));
-                p.tags = new HashSet<PassageTag>();
-                p.tags.add(newTag);
-                p.save();
+            int begin = str.indexOf("[") + 1;
+            for(int i = begin ; i < arr.length; i++){
+                if(arr[i] == ',' || i + 1 == arr.length){
+                    tags.add(str.substring(begin, i));
+                }
             }
 
+
+            p.tags = new HashSet<PassageTag>();
+
+            for(String s : tags){
+                p.tags.add(new PassageTag(s));
+            }
 
             PassageText pt = new PassageText(0, html);
 
@@ -464,12 +469,6 @@ public class SimplePassageController extends Controller {
 	}
 
 
-    public Result viewAllPassageTags(List<PassageTag> tags) {
-        if(session("userFirstName") == null) return ok(index.render(null));
-        return ok(viewAllPassageTags.render(PassageTag.all()));
-    }
-
-
     public Result createSimplePassage_submit() {
         if(session("userFirstName") == null) return ok(index.render(null));
         Form<SimplePassageData> createSPForm = form(SimplePassageData.class).bindFromRequest();
@@ -481,24 +480,6 @@ public class SimplePassageController extends Controller {
         SimplePassage newPassage = new SimplePassage(createSPForm.get());
         newPassage.instructorID = Integer.valueOf(session("userId"));
 
-        if (createSPForm.get().descriptions.size() > 0 && createSPForm.get().types.size() > 0 && createSPForm.get().names.size() > 0) {
-
-            PassageTag t = new PassageTag(createSPForm.get().names.get(0), createSPForm.get().descriptions.get(0), createSPForm.get().types.get(0));
-
-            if (PassageTag.byName(createSPForm.get().names.get(0)) == null) {
-                t.save();
-                newPassage.tagId = t.id;
-
-
-            } else {
-                newPassage.tagId = PassageTag.byName(createSPForm.get().names.get(0)).id;
-                t = PassageTag.byName(createSPForm.get().names.get(0));
-
-            }
-
-            newPassage.tags.add(t);
-
-        }
 
         newPassage.save();
         return redirect(routes.SimplePassageController.viewAllPassages());

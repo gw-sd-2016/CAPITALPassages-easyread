@@ -11,7 +11,6 @@ import play.mvc.Result;
 import views.html.index;
 import views.html.login;
 import views.html.signup;
-import views.html.viewAllPassageTags;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -105,8 +104,5 @@ public class Application extends Controller {
         );
     }
 
-    public static Result viewAllPassageTags() {
-        return ok(viewAllPassageTags.render(PassageTag.all()));
-    }
 
 }

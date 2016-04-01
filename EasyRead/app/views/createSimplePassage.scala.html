@@ -26,33 +26,30 @@
                         <h4>Source</h4>
                         <input type="text" name="source" placeholder="Passage Source" value="@form("source").value">
 
+                        <br>
+                            <div id="tagArea">Tagged as:</div>
+                        <br>
+
                             <!--
                     <div style="padding-top:5px; padding-bottom:5px">
                         <button type="submit" class="btn btn-primary" onclick="addTag()"><i class="glyphicon glyphicon-tag"></i>Add Tag</button>
                     </div>
                     -->
 
-                        <!--
+
                         <div class="tag">
                             <form class="form-inline">
                                 <div class="form-group">
                                     <br>
-                                    <strong>Tag 1</strong>
+                                    <strong>Tag This Passage</strong>
                                     <div class="input-group">
-                                        <input type="text" name="names[0]" placeholder="Tag Name" value="names[0]">
-
-                                        <input type="text" name="descriptions[0]" placeholder="Tag Description" value="descriptions[0]">
-
-                                        <input type="text" name="types[0]" placeholder="Tag Type" value="types[0]">
-
-
+                                        <input type="text" id="tag" placeholder="Keyword" value="">
+                                        <button type="button" class="btn btn-primary" onclick="realAddTag()">Add Tag</button>
                                     </div>
-                                </div>
+                                    </div>
+                                </form>
+                            </div>
 
-                            </form>
-                        </div>
-
--->
                         <h4>Passage Body</h4>
 
                         <input type="text" name="passageText" value="@Html(form("passageText").value)" style="display: none ;">
@@ -110,13 +107,7 @@
 
 
 
-                var jnames = [];
-                var jdescs = [];
-                var jtypes = [];
-
-
-
-
+                var tags = [];
 
                 var configs = {
                     readOnly: false,
@@ -135,9 +126,6 @@
                     formats: ['size', 'underline']
                 };
 
-
-
-
                 var quill = new Quill('#editor', configs);
 
                 quill.on('text-change', function(delta, source) {
@@ -146,13 +134,16 @@
                     element.setAttribute("value", quill.getHTML());
                 });
 
-                function realAddTag(name, desc, tag){
-                    console.log("desc :" + desc);
+                function realAddTag(){
+                    var str = document.getElementById("tag").value;
+                    document.getElementById("tag").value = "";
+                    tags = tags.concat(str);
+                    console.log(tags[0]);
 
-                    jnames = jnames.concat(name);
-                    jdescs = jdescs.concat(desc);
-                    jtypes = jtypes.concat(tag);
-                    console.log(jnames[0]);
+                    var tagArea = document.getElementById("tagArea");
+                    if(tagArea.innerText != "Tagged as:"){
+                        tagArea.innerText += ", " + str;
+                    } else tagArea.innerText += " " + str;
                 }
 
 
@@ -191,29 +182,12 @@
                 }
 
                 function createHTML(){
-
-
                     var realText = quill.getHTML();
-
-                    //http://stackoverflow.com/questions/3001474/how-to-get-caller-element-using-javascript
-                    var numTags = document.getElementsByClassName('tag').length;
-
-                    console.log('tag' + numTags);
-
-
-
-                    if(numTags == 1) realAddTag(document.getElementsByName("names[0]")[0].value, document.getElementsByName("descriptions[0]")[0].value, document.getElementsByName("types[0]")[0].value);
-
-
-
-                    console.log("here");
 
                     $.post(
                             'createPHT?text=' + quill.getText()  + '&title=' + document.getElementsByName("passageTitle")[0].value + "&source=" + document.getElementsByName("source")[0].value ,
                             {'html' : realText,
-                              'names' : JSON.stringify(jnames) ,
-                              'descs' : JSON.stringify(jdescs),
-                              'jtags' : JSON.stringify(jtypes)
+                              'tags' : JSON.stringify(tags)
                             },
 
                             function(data) {

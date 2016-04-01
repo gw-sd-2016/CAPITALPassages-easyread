@@ -9,9 +9,8 @@ public class SimplePassageData {
     public String source;
     public String category;
 
-    public ArrayList<String> names = new ArrayList<String>();
-    public ArrayList<String> descriptions = new ArrayList<String>();
-    public ArrayList<String> types = new ArrayList<String>();
+    public ArrayList<String> tags = new ArrayList<String>();
+
 
     public SimplePassageData() {
     }
