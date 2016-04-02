@@ -265,31 +265,20 @@
                     }
                 });
 
-                function areWithinSameSentence(a, b){
-                    var text = quill.getText();
-
-                    var aLoc = 0;
-                    var bLoc = 0;
-
-                    for(var i = a; i >= 0; i--){
-                        if(text.charAt(i) == '.'){
-                            aLoc++;
-                        }
-                    }
-
-                    for(var i = b; i >= 0; i--){
-                        if(text.charAt(i) == '.'){
-                            bLoc++;
-                        }
-                    }
-
-                    return aLoc == bLoc;
-                }
-
 
                 function getWordForPosition(pos, check){
-                    var text = quill.getHTML();
+                    /*var text = quill.getHTML();
 
+
+*/
+
+                    var text = quill.getText();
+                    var html = quill.getHTML();
+
+
+
+
+/*
                     // white space check from http://stackoverflow.com/questions/1496826/check-if-a-single-character-is-a-whitespace
                     if(/\s/.test(text.charAt(pos))) pos--;
 
@@ -308,13 +297,37 @@
                             startOfWord++;
                             break;
                         }
+                    }*/
+
+
+
+                    // white space check from http://stackoverflow.com/questions/1496826/check-if-a-single-character-is-a-whitespace
+                    if(/\s/.test(text.charAt(pos))) pos--;
+
+                    if(/\s/.test(text.charAt(pos))) return null;
+
+                    var startOfWord = 0;
+                    var endOfWord = 0;
+                    for(endOfWord = pos; endOfWord < text.length - 1; endOfWord++){
+                        if(/\s/.test(text.charAt(endOfWord)) || text.charAt(endOfWord) == '.' && (/\s/.test(text.charAt(endOfWord + 1)) || text.charAt(endOfWord + 1) == '&' || text.charAt(endOfWord + 1) == '<')){
+                            break;
+                        }
+                    }
+                    for(startOfWord = endOfWord - 1; startOfWord >= 0; startOfWord--){
+// white space check from http://stackoverflow.com/questions/1496826/check-if-a-single-character-is-a-whitespace
+                        if(/\s/.test(text.charAt(startOfWord)) || text.charAt(startOfWord) == '.'){
+                            startOfWord++;
+                            break;
+                        }
                     }
 
+                    if(!/\s/.test(text.charAt(endOfWord))) endOfWord++; 
+                  
                     capturedWord = text.substring(startOfWord, endOfWord);
 
                     if(check == true) {
                         console.log("Sending " + capturedWord);
-                        checkWord(capturedWord, startOfWord, endOfWord);
+                        checkWord(capturedWord);
                     }
 
                     return quill.getHTML().substring(startOfWord, endOfWord);
@@ -357,8 +370,6 @@
 
 
                 function setFlag(){
-                    console.log("begin count " + requests.length);
-
                     for(var i = requests.length - 1; i > 0; i--){
                         //removeDuplicateWords(requests[i]);
                         //removeDuplicateSentence(requests[i]);
@@ -369,7 +380,7 @@
                         findContainingSentence(requests[i]);
                     }
 
-                    console.log("end count " + requests.length);
+                    //console.log("end count " + requests.length);
                     requests = [];
                 }
 
@@ -469,10 +480,10 @@
                     return html;
                 }
 
-                function checkWord(word, start, end){
+                function checkWord(word){
                     jsRoutes.controllers.SimplePassageController.checkWord(word, @SimplePassage.byId(passageId).grade, @passageId ).ajax({
                         success : function(data) {
-                            quill.formatText(start, end, 'underline', data.toString() == "UNDERLINE")
+                           quill.formatText(quill.getText().indexOf(word), quill.getText().indexOf(word) + word.length , 'underline', data.toString() == "UNDERLINE");
                         },
                         error : function(err) {
                             //window.location = "";
