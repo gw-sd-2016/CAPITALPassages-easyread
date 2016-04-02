@@ -1245,9 +1245,9 @@ public class SimplePassageController extends Controller {
                     System.out.println("sp:" + spaceIndex);
 
                     if (spaceIndex != -1) {
-                        curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
+                        curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + this.difficultiesCache.get(sentNumber) + ");'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
                     } else {
-                        curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign'>" + curr + "</i> ";
+                        curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + this.difficultiesCache.get(sentNumber) + ");'>" + curr + "</i> ";
                     }
 
                     while (curr.indexOf(" <u>") != -1) {
@@ -1321,10 +1321,11 @@ public class SimplePassageController extends Controller {
                 System.out.println("sp:" + spaceIndex);
 
                 if (spaceIndex != -1) {
-                    curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
+                    curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diff + ");'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
                 } else {
-                    curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign'>" + curr + "</i> ";
+                    curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diff + ");'>" + curr + "</i> ";
                 }
+
 
                 while (curr.indexOf(" <u>") != -1) {
                     curr = curr.substring(0, curr.indexOf(" <u>")) + "&nbsp" + curr.substring(curr.indexOf(" <u>") + 1);

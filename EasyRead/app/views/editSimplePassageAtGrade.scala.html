@@ -6,6 +6,11 @@
     @import scala.reflect.runtime.universe._
 
     @main("Edit a  Passage") {
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+        <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+
+        <link rel="stylesheet" href="/assets/css/easyread.css"></>
 
 
         <style type="text/css">
@@ -19,7 +24,21 @@
             background-color: #333 ;
             color: #fff ;
             box-shadow: inset 0 0 5px 5px #222 ;
+
+
+
+         .ui-btn.my-tooltip-btn,
+         .ui-btn.my-tooltip-btn:hover,
+         .ui-btn.my-tooltip-btn:active {
+                 background: none;
+                 border: 0;
+         }
+
+
+
         }
+
+
         </style>
         <div id="left-panel" class="panel"></div>
 
@@ -489,17 +508,27 @@
                                 var secondEnd = 0;
 
 
-                                var l = "<span class=\"glyphicon glyphicon-exclamation-sign\">".length;
+
+
+
+
+                                var l = "<span class=\"glyphicon glyphicon-exclamation-sign onclick=showJustification(\">".length;
 
                                 //console.log("index of first <: " + index);
 
                                 for(var i = index; i < html.length; i++){
                                     if(html.charAt(i) == '<' && html.substring(i, i + 5) == "<span" && start == 0) {
                                         start = i;
-                                        firstEnd = start + l;
+                                        //firstEnd = start + l;
 
                                     }
-                                    if(firstEnd != 0 && html.charAt(i) == '>' && html.substring(i - 1, i) == "n"){
+
+                                    if(start != 0 && html.charAt(i) == '>' && html.substring(i - 1, i) == "\""){
+                                        firstEnd = i + 1;
+                                    }
+
+
+                                    if(firstEnd != 0 && i > start + l && html.charAt(i) == '>' && html.substring(i - 1, i) == "n"){
                                         secondEnd = i;
                                         break;
                                     }
@@ -724,7 +753,6 @@
                     var button = $(this);
                     button.toggleClass('active');
 
-
                     var result = confirm("Are you sure you want to analyze this passage? This may take a couple minutes");
 
                     if (result) {
@@ -746,8 +774,6 @@
                     var on = "glyphicon glyphicon-refresh glyphicon-spin";
                     var off = "glyphicon glyphicon-refresh";
 
-
-                    document.getElementsByTagName()
                     var elem = document.getElementById("spinner");
 
                     if(elem.className.substring(elem.className.length - 4) == "spin") elem.className = off;
@@ -778,6 +804,25 @@
                     });
 
                 });
+
+
+                $(function () {
+                    $('[data-toggle="tooltip"]').tooltip()
+                })
+
+                function showJustification(grade){
+
+                    grade = Math.ceil(grade);
+
+                    var alertString = "Hey, this sentence looks more appropriate for a ";
+                    if(grade == 0) alertString += "Kindergarten Reader";
+                    else if(grade < 13) alertString += "Grade " + grade + " Reader";
+                    else alertString += "a College Level Reader";
+
+
+                    alert(alertString);
+                }
+
         </script>
 
     }
