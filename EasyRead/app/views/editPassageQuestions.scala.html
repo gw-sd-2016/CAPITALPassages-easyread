@@ -44,7 +44,9 @@
                         @for(question <- passage.questions.toList.sortBy(_.position)) {
                             <tr>
                             <td> @question.position</td>
-                            <td>@PassageQuestionPrompt.byPassageQuestion(question.id).get(0).text </td>
+                            <td>@PassageQuestionPrompt.byPassageQuestion(question.id).get(0).text
+                            <button class="btn btn-primary" onclick="editPrompt(@question.id);">Edit Prompt</button>
+                            </td>
                             <td>@question.correctAnswer</td>
                                 <td>
 

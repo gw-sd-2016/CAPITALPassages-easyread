@@ -101,6 +101,8 @@ public class PassageQuestionChoice extends Model {
         for(PassageQuestionRecord rec : PassageQuestionRecord.all()){
             if(rec.responses.size() == 0) rec.delete();
         }
+
+        super.delete();
     }
 
     public static PassageQuestionChoice byId(Long id) {

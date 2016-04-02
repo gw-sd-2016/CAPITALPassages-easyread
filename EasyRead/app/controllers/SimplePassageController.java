@@ -120,6 +120,8 @@ public class SimplePassageController extends Controller {
             }
 
 
+
+
             // getting what the next choiceId Will be.
             Long cID = Long.valueOf("0");
             for (PassageQuestionChoice c : PassageQuestionChoice.find.all()) {
@@ -147,10 +149,34 @@ public class SimplePassageController extends Controller {
 
                 q.prompt = testPrompt;
 
+                if(PassageQuestion.find.all().size() == 0){
+                    passage.questions.add(q);
+                    passage.save();
+
+                    qID = Long.valueOf(-1);
+                    for(PassageQuestion ques : passage.questions){
+                        qID = Math.max(ques.id, qID);
+                    }
+                }
+
+                testPrompt.questionId = qID + i;
+
+                testPrompt.save();
+
+
                 q.choices = new HashSet<PassageQuestionChoice>();
 
                 for (int c = 0; c < createSPForm.get().choices.get(i).size(); c++) {
                     PassageQuestionChoice w = new PassageQuestionChoice();
+
+                    if(PassageQuestionChoice.find.all().size() == 0){
+                        q.choices.add(w);
+                        q.save();
+
+                        for(PassageQuestionChoice choice : q.choices){
+                            cID = Math.max(choice.id, cID);
+                        }
+                    }
 
 
                     if (createSPForm.get().correctAnswers.size() > 0 && createSPForm.get().correctAnswers.get(i).equals(String.valueOf(c))) {
@@ -171,83 +197,26 @@ public class SimplePassageController extends Controller {
                     answer.save();
                     w.answer = answer;
 
-                    q.choices.add(w);
+
+                    if(PassageQuestionChoice.find.all().size() != 0) {
+                        q.choices.add(w);
+                    }
+
 
                 }
 
 
-                passage.questions.add(q);
+                if(PassageQuestion.find.all().size() != 0) {
+                    passage.questions.add(q);
+                }
+
 
 
             }
 
 
-            System.out.println("Size : " + passage.questions.size());
-
 
             passage.save();
-
-
-            // resolve question ids
-            // if there were 3 questions created then get the last 3 prompts
-
-
-
-		/*PassageQuestion[] arr = new PassageQuestion[passage.questions.size()];
-
-		int w = 0;
-		for(PassageQuestion q : passage.questions) {
-			arr[w] = q;
-			w++;
-		}
-
-
-		for(int i = 0; i < arr.length; i++){
-			int maxPromptId = 0;
-			for(PassageQuestionPrompt p : PassageQuestionPrompt.all()) maxPromptId = Math.max(maxPromptId, p.id.intValue());
-
-			System.out.println("prompt " + maxPromptId);
-
-
-			int thisId = maxPromptId - (passage.questions.size()) + arr[i].position;
-
-			System.out.println("thisId " + thisId);
-
-			PassageQuestionPrompt thisOne = PassageQuestionPrompt.byId(Long.valueOf(thisId));
-
-			thisOne.questionId = arr[i].id;
-
-			thisOne.save();
-
-			PassageQuestionChoice[] choices = new PassageQuestionChoice[arr[i].choices.size()];
-			int e = 0;
-			for(PassageQuestionChoice c : arr[i].choices) {
-				choices[e] = c;
-				e++;
-			}
-
-
-
-
-			for(int c = 0; c < choices.length; c++){
-				int maxAnswerId = 0;
-				for(PassageQuestionAnswer a : PassageQuestionAnswer.all()) maxAnswerId = Math.max(maxAnswerId, a.id.intValue());
-
-				int thisChoiceId = maxAnswerId - (choices.length - 1) + choices[i].position - 1;
-
-				PassageQuestionAnswer thisAnswer = PassageQuestionAnswer.byId(Long.valueOf(thisChoiceId));
-
-				thisAnswer.choiceId = choices[i].id;
-
-				thisAnswer.save();
-
-
-			}
-
-
-
-		}
-		 */
 
 
             return ok(viewPassageQuestions.render(passage.id));
@@ -560,11 +529,20 @@ public class SimplePassageController extends Controller {
             PassageQuestion ques = PassageQuestion.byId(questionId);
 
             PassageQuestionChoice choice = new PassageQuestionChoice(ques.basis_id, isCorrect, true);
-            choice.answer = new PassageQuestionAnswer(choice, newChoice);
-            choice.position = ques.choices.size();
 
             ques.choices.add(choice);
 
+            ques.save();
+
+            PassageQuestionAnswer answer = new PassageQuestionAnswer(choice, newChoice);
+
+            answer.save();
+
+            choice.answer = answer;
+            choice.position = ques.choices.size();
+
+
+            choice.save();
             ques.save();
 
             if(isCorrect) return setAsCorrectAnswer(choice.id, questionId);
@@ -612,7 +590,7 @@ public class SimplePassageController extends Controller {
                 }
             }
 
-            choice.delete();
+            choice.deepDelete();
             q.save();
 
             return ok();

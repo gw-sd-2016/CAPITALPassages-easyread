@@ -107,3 +107,40 @@ function editAnswer(choiceId, questionId){
                 });
 
 }
+
+function editPrompt(questionId){
+	//http://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_prompt
+	var newAnswer = prompt("What's the question?", "Why do people use Android?");
+    
+     jsRoutes.controllers.SimplePassageController.editPromptForQuestion(questionId, newAnswer).ajax({
+                    success : function(data) {
+                        //window.location.reload();
+                    },
+                    error : function(err) {
+                        //window.location = "";
+                    },
+                    complete : function() {
+                        window.location.reload();
+                    }
+                });
+
+}
+
+
+function addChoice(questionId){
+	//http://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_prompt
+	var newAnswer = prompt("What's the answer choice?", "OSX is the best");
+    
+     jsRoutes.controllers.SimplePassageController.addChoiceToQuestion(questionId, newAnswer, false).ajax({
+                    success : function(data) {
+                        //window.location.reload();
+                    },
+                    error : function(err) {
+                        //window.location = "";
+                    },
+                    complete : function() {
+                        window.location.reload();
+                    }
+                });
+
+}
