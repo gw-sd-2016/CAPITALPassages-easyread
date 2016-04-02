@@ -5,12 +5,22 @@
 
         @helper.form(routes.SimplePassageController.answerPassageQuestions_submit(passageId)) {
 
+            <!-- https://davidwalsh.name/css-fixed-position and http://stackoverflow.com/questions/11399537/how-do-you-make-a-div-follow-as-you-scroll -->
+            <div class="pull-right" style="width:50%; height: 90%; overflow-y: scroll; position:fixed; top:100px; right:2%; padding-bottom:200px;  ">
+
+            @SimplePassage.byId(passageId).text
+
+
+            </div>
+
+
             <div style="padding-left:20px">
 
 
-                <div class="pull-right" style="width:50% ;">
-                @SimplePassage.byId(passageId).text
-                </div>
+
+
+
+
                 <div>
 
                     <p>
