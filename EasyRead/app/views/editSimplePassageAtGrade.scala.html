@@ -101,28 +101,34 @@
 
                             <div>
                         @if(!routes.SimplePassageController.isAnalyzing.equals("prog")){
+
+                            <div class="btn-group">
+                                <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passageId" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
+                                    <i class="glyphicon glyphicon-plus"></i>
+                                    Add new Questions
+                                </a>
+
+                                <a class="btn btn-primary" id="add" href="/editQuestions?passageId=@passageId" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
+                                    <i class="glyphicon glyphicon-pen"></i>
+                                    Edit Questions
+                                </a>
+
                             <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
                                 <i id="spinner" class="glyphicon glyphicon-refresh"></i> Analyze
                             </button>
+                                </div>
                         } else {
-
-                            <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passageId" style="margin-bottom: 20px ;">
-                                <i class="glyphicon glyphicon-plus"></i>
-                                Add new Questions
-                            </a>
-
-
                             <div class="btn-group">
-
-
-
+                                <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passageId" style="margin-bottom: 20px ;">
+                                    <i class="glyphicon glyphicon-plus"></i>
+                                    Add new Questions
+                                </a>
 
                                 <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
                                     <i id="spinner" class="glyphicon glyphicon-refresh glyphicon-spin"></i> Analyze
                                 </button>
 
                             </div>
-
                         }
 
                     </div>

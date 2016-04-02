@@ -592,6 +592,7 @@ public class SimplePassageController extends Controller {
         }
     }
 
+    // what if you delete the correct answer?
     public Result deleteChoiceForQuestion(Long questionId, Long passageId, Long choiceId){
         try{
             SimplePassage p = SimplePassage.byId(passageId);

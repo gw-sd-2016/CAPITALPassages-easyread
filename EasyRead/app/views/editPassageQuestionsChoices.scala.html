@@ -45,12 +45,12 @@
                                 <td>
                                     <button class="btn btn-primary">Edit Answer</button>
                                     @if(choice.position != 0){
-                                        <button class="btn btn-primary">Move up</button>
+                                        <button class="btn btn-primary" onclick="moveChoiceUp(@choice.id, @question.id);">Move up</button>
                                     }
                                     @if(choice.position != question.choices.toList.sortBy(_.position).size - 1){
-                                        <button class="btn btn-primary">Move Down</button>
+                                        <button class="btn btn-primary" onclick="moveChoiceDown(@choice.id, @question.id);">Move Down</button>
                                     }
-                                    <button class="btn btn-danger">Delete Choice</button>
+                                    <button class="btn btn-danger" onclick="deleteChoice(@question.id, @question.basis_id, @choice.id);">Delete Choice</button>
                                     @if(choice.correct == false){
                                         <button class="btn btn-primary">Set As Correct Answer</button>
                                     }
@@ -65,6 +65,8 @@
 
 
                 <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+
+                <script type="text/javascript" src="/assets/javascripts/questions.js"></script>
 
 
 

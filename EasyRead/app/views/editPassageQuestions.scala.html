@@ -47,7 +47,7 @@
                             <td>@PassageQuestionPrompt.byPassageQuestion(question.id).get(0).text </td>
                             <td>@question.correctAnswer</td>
                                 <td>
-                                    <button class="btn btn-primary"><a href="/editPassageQuestionsChoices?questionId=@question.id">Edit Choices</a> </button>
+                                    <button class="btn btn-primary"><a href="/editQuestionChoices?questionId=@question.id">Edit Choices</a> </button>
                                     @if(question.position != 0){
                                         <button class="btn btn-primary">Move up</button>
                                     }
