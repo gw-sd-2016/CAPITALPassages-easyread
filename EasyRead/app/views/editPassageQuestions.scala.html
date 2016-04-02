@@ -1,145 +1,134 @@
-@(form: Form[formdata.SimplePassageNumQuestionsData], passageId: Long)
+@(passage: models.SimplePassage, inst: models.User)
 
-    @main("Edit Passage Questions") {
+    @main("View All Passages") {
 
-        @helper.form(routes.SimplePassageController.editQuestions_submit(passageId)) {
+        <link rel="stylesheet" href="/assets/css/easyread.css"></>
 
-
-            @if(form.hasGlobalErrors) {
-                <div class="alert alert-danger">
-                @form.globalError.message
-
-                </div>
-
-
-            }
-
-            <div style="padding-left:20px">
-                <div class="pull-right" style="width:50% ;">
-                @SimplePassage.byId(passageId).text
-                </div>
-                <div>
-                    <p>
-                <h3> New Multiple Choice Question for @SimplePassage.byId(passageId).title</h3>
-                    <div style="display:none">
-                        <input type="text" name="passageId" placeholder="Description" value="@passageId">
-                    </div>
-
-                    <label>
-                        <button name="addQ" type="button" class="btn btn-primary" onclick="addQuestions();">
-                            Add Questions</button>
-                    </label>
-
-
-                    @for(pq <- SimplePassage.byId(passageId).questions) {
-
-                        <script>
-					function addQuestions () {
-                        var numQuestions = $('.question').length;
-
-                        if(numQuestions == null) numQuestions = 0;
-
-                        var lastQuestion = document.getElementsByName('question[' + (numQuestions - 1) + ']');
-
-
-                        var newQ = '<br><h3>' + (numQuestions + 1) + '.</h3> <div class="question" name="question[' + numQuestions +']"><label>Question Prompt: <input type="text" name="questions[' + numQuestions +']" placeholder="Description" value="questions[' + numQuestions +']"> <button type="button" class="btn btn-primary" name="b' + numQuestions +'" onclick="addChoices();">Add Choice</button></label><strong>Check the box next to the correct answer</strong><div class="choice' + numQuestions + '"><input type="text" name="choices[' + numQuestions +'][0]" placeholder="Description" value="choices[' + numQuestions +'][0]" style="margin-left:25px;"> <input type="checkbox" name="correctBox[' + numQuestions +'][0]" onclick="setCorrectAnswer();" style="padding-left:5px;" checked="true"></div></div><br>';
-
-                        var $this = $(lastQuestion);
-                        if(numQuestions > 0) $(newQ).insertAfter(lastQuestion[lastQuestion.length - 1]);
-                        else $(newQ).insertAfter(document.getElementsByName("addQ")[0]);
-                    }
-
-
-                    addQuestions();
-
-				 </script>
-
-                    }
-
-
-                    </p>
-                    <br>
-                    <p>
-                        <button type="submit" class="btn btn-success">
-                            <i class="btn-icon-only icon-check"></i> Submit
-                        </button>
-                    </p>
-                </div>
+        @if(flash.containsKey("success")) {
+            <div class="alert alert-success">
+                <h2>Done!</h2> @flash.get("success")
             </div>
         }
 
-        <script>
-                function addChoices (e) {
-//problem here
-                    //http://stackoverflow.com/questions/3001474/how-to-get-caller-element-using-javascript
-                    var sender = (e && e.target) || (window.event && window.event.srcElement);
-                    var name = sender.name;
+        <div>
 
-                    var numQuestions = name.substr(name.indexOf("b") + 1);
+            <div id="students" class="box">
 
-                    var numChoices = document.getElementsByClassName('choice' + numQuestions).length;
+                <div class="box-header">
+                    <i class="fa fa-group fa-2x"></i>
+                    <h5>View All Passages</h5>
+                </div>
 
-                    console.log('choice' + numQuestions);
-
-                    var newChoice = '<div class="choice' + numQuestions + '"><input name="choices[' + numQuestions + '][' + numChoices + ']" type="text" id="choice" value=choices[' + numQuestions + '][' + numChoices + ']" style="margin-left:25px;"/> <input type="checkbox" name="correctBox[' + numQuestions + '][' + numChoices + ']" onclick="setCorrectAnswer();" style="padding-left:5px;" /> </div>';
-
-                    var lastChoice = document.getElementsByName('correctBox[' + numQuestions + '][' + (numChoices - 1) + ']');
-
-                    console.log(lastChoice.length);
-
-                    var $this = $(lastChoice);
-                    $(newChoice).insertAfter(lastChoice[lastChoice.length - 1]);
-                }
-
-                function addQuestions () {
-                    var numQuestions = $('.question').length;
+                <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passage.id" style="margin-bottom: 20px ;">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    Add new Questions
+                </a>
 
 
-                    var lastQuestion = document.getElementsByName('question[' + (numQuestions - 1) + ']');
-
-
-                    var newQ = '<br><h3>' + (numQuestions + 1) + '.</h3> <div class="question" name="question[' + numQuestions +']"><label>Question Prompt: <input type="text" name="questions[' + numQuestions +']" placeholder="Description" value="questions[' + numQuestions +']"> <button type="button" class="btn btn-primary" name="b' + numQuestions +'" onclick="addChoices();">Add Choice</button></label><strong>Check the box next to the correct answer</strong><div class="choice' + numQuestions + '"><input type="text" name="choices[' + numQuestions +'][0]" placeholder="Description" value="choices[' + numQuestions +'][0]" style="margin-left:25px;"> <input type="checkbox" name="correctBox[' + numQuestions +'][0]" onclick="setCorrectAnswer();" style="padding-left:5px;" checked="true"></div></div><br>';
-
-                    var $this = $(lastQuestion);
-                    $(newQ).insertAfter(lastQuestion[lastQuestion.length - 1]);
-                }
-
-                function setCorrectAnswer(e){
-                    //http://stackoverflow.com/questions/3001474/how-to-get-caller-element-using-javascript
-                    var sender = (e && e.target) || (window.event && window.event.srcElement);
-                    var name = sender.name;
-
-                    name = name.substr(name.indexOf("x") + 2);
-
-                    var questionNumber = name.substr(0,name.indexOf("]"));
-
-                    name = name.substr(name.indexOf("[") + 1);
-
-                    var choiceNumber = name.substr(0,name.indexOf("]"));
-
-
-
-
-                    var previousAnswers = document.getElementsByName("correctAnswers[" + questionNumber + "]");
-
-                    console.log(" correctAnswers[" + questionNumber + "] " + previousAnswers.length);
-
-
-                    var checkboxes = document.getElementsByTagName("input");
-                    if(previousAnswers != null && previousAnswers.length > 0){
-                        previousAnswers[0].value = choiceNumber
-                    } else {
-                        var hiddenChoiceDiv = '<div style="display:none"><input type="text" name="correctAnswers[' + questionNumber + ']" value="' + choiceNumber + '" /> </div>';
-                        $(hiddenChoiceDiv).insertAfter(sender);
-                    }
-
-                    for(var i = 0; i < checkboxes.length; i++){
-                        if(checkboxes[i].type == "checkbox" && checkboxes[i].name != sender.name && checkboxes[i].name.indexOf("correctBox[" + questionNumber) >= 0){
-                            checkboxes[i].checked = false;
+                <div class="box-content box-table" style="padding: 10px ;">
+                @if(passage.questions.size == 0) {
+                    <div class="well">
+                        <strong><em>There are no questions in the system!</em></strong>
+                    </div>
+                } else {
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Position</th>
+                                <th>Prompt</th>
+                                <th>Correct Answer</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @for(question <- passage.questions.toList.sortBy(_.position)) {
+                            <tr>
+                            <td> @question.position</td>
+                            <td>@PassageQuestionPrompt.byPassageQuestion(question.id).get(0).text </td>
+                            <td>@question.correctAnswer</td>
+                                <td>
+                                    <button class="btn btn-primary"><a href="/editPassageQuestionsChoices?questionId=@question.id">Edit Choices</a> </button>
+                                    @if(question.position != 0){
+                                        <button class="btn btn-primary">Move up</button>
+                                    }
+                                    @if(question.position != passage.questions.toList.sortBy(_.position).size - 1){
+                                        <button class="btn btn-primary">Move Down</button>
+                                    }
+                                    <button class="btn btn-danger">Delete Question</button>
+                                </td>
+                            </tr>
                         }
-                    }
+                        </tbody>
+                    </table>
                 }
 
+                </div>
 
-        </script>
+
+                <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+
+                <script>
+                        $('button#deletePassage').click(function() {
+                            var button = $(this);
+                            button.toggleClass('active');
+
+                            var passageData = $(this).attr('name').split(":|:");
+                            var passageId = passageData[0];
+                            var passageName = passageData[1];
+
+                            var result = confirm("Are you sure you want to delete passage '" + passageName + "'? This cannot be undone.");
+                            if (result) {
+                                button.prop("disabled", true);
+                                jsRoutes.controllers.SimplePassageController.deletePassage(passageId).ajax({
+                                    success : function(data) {
+                                        window.location.reload();
+                                    },
+                                    error : function(err) {
+                                        //window.location = "";
+                                    }
+                                });
+                            } else {
+                                button.toggleClass('active');
+                            }
+
+                        });
+
+                        $('button#analyzePassages').click(function() {
+                            var button = $(this);
+                            button.toggleClass('active');
+
+
+
+                            var result = confirm("Are you sure you want to analyze passages? This may take a couple minutes");
+
+                            if (result) {
+                                switchSpinner();
+                                jsRoutes.controllers.SimplePassageController.analyzePassages().ajax({
+                                    success : function(data) {
+                                        window.location.reload();
+                                    },
+                                    error : function(err) {
+                                        //window.location = "";
+                                    }
+                                });
+                            }
+
+                        });
+
+                        function switchSpinner(){
+                            var on = "glyphicon glyphicon-refresh glyphicon-spin";
+                            var off = "glyphicon glyphicon-refresh";
+
+
+                            document.getElementsByTagName()
+                            var elem = document.getElementById("spinner");
+
+                            if(elem.className.substring(elem.className.length - 4) == "spin") elem.className = off;
+                            else elem.className = on;
+                        }
+
+
+                </script>
+
+
     }

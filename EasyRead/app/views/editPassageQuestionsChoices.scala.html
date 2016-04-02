@@ -1,0 +1,71 @@
+@(question: models.PassageQuestion, inst: models.User)
+
+    @main("View All Passages") {
+
+        <link rel="stylesheet" href="/assets/css/easyread.css"></>
+
+        @if(flash.containsKey("success")) {
+            <div class="alert alert-success">
+                <h2>Done!</h2> @flash.get("success")
+            </div>
+        }
+
+        <div>
+
+            <div id="students" class="box">
+
+                <div class="box-header">
+                    <i class="fa fa-group fa-2x"></i>
+                    <h5>View Choices</h5>
+                </div>
+
+                <button class="btn btn-primary">Add a Choice</button>
+
+                <div class="box-content box-table" style="padding: 10px ;">
+                @if(question.choices.size == 0) {
+                    <div class="well">
+                        <strong><em>There are no choices in the system!</em></strong>
+                    </div>
+                } else {
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Position</th>
+                                <th>Prompt</th>
+                                <th>Correct</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @for(choice <- question.choices.toList.sortBy(_.position)) {
+                            <tr>
+                            <td> @choice.position</td>
+                            <td>@PassageQuestionAnswer.byPassageQuestionChoice(choice.id).get(0).text </td>
+                            <td>@choice.correct.toString.capitalize</td>
+                                <td>
+                                    <button class="btn btn-primary">Edit Answer</button>
+                                    @if(choice.position != 0){
+                                        <button class="btn btn-primary">Move up</button>
+                                    }
+                                    @if(choice.position != question.choices.toList.sortBy(_.position).size - 1){
+                                        <button class="btn btn-primary">Move Down</button>
+                                    }
+                                    <button class="btn btn-danger">Delete Choice</button>
+                                    @if(choice.correct == false){
+                                        <button class="btn btn-primary">Set As Correct Answer</button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                }
+
+                </div>
+
+
+                <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+
+
+
+    }

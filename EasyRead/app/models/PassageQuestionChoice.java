@@ -66,6 +66,11 @@ public class PassageQuestionChoice extends Model {
         return find.where().ne("disavowed", true).findList();
     }
 
+
+    public static PassageQuestionChoice byQuestionAndPosition(Long qId, int pos){
+       return find.where().eq("passage_question_id", qId).eq("position", pos).findUnique();
+    }
+
     public void addAnswer(PassageQuestionAnswer a) {
         a.choiceId = this.id;
         a.save();

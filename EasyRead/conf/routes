@@ -29,10 +29,9 @@ GET         /analyzePassages                      @controllers.SimplePassageCont
 GET         /answerPassageQuestions               controllers.SimplePassageController.answerPassageQuestions(passageId : Long)
 POST        /answerPassageQuestions_submit        controllers.SimplePassageController.answerPassageQuestions_submit(passageId : Long)
 GET         /viewPassageQuestionAnswers           controllers.SimplePassageController.viewPassageQuestionAnswers(passageId : Long)
-GET         /deletePassageQuestion                controllers.SimplePassageController.deletePassageQuestion(questionId : Long)
-GET         /deletePassageQuestionChoice          controllers.SimplePassageController.deletePassageQuestionChoice(choiceId : Long)
 GET         /editQuestions                        controllers.SimplePassageController.editQuestions(passageId : Long)
 POST        /editQuestion_submit                  controllers.SimplePassageController.editQuestions_submit(passageId : Long)
+GET         /editQuestionChoices                     controllers.SimplePassageController.editQuestionChoices(questionId : Long)
 GET         /viewPassageWithSuggestions           controllers.SimplePassageController.viewS(passageId : Long, grade : Int)
 GET         /viewPassageAsStudent           controllers.SimplePassageController.viewAsStudent(passageId : Long, grade : Int)
 GET         /acceptWord                           @controllers.SimplePassageController.acceptWord(word : String, grade : Int)
@@ -48,6 +47,15 @@ POST       /createPHT                              controllers.SimplePassageCont
 GET        /inProg                                controllers.SimplePassageController.isAnalyzing()
 GET        /analyzeS                                controllers.SimplePassageController.analyzeSingularPassage(passageId : Long)
 GET        /loggedInId                              controllers.Application.getLoggedInUserId()
+GET        /moveQ                                   controllers.SimplePassageController.moveQuestion(questionId : Long, up : boolean)
+GET        /moveC                                   controllers.SimplePassageController.moveChoice(choiceId : Long, questionId : Long, up : boolean)
+GET        /editCA                                  controllers.SimplePassageController.editChoiceAnswer(choiceId : Long, questionId : Long, newText : String)
+GET        /setCorrect                              controllers.SimplePassageController.setAsCorrectAnswer(choiceId : Long, questionId : Long)
+GET        /editPrompt                              controllers.SimplePassageController.editPromptForQuestion(questionId : Long, newText : String)
+GET        /addChoice                               controllers.SimplePassageController.addChoiceToQuestion(questionId : Long, newChoice : String, isCorrect : boolean)
+GET         /deletePassageQuestion                controllers.SimplePassageController.deleteQuestion(questionId : Long, passageId : Long)
+GET         /deletePassageQuestionChoice          controllers.SimplePassageController.deleteChoiceForQuestion(questionId : Long, passageId : Long, choiceId : Long)
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                         controllers.Assets.at(path="/public", file)

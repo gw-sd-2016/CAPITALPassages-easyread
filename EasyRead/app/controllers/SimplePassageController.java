@@ -264,34 +264,23 @@ public class SimplePassageController extends Controller {
 
 
         if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            return ok(editPassageQuestions.render(SimplePassage.byId(passageId), User.byId(session("userId"))));
+        } else {
+            return ok(index.render(session("userFirstName")));
+        }
 
 
-            SimplePassage passage = SimplePassage.byId(passageId);
-            if (passage == null) {
-                return redirect(routes.SimplePassageController.viewAllPassages());
-            }
 
-            //questions, choices, corect answers
-            ArrayList<String> q = new ArrayList<String>();
-            ArrayList<ArrayList<String>> c = new ArrayList<ArrayList<String>>();
-            ArrayList<String> ca = new ArrayList<String>();
+    }
 
 
-            for (PassageQuestion pq : passage.questions) {
-                q.add(PassageQuestionPrompt.byPassageQuestion(pq.id).get(0).text);
-                ArrayList<String> thisQList = new ArrayList<String>();
-                for (PassageQuestionChoice pqc : pq.choices) {
 
-                    thisQList.add(PassageQuestionAnswer.byPassageQuestionChoice(pqc.id).get(0).text);
-                    if (pqc.correct) ca.add(String.valueOf(pqc.position));
-                }
-            }
+    public Result editQuestionChoices(Long questionId) {
+        if(session("userFirstName") == null) return ok(index.render(null));
 
-            SimplePassageNumQuestionsData data = new SimplePassageNumQuestionsData(passageId, q, c, ca);
-            Form<SimplePassageNumQuestionsData> form = Form.form(SimplePassageNumQuestionsData.class);
-            form = form.fill(data);
 
-            return ok(editPassageQuestions.render(form, passageId));
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            return ok(editPassageQuestionsChoices.render(PassageQuestion.byId(questionId), User.byId(session("userId"))));
         } else {
             return ok(index.render(session("userFirstName")));
         }
@@ -456,6 +445,180 @@ public class SimplePassageController extends Controller {
         }
 
     }
+
+
+    public Result moveQuestion(Long questionId, boolean up){
+        try{
+            PassageQuestion q = PassageQuestion.byId(questionId);
+            PassageQuestion other;
+            if(up){
+                other = PassageQuestion.byPassageAndPosition(q.basis_id, q.position - 1);
+            } else {
+                other = PassageQuestion.byPassageAndPosition(q.basis_id, q.position + 1);
+            }
+            int temp = q.position;
+            q.position = other.position;
+            other.position = temp;
+
+            q.save();
+            other.save();
+            return ok();
+        } catch(Exception e){
+            return badRequest();
+        }
+    }
+
+    public Result moveChoice(Long choiceId, Long questionId, boolean up){
+        try{
+            PassageQuestionChoice c = PassageQuestionChoice.byId(choiceId);
+            PassageQuestionChoice other;
+            if(up){
+                other = PassageQuestionChoice.byQuestionAndPosition(questionId, c.position - 1);
+            } else {
+                other = PassageQuestionChoice.byQuestionAndPosition(questionId, c.position + 1);
+            }
+            int temp = c.position;
+            c.position = other.position;
+            other.position = temp;
+
+            c.save();
+            other.save();
+            return ok();
+        } catch(Exception e){
+            return badRequest();
+        }
+    }
+
+    public Result editChoiceAnswer(Long choiceId, Long questionId, String newText){
+        try{
+            PassageQuestionChoice c = PassageQuestionChoice.byId(choiceId);
+
+
+            PassageQuestionAnswer ans = c.answer;
+
+            c.answer.text = newText;
+
+            c.save();
+
+            return ok();
+        } catch(Exception e){
+            return badRequest();
+        }
+    }
+
+
+    public Result setAsCorrectAnswer(Long choiceId, Long questionId){
+        try{
+            PassageQuestionChoice c = PassageQuestionChoice.byId(choiceId);
+
+
+           PassageQuestion ques = PassageQuestion.byId(questionId);
+
+            for(PassageQuestionChoice choice : ques.choices){
+                if(choice.correct){
+                    choice.correct = false;
+                    choice.save();
+                    break;
+                }
+            }
+
+            ques.correctAnswer = PassageQuestionAnswer.byPassageQuestionChoice(c.id).get(0).text;
+
+            c.correct = true;
+
+            ques.save();
+            c.save();
+
+            return ok();
+        } catch(Exception e){
+            return badRequest();
+        }
+    }
+
+
+
+    public Result editPromptForQuestion(Long questionId, String newText){
+        try{
+            PassageQuestionPrompt prompt = PassageQuestionPrompt.byPassageQuestion(questionId).get(0);
+
+            prompt.text = newText;
+
+           prompt.save();
+
+            return ok();
+        } catch(Exception e){
+            return badRequest();
+        }
+    }
+
+    public Result addChoiceToQuestion(Long questionId, String newChoice, boolean isCorrect){
+        try{
+            PassageQuestion ques = PassageQuestion.byId(questionId);
+
+            PassageQuestionChoice choice = new PassageQuestionChoice(ques.basis_id, isCorrect, true);
+            choice.answer = new PassageQuestionAnswer(choice, newChoice);
+            choice.position = ques.choices.size();
+
+            ques.choices.add(choice);
+
+            ques.save();
+
+            if(isCorrect) return setAsCorrectAnswer(choice.id, questionId);
+
+            return ok();
+        } catch(Exception e){
+            return badRequest();
+        }
+    }
+
+    public Result deleteQuestion(Long questionId, Long passageId){
+
+        try{
+            SimplePassage p = SimplePassage.byId(passageId);
+            PassageQuestion q = PassageQuestion.byId(questionId);
+
+            for(PassageQuestion ques : p.questions){
+                if(ques.position > q.position){
+                    ques.position--;
+                    ques.save();
+                }
+            }
+
+            q.delete();
+
+            return ok();
+        } catch(Exception e){
+            return badRequest();
+        }
+    }
+
+    public Result deleteChoiceForQuestion(Long questionId, Long passageId, Long choiceId){
+        try{
+            SimplePassage p = SimplePassage.byId(passageId);
+            PassageQuestion q = PassageQuestion.byId(questionId);
+
+            PassageQuestionChoice choice = PassageQuestionChoice.byId(choiceId);
+
+
+            for(PassageQuestionChoice c : q.choices){
+                if(c.position > choice.position){
+                    c.position--;
+                    c.save();
+                }
+            }
+
+            choice.delete();
+            q.save();
+
+            return ok();
+        } catch(Exception e){
+            return badRequest();
+        }
+    }
+
+
+
+    //-- end questions
 
     public Result editPassage(Long passageId, int grade) {
         if(session("userFirstName") == null) return ok(index.render(null));

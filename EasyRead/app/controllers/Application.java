@@ -105,11 +105,17 @@ public class Application extends Controller {
                         controllers.routes.javascript.SimplePassageController.createPassageHTML(),
                         controllers.routes.javascript.SimplePassageController.isAnalyzing(),
                         controllers.routes.javascript.SimplePassageController.analyzeSingularPassage()
-                        /*,
-                        controllers.routes.javascript.SimplePassageController.deletePassageQuestion()
-                        controllers.routes.javascript.SimplePassageController.deletePassageQuestionChoice()*/
+                        controllers.routes.javascript.SimplePassageController.moveQuestion(),
+                        controllers.routes.javascript.SimplePassageController.moveChoice(),
+                        controllers.routes.javascript.SimplePassageController.editChoiceAnswer(),
+                        controllers.routes.javascript.SimplePassageController.setAsCorrectAnswer(),
+                        controllers.routes.javascript.SimplePassageController.editPromptForQuestion(),
+                        controllers.routes.javascript.SimplePassageController.addChoiceToQuestion(),
+                        controllers.routes.javascript.SimplePassageController.deleteQuestion(),
+                        controllers.routes.javascript.SimplePassageController.deleteChoiceForQuestion()
 
-                )
+
+        )
         );
     }
 

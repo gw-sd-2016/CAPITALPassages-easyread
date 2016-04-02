@@ -70,11 +70,16 @@ public class PassageQuestion extends Model implements Comparable<PassageQuestion
 		/*c = c.thenComparing((p, o) ->
 		p.compareTo(o));*/
 
-        List<PassageQuestion> ret = find.where().ne("disavowed", true).findList();
+        List<PassageQuestion> ret =
         //ret.sort(c);
-
+        find.where().ne("disavowed", true).findList();
 
         return ret;
+    }
+
+
+    public static PassageQuestion byPassageAndPosition(Long passageId, int pos){
+       return find.where().eq("simple_passage_id", passageId).eq("position", pos).findUnique();
     }
 
     public static PassageQuestion create(PassageQuestion question) {
@@ -115,8 +120,13 @@ public class PassageQuestion extends Model implements Comparable<PassageQuestion
         }
 
         question.disavowed = true;
-        question.save();
+
+        question.delete();
+
+
+
     }
+
 
     public static List<String> promptsForPassageQuestion(Long passageId) {
         List<String> ret = new ArrayList<String>();
