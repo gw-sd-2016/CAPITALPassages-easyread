@@ -491,14 +491,18 @@ public class SimplePassageController extends Controller {
 
     public Result editChoiceAnswer(Long choiceId, Long questionId, String newText){
         try{
-            PassageQuestionChoice c = PassageQuestionChoice.byId(choiceId);
+            PassageQuestion q = PassageQuestion.byId(questionId);
 
+            for(PassageQuestionChoice c : q.choices){
+                if(c.id == Long.valueOf(choiceId)){
+                    PassageQuestionAnswer answer = PassageQuestionAnswer.byPassageQuestionChoice(c.id).get(0);
+                    answer.text = newText;
+                    answer.save();
 
-            PassageQuestionAnswer ans = c.answer;
+                    break;
+                }
+            }
 
-            c.answer.text = newText;
-
-            c.save();
 
             return ok();
         } catch(Exception e){

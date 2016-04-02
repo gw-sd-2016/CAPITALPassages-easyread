@@ -52,13 +52,6 @@ public class PassageQuestionAnswer extends Model {
 
     }
 
-	
-
-    public void delete(){
-		this.delete();
-		System.out.println("deleting");
-	}
-
 
     public static List<PassageQuestionAnswer> allAnswers() {
         return find.all();

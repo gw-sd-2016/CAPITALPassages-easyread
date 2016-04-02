@@ -21,6 +21,8 @@
 
                 <button class="btn btn-primary">Add a Choice</button>
 
+                <a href="/editQuestions?passageId=@question.basis_id" class="btn btn-primary">Back to Question</a>
+
                 <div class="box-content box-table" style="padding: 10px ;">
                 @if(question.choices.size == 0) {
                     <div class="well">
@@ -43,7 +45,7 @@
                             <td>@PassageQuestionAnswer.byPassageQuestionChoice(choice.id).get(0).text </td>
                             <td>@choice.correct.toString.capitalize</td>
                                 <td>
-                                    <button class="btn btn-primary">Edit Answer</button>
+                                    <button class="btn btn-primary" onclick="editAnswer(@choice.id, @question.id);">Edit Answer</button>
                                     @if(choice.position != 0){
                                         <button class="btn btn-primary" onclick="moveChoiceUp(@choice.id, @question.id);">Move up</button>
                                     }
@@ -52,7 +54,7 @@
                                     }
                                     <button class="btn btn-danger" onclick="deleteChoice(@question.id, @question.basis_id, @choice.id);">Delete Choice</button>
                                     @if(choice.correct == false){
-                                        <button class="btn btn-primary">Set As Correct Answer</button>
+                                        <button class="btn btn-primary" onclick="setAsCorrectAnswer(@choice.id, @question.id)">Set As Correct Answer</button>
                                     }
                                 </td>
                             </tr>

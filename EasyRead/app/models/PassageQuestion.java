@@ -25,7 +25,7 @@ public class PassageQuestion extends Model implements Comparable<PassageQuestion
 
     @Required
     @Expose
-    public Long basis_id;
+    public Long basis_id; // simple passage id
 
     @Required
     public boolean active;
@@ -71,15 +71,15 @@ public class PassageQuestion extends Model implements Comparable<PassageQuestion
 		p.compareTo(o));*/
 
         List<PassageQuestion> ret =
-        //ret.sort(c);
-        find.where().ne("disavowed", true).findList();
+                //ret.sort(c);
+                find.where().ne("disavowed", true).findList();
 
         return ret;
     }
 
 
     public static PassageQuestion byPassageAndPosition(Long passageId, int pos){
-       return find.where().eq("simple_passage_id", passageId).eq("position", pos).findUnique();
+        return find.where().eq("simple_passage_id", passageId).eq("position", pos).findUnique();
     }
 
     public static PassageQuestion create(PassageQuestion question) {
@@ -93,37 +93,21 @@ public class PassageQuestion extends Model implements Comparable<PassageQuestion
     }
 
 
-    public static void delete(Long id) {
-        PassageQuestion question = byId(id);
-        if (question == null) {
-            return;
+    @Override
+    public void delete() {
+        for(PassageQuestionChoice c : this.choices){
+            c.deepDelete();
         }
 
-        Iterator<PassageQuestionChoice> choicesItr = question.choices.iterator();
-        while (choicesItr.hasNext()) {
-            PassageQuestionChoice choice = choicesItr.next();
-            if (choice == null) {
-                continue;
-            }
+        PassageQuestionPrompt realPrompt = PassageQuestionPrompt.byPassageQuestion(id).get(0);
+        realPrompt.delete();
 
-            PassageQuestionChoice.delete(choice.id);
+        for(PassageQuestionRecord rec : PassageQuestionRecord.byPassageQuestionId(id)){
+            for(PassageQuestionResponse res : rec.responses) res.delete();
+            rec.delete();
         }
 
-        Iterator<PassageQuestionRecord> questionRecordsItr = PassageQuestionRecord.byPassageQuestionId(question.id).iterator();
-        while (questionRecordsItr.hasNext()) {
-            PassageQuestionRecord questionRecord = questionRecordsItr.next();
-            if (questionRecord == null) {
-                continue;
-            }
-
-            PassageQuestionRecord.delete(questionRecord.id);
-        }
-
-        question.disavowed = true;
-
-        question.delete();
-
-
+        super.delete();
 
     }
 

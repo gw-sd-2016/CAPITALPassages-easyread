@@ -63,15 +63,10 @@ public class PassageQuestionRecord extends Model {
         return courseRecord;
     }
 
-    public static void delete(Long id) {
-//		find.ref(id).delete();
-        PassageQuestionRecord questionRecord = find.ref(id);
-        if (questionRecord == null) {
-            return;
-        }
-
-        questionRecord.disavowed = true;
-        questionRecord.save();
+    @Override
+    public void delete() {
+        for(PassageQuestionResponse res : this.responses)  res.delete();
+        super.delete();
     }
 
     public static PassageQuestionRecord byId(Long id) {

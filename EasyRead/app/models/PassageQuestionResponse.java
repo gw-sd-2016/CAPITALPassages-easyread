@@ -57,13 +57,6 @@ public class PassageQuestionResponse extends Model {
         return response;
     }
 
-    public static void delete(Long id) {
-//		find.ref(id).delete();
-        PassageQuestionResponse response = find.ref(id);
-        response.disavowed = true;
-        response.save();
-    }
-
     public static PassageQuestionResponse byId(Long id) {
         return find.where().ne("disavowed", true).eq("id", id).findUnique();
     }
@@ -76,6 +69,10 @@ public class PassageQuestionResponse extends Model {
                 .findUnique();
     }
 
+
+    public static List<PassageQuestionResponse> byChoice(Long choiceId){
+        return find.where().ne("disavowed", true).eq("entity_id",choiceId).findList();
+    }
 
     public static List<PassageQuestionResponse> getAllQuestionsAnswered() {
         Calendar cal = Calendar.getInstance();

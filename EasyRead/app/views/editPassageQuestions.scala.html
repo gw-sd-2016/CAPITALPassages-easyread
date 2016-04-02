@@ -47,14 +47,15 @@
                             <td>@PassageQuestionPrompt.byPassageQuestion(question.id).get(0).text </td>
                             <td>@question.correctAnswer</td>
                                 <td>
-                                    <button class="btn btn-primary"><a href="/editQuestionChoices?questionId=@question.id">Edit Choices</a> </button>
+
+                                    <a href="/editQuestionChoices?questionId=@question.id" class="btn btn-primary">Edit Choices</a>
                                     @if(question.position != 0){
-                                        <button class="btn btn-primary">Move up</button>
+                                        <button class="btn btn-primary" onclick="moveQuestion(@question.id, true);">Move up</button>
                                     }
                                     @if(question.position != passage.questions.toList.sortBy(_.position).size - 1){
-                                        <button class="btn btn-primary">Move Down</button>
+                                        <button class="btn btn-primary" onclick="moveQuestion(@question.id, false);">Move Down</button>
                                     }
-                                    <button class="btn btn-danger">Delete Question</button>
+                                    <button class="btn btn-danger" onclick="deleteQuestion(@question.id, @question.basis_id);">Delete Question</button>
                                 </td>
                             </tr>
                         }
@@ -66,6 +67,8 @@
 
 
                 <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+
+                <script type="text/javascript" src="/assets/javascripts/questions.js"></script>
 
                 <script>
                         $('button#deletePassage').click(function() {

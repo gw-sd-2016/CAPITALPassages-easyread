@@ -24,7 +24,7 @@ public class PassageQuestionChoice extends Model {
 
     @Required
     @Expose
-    public Long entity_id;    // e.g. Word.id
+    public Long entity_id;    // e.g. not being used for anything right now
 
     @Required
     @Expose
@@ -68,7 +68,7 @@ public class PassageQuestionChoice extends Model {
 
 
     public static PassageQuestionChoice byQuestionAndPosition(Long qId, int pos){
-       return find.where().eq("passage_question_id", qId).eq("position", pos).findUnique();
+       return find.where().ne("disavowed", true).eq("passage_question_id", qId).eq("position", pos).findUnique();
     }
 
     public void addAnswer(PassageQuestionAnswer a) {
@@ -82,14 +82,25 @@ public class PassageQuestionChoice extends Model {
     }
 
 
-    public static void delete(Long id) {
-        PassageQuestionChoice choice = find.ref(id);
-        if (choice == null) {
-            return;
-        }
+    @Override
+    public  void delete() {
+        PassageQuestionAnswer ans = PassageQuestionAnswer.byPassageQuestionChoice(id).get(0);
+        ans.delete();
+        this.disavowed = true;
+        this.save();
+    }
 
-        choice.disavowed = true;
-        choice.save();
+    public void deepDelete(){
+        PassageQuestionAnswer ans = PassageQuestionAnswer.byPassageQuestionChoice(id).get(0);
+        ans.delete();
+
+        List<PassageQuestionResponse> resps = PassageQuestionResponse.byChoice(id);
+
+        for(PassageQuestionResponse res : resps ) res.delete();
+
+        for(PassageQuestionRecord rec : PassageQuestionRecord.all()){
+            if(rec.responses.size() == 0) rec.delete();
+        }
     }
 
     public static PassageQuestionChoice byId(Long id) {
