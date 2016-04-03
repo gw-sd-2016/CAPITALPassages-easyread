@@ -3,6 +3,13 @@
 
 # --- !Ups
 
+create table inflected_word_form (
+  id                        bigint auto_increment not null,
+  word                      varchar(255),
+  stem                      varchar(255),
+  constraint pk_inflected_word_form primary key (id))
+;
+
 create table pos (
   id                        bigint auto_increment not null,
   word_id                   bigint not null,
@@ -189,6 +196,8 @@ alter table simple_passage_passage_tag add constraint fk_simple_passage_passage_
 # --- !Downs
 
 SET FOREIGN_KEY_CHECKS=0;
+
+drop table inflected_word_form;
 
 drop table pos;
 

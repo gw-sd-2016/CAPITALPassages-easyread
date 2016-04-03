@@ -755,7 +755,11 @@ public class SimplePassageController extends Controller {
 
                 this.difficultiesCache = getDifficulties(p);
 
-                for (int i = 0; i < 14; i++) {
+
+                int stopPoint = 14;
+                if(!p.original) stopPoint = p.grade;
+
+                for (int i = 0; i < stopPoint; i++) {
                     generatePassageTextAtGrade(p.id, i);
                     beginSentenceBreakdown(p.id, i);
                 }
@@ -798,11 +802,13 @@ public class SimplePassageController extends Controller {
 
                 this.difficultiesCache = getDifficulties(p);
 
-                for (int i = 0; i < 14; i++) {
+                int stopPoint = 14;
+                if(!p.original) stopPoint = p.grade;
+
+                for (int i = 0; i < stopPoint; i++) {
                     generatePassageTextAtGrade(p.id, i);
                     beginSentenceBreakdown(p.id, i);
                 }
-
 
 
                 p.analyzed = true;
@@ -866,10 +872,14 @@ public class SimplePassageController extends Controller {
                 }
 
                 Word raw = Word.byRawString(w);
+                Word inflected = InflectedWordForm.byInflectedForm(w);
 
                 // maybe need to deal with compound words here
 
                 if (raw != null && raw.ageOfAcquisition > (grade + 6) && !w.contains("<u>") && !Word.isStopWord(raw)) {
+                    current.html = current.html.replace(" " + w + " ", " <u>" + w + "</u> ");
+                    current.html = current.html.replace(" " + w.toLowerCase() + " ", " <u>" + w + "</u> ");
+                } else if(inflected != null && inflected.ageOfAcquisition > (grade + 6) && !w.contains("<u>") && !Word.isStopWord(raw)){
                     current.html = current.html.replace(" " + w + " ", " <u>" + w + "</u> ");
                     current.html = current.html.replace(" " + w.toLowerCase() + " ", " <u>" + w + "</u> ");
                 }

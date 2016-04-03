@@ -1,5 +1,7 @@
 package controllers;
 
+import edu.stanford.nlp.dcoref.CoNLL2011DocumentReader;
+import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
@@ -7,10 +9,7 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
-import models.POS;
-import models.Sentence;
-import models.SimplePassage;
-import models.Word;
+import models.*;
 import net.sf.extjwnl.JWNLException;
 
 import java.util.List;
@@ -25,7 +24,7 @@ public class ParsingController {
     private void initPipeline() {
         Properties props = new Properties();
         // do we still need all these annotators
-        props.put("annotators", "tokenize, ssplit, pos, lemma");
+        props.put("annotators", "tokenize, ssplit, pos, lemma, ner");
         pipeline = new StanfordCoreNLP(props);
 
     }
@@ -81,12 +80,23 @@ public class ParsingController {
                 String pos = token.get(PartOfSpeechAnnotation.class);
 
                 String lemma = token.originalText();
-                // System.out.println("LEMMA : " + lemma);
 
+                String stem = token.lemma();
+
+                // this is the NER label of the token
+                String ne = token.get(CoreAnnotations.NamedEntityTagAnnotation.class);
 
                 POS p = new POS(pos);
 
                 if (lemma.length() > 1 || Character.isLetter(lemma.charAt(0))) {
+
+                    // keep track of words for which there is a different form of a word used in the database
+                    if(!stem.toLowerCase().equals(lemma.toLowerCase())){
+                        InflectedWordForm wordForm = new InflectedWordForm();
+                        wordForm.stem = stem;
+                        wordForm.word = lemma;
+                        wordForm.save();
+                    }
 						/*if(originalSCount == 0) {*/
                     new MashapeController().getNumSyllablesForWord(lemma, passage);
 
