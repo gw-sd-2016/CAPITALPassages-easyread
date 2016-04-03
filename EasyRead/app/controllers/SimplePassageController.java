@@ -1,21 +1,16 @@
 package controllers;
 
 
-import com.fasterxml.jackson.databind.JsonNode;
 import formdata.PassageQuestionAnswerData;
 import formdata.SimplePassageData;
 import formdata.SimplePassageNumQuestionsData;
 import models.*;
 import net.sf.extjwnl.JWNLException;
 import play.data.Form;
-import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
-import scala.util.parsing.json.JSONArray$;
 import views.html.*;
 
-import javax.json.JsonArray;
-import javax.json.JsonObject;
 import java.util.*;
 
 import static play.data.Form.form;
@@ -30,7 +25,10 @@ public class SimplePassageController extends Controller {
     // New Passage Methods
     public Result createSimplePassage() throws JWNLException {
         if(session("userFirstName") == null) return ok(index.render(null));
-        return ok(createSimplePassage.render(form(SimplePassageData.class)));
+
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            return ok(createSimplePassage.render(form(SimplePassageData.class)));
+        } else return badRequest();
     }
 
     public Result createPassageHTML(String text, String title, String source) {
@@ -84,12 +82,17 @@ public class SimplePassageController extends Controller {
     }
 
     public Result changeVisibility(Long passageId){
-        try{
-            SimplePassage p = SimplePassage.byId(passageId);
-            p.visibleToStudents = !p.visibleToStudents;
-            p.save();
-            return ok();
-        } catch (Exception e){
+
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            try{
+                SimplePassage p = SimplePassage.byId(passageId);
+                p.visibleToStudents = !p.visibleToStudents;
+                p.save();
+                return ok();
+            } catch (Exception e){
+                return badRequest();
+            }
+        } else {
             return badRequest();
         }
     }
@@ -429,66 +432,73 @@ public class SimplePassageController extends Controller {
 
 
     public Result moveQuestion(Long questionId, boolean up){
-        try{
-            PassageQuestion q = PassageQuestion.byId(questionId);
-            PassageQuestion other;
-            if(up){
-                other = PassageQuestion.byPassageAndPosition(q.basis_id, q.position - 1);
-            } else {
-                other = PassageQuestion.byPassageAndPosition(q.basis_id, q.position + 1);
-            }
-            int temp = q.position;
-            q.position = other.position;
-            other.position = temp;
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            try{
+                PassageQuestion q = PassageQuestion.byId(questionId);
+                PassageQuestion other;
+                if(up){
+                    other = PassageQuestion.byPassageAndPosition(q.basis_id, q.position - 1);
+                } else {
+                    other = PassageQuestion.byPassageAndPosition(q.basis_id, q.position + 1);
+                }
+                int temp = q.position;
+                q.position = other.position;
+                other.position = temp;
 
-            q.save();
-            other.save();
-            return ok();
-        } catch(Exception e){
-            return badRequest();
-        }
+                q.save();
+                other.save();
+                return ok();
+            } catch(Exception e){
+                return badRequest();
+            }
+        } else return badRequest();
     }
 
     public Result moveChoice(Long choiceId, Long questionId, boolean up){
-        try{
-            PassageQuestionChoice c = PassageQuestionChoice.byId(choiceId);
-            PassageQuestionChoice other;
-            if(up){
-                other = PassageQuestionChoice.byQuestionAndPosition(questionId, c.position - 1);
-            } else {
-                other = PassageQuestionChoice.byQuestionAndPosition(questionId, c.position + 1);
-            }
-            int temp = c.position;
-            c.position = other.position;
-            other.position = temp;
 
-            c.save();
-            other.save();
-            return ok();
-        } catch(Exception e){
-            return badRequest();
-        }
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            try{
+                PassageQuestionChoice c = PassageQuestionChoice.byId(choiceId);
+                PassageQuestionChoice other;
+                if(up){
+                    other = PassageQuestionChoice.byQuestionAndPosition(questionId, c.position - 1);
+                } else {
+                    other = PassageQuestionChoice.byQuestionAndPosition(questionId, c.position + 1);
+                }
+                int temp = c.position;
+                c.position = other.position;
+                other.position = temp;
+
+                c.save();
+                other.save();
+                return ok();
+            } catch(Exception e){
+                return badRequest();
+            }
+        } else return badRequest();
     }
 
     public Result editChoiceAnswer(Long choiceId, Long questionId, String newText){
-        try{
-            PassageQuestion q = PassageQuestion.byId(questionId);
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            try{
+                PassageQuestion q = PassageQuestion.byId(questionId);
 
-            for(PassageQuestionChoice c : q.choices){
-                if(c.id == Long.valueOf(choiceId)){
-                    PassageQuestionAnswer answer = PassageQuestionAnswer.byPassageQuestionChoice(c.id).get(0);
-                    answer.text = newText;
-                    answer.save();
+                for(PassageQuestionChoice c : q.choices){
+                    if(c.id == Long.valueOf(choiceId)){
+                        PassageQuestionAnswer answer = PassageQuestionAnswer.byPassageQuestionChoice(c.id).get(0);
+                        answer.text = newText;
+                        answer.save();
 
-                    break;
+                        break;
+                    }
                 }
+
+
+                return ok();
+            } catch(Exception e){
+                return badRequest();
             }
-
-
-            return ok();
-        } catch(Exception e){
-            return badRequest();
-        }
+        } else return badRequest();
     }
 
 
@@ -497,7 +507,7 @@ public class SimplePassageController extends Controller {
             PassageQuestionChoice c = PassageQuestionChoice.byId(choiceId);
 
 
-           PassageQuestion ques = PassageQuestion.byId(questionId);
+            PassageQuestion ques = PassageQuestion.byId(questionId);
 
             for(PassageQuestionChoice choice : ques.choices){
                 if(choice.correct){
@@ -523,46 +533,52 @@ public class SimplePassageController extends Controller {
 
 
     public Result editPromptForQuestion(Long questionId, String newText){
-        try{
-            PassageQuestionPrompt prompt = PassageQuestionPrompt.byPassageQuestion(questionId).get(0);
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            try{
+                PassageQuestionPrompt prompt = PassageQuestionPrompt.byPassageQuestion(questionId).get(0);
 
-            prompt.text = newText;
+                prompt.text = newText;
 
-           prompt.save();
+                prompt.save();
 
-            return ok();
-        } catch(Exception e){
-            return badRequest();
-        }
+                return ok();
+            } catch(Exception e){
+                return badRequest();
+            }
+        } else return badRequest();
     }
 
     public Result addChoiceToQuestion(Long questionId, String newChoice, boolean isCorrect){
-        try{
-            PassageQuestion ques = PassageQuestion.byId(questionId);
 
-            PassageQuestionChoice choice = new PassageQuestionChoice(ques.basis_id, isCorrect, true);
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            try{
+                PassageQuestion ques = PassageQuestion.byId(questionId);
 
-            ques.choices.add(choice);
+                PassageQuestionChoice choice = new PassageQuestionChoice(ques.basis_id, isCorrect, true);
 
-            ques.save();
+                ques.choices.add(choice);
 
-            PassageQuestionAnswer answer = new PassageQuestionAnswer(choice, newChoice);
+                ques.save();
 
-            answer.save();
+                PassageQuestionAnswer answer = new PassageQuestionAnswer(choice, newChoice);
 
-            choice.answer = answer;
-            choice.position = ques.choices.size();
+                answer.save();
+
+                choice.answer = answer;
+                choice.position = ques.choices.size();
 
 
-            choice.save();
-            ques.save();
+                choice.save();
+                ques.save();
 
-            if(isCorrect) return setAsCorrectAnswer(choice.id, questionId);
+                if(isCorrect) return setAsCorrectAnswer(choice.id, questionId);
 
-            return ok();
-        } catch(Exception e){
-            return badRequest();
-        }
+                return ok();
+            } catch(Exception e){
+                return badRequest();
+            }
+        } else return badRequest();
+
     }
 
     public Result deleteQuestion(Long questionId, Long passageId){
@@ -588,27 +604,122 @@ public class SimplePassageController extends Controller {
 
     // what if you delete the correct answer?
     public Result deleteChoiceForQuestion(Long questionId, Long passageId, Long choiceId){
-        try{
-            SimplePassage p = SimplePassage.byId(passageId);
-            PassageQuestion q = PassageQuestion.byId(questionId);
 
-            PassageQuestionChoice choice = PassageQuestionChoice.byId(choiceId);
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            try{
+                SimplePassage p = SimplePassage.byId(passageId);
+                PassageQuestion q = PassageQuestion.byId(questionId);
+
+                PassageQuestionChoice choice = PassageQuestionChoice.byId(choiceId);
 
 
-            for(PassageQuestionChoice c : q.choices){
-                if(c.position > choice.position){
-                    c.position--;
-                    c.save();
+                for(PassageQuestionChoice c : q.choices){
+                    if(c.position > choice.position){
+                        c.position--;
+                        c.save();
+                    }
+                }
+
+                choice.deepDelete();
+                q.save();
+
+                return ok();
+            } catch(Exception e){
+                return badRequest();
+            }
+        } else return badRequest();
+    }
+
+    public Result answerPassageQuestions_submit(Long passageId) {
+        if(session("userFirstName") == null) return ok(index.render(null));
+
+
+        Long userID = Long.valueOf(session("userId"));
+        SimplePassage passage = SimplePassage.byId(passageId);
+        if (passage == null) {
+            return redirect(routes.SimplePassageController.answerPassageQuestions(passageId));
+        }
+
+        Form<PassageQuestionAnswerData> form = Form.form(PassageQuestionAnswerData.class).bindFromRequest();
+
+        if (form.hasErrors()) {
+            return badRequest(answerPassageQuestions.render(form(PassageQuestionAnswerData.class), passageId));
+        }
+
+
+        PassageQuestionAnswerData data = form.get();
+
+        List<PassageQuestionRecord> records = PassageQuestionRecord.all();
+
+        for (int i = 0; i < data.answers.size(); i++) {
+            if (data.answers.get(i) != "") {
+                PassageQuestionRecord thisQ = null;
+                //thisQ.user = User.byId(userID);
+                for (PassageQuestionRecord r : records) {
+                    if (r.question.position == i && r.question.basis_id == passageId) thisQ = r;
+                }
+
+                if (thisQ != null) {
+                    int id = -1;
+                    for (PassageQuestionChoice c : thisQ.question.choices) {
+
+                        if (c.position == Integer.valueOf(data.answers.get(i))) {
+                            id = c.id.intValue();
+                        }
+                    }
+
+                    PassageQuestionResponse res = new PassageQuestionResponse(Long.valueOf(id), null);
+                    res.submitter = User.byId(userID);
+                    thisQ.responses.add(res);
+                    thisQ.save();
+                } else {
+                    PassageQuestion current = null;
+                    for (PassageQuestion q : passage.questions) {
+                        if (q.position == Long.valueOf(i)) {
+                            current = q;
+                        }
+                    }
+                    Long instId = Long.valueOf((session("userId")));
+                    User inst = User.byId(instId);
+
+                    thisQ = new PassageQuestionRecord(inst, current, false);
+
+                    int id = -1;
+                    for (PassageQuestionChoice c : thisQ.question.choices) {
+                        if (c.position == Integer.valueOf(data.answers.get(i))) {
+                            id = c.id.intValue();
+                        }
+                    }
+
+
+                    PassageQuestionResponse newPQRes = new PassageQuestionResponse(Long.valueOf(id), null);
+                    newPQRes.submitter = User.byId(session("userId"));
+                    thisQ.responses.add(newPQRes);
+                    thisQ.save();
                 }
             }
-
-            choice.deepDelete();
-            q.save();
-
-            return ok();
-        } catch(Exception e){
-            return badRequest();
         }
+
+        Long instId = Long.valueOf((session("userId")));
+        User inst = User.byId(instId);
+
+
+        return ok(viewPassageQuestionAnswers.render(passageId, inst));
+    }
+
+    public Result viewPassageQuestionAnswers(Long passageId) {
+        if(session("userFirstName") == null) return ok(index.render(null));
+
+        Long instId = Long.valueOf((session("userId")));
+        User inst = User.byId(instId);
+
+        return ok(viewPassageQuestionAnswers.render(passageId, inst));
+    }
+
+
+    public Result answerPassageQuestions(Long passageId) {
+        if(session("userFirstName") == null) return ok(index.render(null));
+        return ok(answerPassageQuestions.render(form(PassageQuestionAnswerData.class), passageId));
     }
 
 
@@ -648,21 +759,21 @@ public class SimplePassageController extends Controller {
         if(session("userFirstName") == null) return ok(index.render(null));
 
 
-            User user = User.byId(session("userId"));
+        User user = User.byId(session("userId"));
 
 
-            if(user.type == User.Role.STUDENT) return viewAsStudent(passageId, grade);
-            if (user == null) {
-                return ok(index.render(session("userFirstName")));
-            }
+        if(user.type == User.Role.STUDENT) return viewAsStudent(passageId, grade);
+        if (user == null) {
+            return ok(index.render(session("userFirstName")));
+        }
 
-            SimplePassage passage = SimplePassage.byId(passageId);
+        SimplePassage passage = SimplePassage.byId(passageId);
 
-            if (grade >= 0) {
-                passage.grade = grade;
-            } else passage.grade = 0;
+        if (grade >= 0) {
+            passage.grade = grade;
+        } else passage.grade = 0;
 
-            return ok(viewPassageWithSuggestions.render(passage, User.byId(passage.instructorID), true));
+        return ok(viewPassageWithSuggestions.render(passage, User.byId(passage.instructorID), true));
 
 
     }
@@ -687,25 +798,29 @@ public class SimplePassageController extends Controller {
 
 
     public Result viewPassageQuestions(Long passageId) {
-        if(session("userFirstName") == null) return ok(index.render(null));
-		return ok(viewPassageQuestions.render(passageId));
-	}
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            if(session("userFirstName") == null) return ok(index.render(null));
+            return ok(viewPassageQuestions.render(passageId));
+        } else return badRequest();
+    }
 
 
     public Result createSimplePassage_submit() {
-        if(session("userFirstName") == null) return ok(index.render(null));
-        Form<SimplePassageData> createSPForm = form(SimplePassageData.class).bindFromRequest();
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            if(session("userFirstName") == null) return ok(index.render(null));
+            Form<SimplePassageData> createSPForm = form(SimplePassageData.class).bindFromRequest();
 
-        if (createSPForm.hasErrors()) {
-            return badRequest(createSimplePassage.render(createSPForm));
-        }
+            if (createSPForm.hasErrors()) {
+                return badRequest(createSimplePassage.render(createSPForm));
+            }
 
-        SimplePassage newPassage = new SimplePassage(createSPForm.get());
-        newPassage.instructorID = Integer.valueOf(session("userId"));
+            SimplePassage newPassage = new SimplePassage(createSPForm.get());
+            newPassage.instructorID = Integer.valueOf(session("userId"));
 
 
-        newPassage.save();
-        return redirect(routes.SimplePassageController.viewAllPassages());
+            newPassage.save();
+            return redirect(routes.SimplePassageController.viewAllPassages());
+        } else return badRequest();
     }
 
 
@@ -733,101 +848,113 @@ public class SimplePassageController extends Controller {
 
 
     public Result isAnalyzing(){
-        if(inProgress) return ok("prog");
-        else return ok("fine");
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            if(inProgress) return ok("prog");
+            else return ok("fine");
+        } else{
+            return badRequest();
+        }
     }
+
 
     public Result analyzePassages() throws JWNLException {
         if(session("userFirstName") == null) return ok(index.render(null));
-        this.inProgress = true;
-        for (SimplePassage p : SimplePassage.all()) {
 
-            if(!p.analyzed){
-                parseAndAddSuggestions(p);
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            this.inProgress = true;
+            for (SimplePassage p : SimplePassage.all()) {
 
-                if(p.htmlRepresentations != null){
-                    for(PassageText pt : p.htmlRepresentations) pt.delete();
+                if(!p.analyzed){
+                    parseAndAddSuggestions(p);
+
+                    if(p.htmlRepresentations != null){
+                        for(PassageText pt : p.htmlRepresentations) pt.delete();
+                    }
+
+
+
+                    p.htmlRepresentations = new HashSet<PassageText>();
+
+                    this.difficultiesCache = getDifficulties(p);
+
+
+                    int stopPoint = 14;
+                    if(!p.original) stopPoint = p.grade;
+
+                    for (int i = 0; i < stopPoint; i++) {
+                        generatePassageTextAtGrade(p.id, i);
+                        beginSentenceBreakdown(p.id, i);
+                    }
+
+
+
+                    p.analyzed = true;
+
+
+                    parsingController.reviseSuggestions();
+
+                    p.save();
                 }
-
-
-
-                p.htmlRepresentations = new HashSet<PassageText>();
-
-                this.difficultiesCache = getDifficulties(p);
-
-
-                int stopPoint = 14;
-                if(!p.original) stopPoint = p.grade;
-
-                for (int i = 0; i < stopPoint; i++) {
-                    generatePassageTextAtGrade(p.id, i);
-                    beginSentenceBreakdown(p.id, i);
-                }
-
-
-
-                p.analyzed = true;
-
-
-                parsingController.reviseSuggestions();
-
-                p.save();
-            }
-
-        }
-        this.inProgress = false;
-        flash("success", "Passage Analysis Completed.");
-        return ok("true");
-    }
-
-
-    public Result analyzeSingularPassage(Long passageId) throws JWNLException {
-        if(session("userFirstName") == null) return ok(index.render(null));
-
-        this.inProgress = true;
-
-        SimplePassage p = SimplePassage.byId(passageId);
-
-        if(p != null) {
-            if(!p.analyzed){
-                parseAndAddSuggestions(p);
-
-                if(p.htmlRepresentations != null){
-                    for(PassageText pt : p.htmlRepresentations) pt.delete();
-                }
-
-
-
-                p.htmlRepresentations = new HashSet<PassageText>();
-
-                this.difficultiesCache = getDifficulties(p);
-
-                int stopPoint = 14;
-                if(!p.original) stopPoint = p.grade;
-
-                for (int i = 0; i < stopPoint; i++) {
-                    generatePassageTextAtGrade(p.id, i);
-                    beginSentenceBreakdown(p.id, i);
-                }
-
-
-                p.analyzed = true;
-
-
-                parsingController.reviseSuggestions();
-
-                p.save();
 
             }
             this.inProgress = false;
             flash("success", "Passage Analysis Completed.");
             return ok("true");
         } else {
-            this.inProgress = false;
             return badRequest();
         }
+    }
 
 
+    public Result analyzeSingularPassage(Long passageId) throws JWNLException {
+        if(session("userFirstName") == null) return ok(index.render(null));
+
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            this.inProgress = true;
+
+            SimplePassage p = SimplePassage.byId(passageId);
+
+            if(p != null) {
+                if(!p.analyzed){
+                    parseAndAddSuggestions(p);
+
+                    if(p.htmlRepresentations != null){
+                        for(PassageText pt : p.htmlRepresentations) pt.delete();
+                    }
+
+
+
+                    p.htmlRepresentations = new HashSet<PassageText>();
+
+                    this.difficultiesCache = getDifficulties(p);
+
+                    int stopPoint = 14;
+                    if(!p.original) stopPoint = p.grade;
+
+                    for (int i = 0; i < stopPoint; i++) {
+                        generatePassageTextAtGrade(p.id, i);
+                        beginSentenceBreakdown(p.id, i);
+                    }
+
+
+                    p.analyzed = true;
+
+
+                    parsingController.reviseSuggestions();
+
+                    p.save();
+
+                }
+                this.inProgress = false;
+                flash("success", "Passage Analysis Completed.");
+                return ok("true");
+            } else {
+                this.inProgress = false;
+                return badRequest();
+            }
+        } else {
+            return badRequest();
+        }
     }
 
     private HashMap<String, String> sugMap = new HashMap<String, String>();
@@ -1047,144 +1174,7 @@ public class SimplePassageController extends Controller {
         }
     }
 
-    // do we possible need to clean up response here?? are they unreachable
-    public Result deletePassageQuestion(Long questionId) {
-        if(session("userFirstName") == null) return ok(index.render(null));
 
-        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
-            PassageQuestion a = PassageQuestion.byId(questionId);
-
-            if (a == null) {
-                flash("error", "Couldn't find a question matching this id to delete");
-                return ok("false");
-            }
-
-            a.delete("");
-
-            System.out.println("Should be deleted");
-
-
-            return ok("true");
-        } else {
-            return ok(index.render(session("userFirstName")));
-        }
-
-
-    }
-
-    public Result deletePassageQuestionChoice(Long choiceId) {
-        if(session("userFirstName") == null) return ok(index.render(null));
-
-        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
-            PassageQuestionChoice a = PassageQuestionChoice.byId(choiceId);
-
-            if (a == null) {
-                flash("error", "Couldn't find a choice matching this id to delete");
-                return ok("false");
-            }
-
-            a.delete("");
-
-            System.out.println("Should be deleted");
-
-
-            return ok("true");
-        } else {
-            return ok(index.render(session("userFirstName")));
-        }
-    }
-
-    public Result answerPassageQuestions(Long passageId) {
-        if(session("userFirstName") == null) return ok(index.render(null));
-        return ok(answerPassageQuestions.render(form(PassageQuestionAnswerData.class), passageId));
-    }
-
-
-    public Result answerPassageQuestions_submit(Long passageId) {
-        if(session("userFirstName") == null) return ok(index.render(null));
-
-
-        Long userID = Long.valueOf(session("userId"));
-        SimplePassage passage = SimplePassage.byId(passageId);
-        if (passage == null) {
-            return redirect(routes.SimplePassageController.answerPassageQuestions(passageId));
-        }
-
-        Form<PassageQuestionAnswerData> form = Form.form(PassageQuestionAnswerData.class).bindFromRequest();
-
-        if (form.hasErrors()) {
-            return badRequest(answerPassageQuestions.render(form(PassageQuestionAnswerData.class), passageId));
-        }
-
-
-        PassageQuestionAnswerData data = form.get();
-
-        List<PassageQuestionRecord> records = PassageQuestionRecord.all();
-
-        for (int i = 0; i < data.answers.size(); i++) {
-            if (data.answers.get(i) != "") {
-                PassageQuestionRecord thisQ = null;
-                //thisQ.user = User.byId(userID);
-                for (PassageQuestionRecord r : records) {
-                    if (r.question.position == i && r.question.basis_id == passageId) thisQ = r;
-                }
-
-                if (thisQ != null) {
-                    int id = -1;
-                    for (PassageQuestionChoice c : thisQ.question.choices) {
-
-                        if (c.position == Integer.valueOf(data.answers.get(i))) {
-                            id = c.id.intValue();
-                        }
-                    }
-
-                    PassageQuestionResponse res = new PassageQuestionResponse(Long.valueOf(id), null);
-                    res.submitter = User.byId(userID);
-                    thisQ.responses.add(res);
-                    thisQ.save();
-                } else {
-                    PassageQuestion current = null;
-                    for (PassageQuestion q : passage.questions) {
-                        if (q.position == Long.valueOf(i)) {
-                            current = q;
-                        }
-                    }
-                    Long instId = Long.valueOf((session("userId")));
-                    User inst = User.byId(instId);
-
-                    thisQ = new PassageQuestionRecord(inst, current, false);
-
-                    int id = -1;
-                    for (PassageQuestionChoice c : thisQ.question.choices) {
-                        if (c.position == Integer.valueOf(data.answers.get(i))) {
-                            id = c.id.intValue();
-                        }
-                    }
-
-
-                    PassageQuestionResponse newPQRes = new PassageQuestionResponse(Long.valueOf(id), null);
-                    newPQRes.submitter = User.byId(session("userId"));
-                    thisQ.responses.add(newPQRes);
-                    thisQ.save();
-                }
-            }
-        }
-
-        Long instId = Long.valueOf((session("userId")));
-        User inst = User.byId(instId);
-
-
-        return ok(viewPassageQuestionAnswers.render(passageId, inst));
-    }
-
-    public Result viewPassageQuestionAnswers(Long passageId) {
-        if(session("userFirstName") == null) return ok(index.render(null));
-
-            Long instId = Long.valueOf((session("userId")));
-            User inst = User.byId(instId);
-
-            return ok(viewPassageQuestionAnswers.render(passageId, inst));
-    }
 
     public ArrayList<Double> getDifficulties(SimplePassage p) {
         PassageAnalysisController analysisController = new PassageAnalysisController();
@@ -1222,61 +1212,144 @@ public class SimplePassageController extends Controller {
 
 
     public Result beginSentenceBreakdown(Long passageId, int grade) {
-        if(session("userFirstName") == null) return ok(index.render(null));
-        System.out.println("Begin");
-        SimplePassage p = SimplePassage.byId(passageId);
+
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            if(session("userFirstName") == null) return ok(index.render(null));
+            System.out.println("Begin");
+            SimplePassage p = SimplePassage.byId(passageId);
 
 
-        PassageText current = PassageText.bySimplePassageAndGrade(passageId, grade);
+            PassageText current = PassageText.bySimplePassageAndGrade(passageId, grade);
 
-        if (current.html != null && current.html.length() > 0) {
-            System.out.println("in here");
+            if (current.html != null && current.html.length() > 0) {
+                System.out.println("in here");
 
 
-            System.out.println("----" + current.html);
+                System.out.println("----" + current.html);
 
-            String[] split = current.html.split(" ");
+                String[] split = current.html.split(" ");
 
-            int sentNumber = 0;
-            boolean placed = false;
-            for (int i = 0; i < split.length; i++) {
-                if (sentNumber < p.sentences.size() && this.difficultiesCache.get(sentNumber) > grade && !placed) {
-                    String curr = split[i];
+                int sentNumber = 0;
+                boolean placed = false;
+                for (int i = 0; i < split.length; i++) {
+                    if (sentNumber < p.sentences.size() && this.difficultiesCache.get(sentNumber) > grade && !placed) {
+                        String curr = split[i];
+                        int spaceIndex = curr.indexOf("&nbsp");
+
+                        System.out.println("sp:" + spaceIndex);
+
+                        if (spaceIndex != -1) {
+                            curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + this.difficultiesCache.get(sentNumber) + ");'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
+                        } else {
+                            curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + this.difficultiesCache.get(sentNumber) + ");'>" + curr + "</i> ";
+                        }
+
+                        while (curr.indexOf(" <u>") != -1) {
+                            curr = curr.substring(0, curr.indexOf(" <u>")) + "&nbsp" + curr.substring(curr.indexOf(" <u>") + 1);
+                        }
+
+
+                        split[i] = curr;
+                        System.out.println(split[i]);
+                        placed = true;
+                    }
+
+                    if (split[i].charAt(split[i].length() - 1) == '.') {
+                        sentNumber++;
+                        placed = false;
+                    }
+
+
+                }
+
+
+                current.html = rebuildHTML(split);
+
+                for (int c = 0; c < current.html.length() - 2; c++) {
+                    if (current.html.charAt(c) == ' ' && current.html.substring(c + 1, c + 3).equals("<u")) {
+                        current.html = current.html.substring(0, c) + "&nbsp" + current.html.substring(c + 1);
+                    }
+                }
+
+
+                // do i actually need to do this?
+                for (PassageText pt : p.htmlRepresentations) {
+                    if (pt.grade == current.grade) {
+                        pt.html = current.html;
+                        break;
+                    }
+                }
+
+                System.out.println(current.html);
+                p.save();
+            } else System.out.println("null");
+
+
+            return ok();
+        } else return badRequest();
+    }
+
+
+    private ArrayList<Double> diffCache;
+
+    public Result singularSentenceBreakdown(Long passageId, int grade, String sentence) {
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            if(session("userFirstName") == null) return ok(index.render(null));
+            SimplePassage p = SimplePassage.byId(passageId);
+            if(diffCache == null) diffCache = getDifficulties(p);
+
+
+            PassageText current = PassageText.bySimplePassageAndGrade(passageId, grade);
+
+            String ogSentence = sentence;
+
+            if (current.html != null && current.html.length() > 0) {
+
+
+                if(analysisController == null) analysisController = new PassageAnalysisController();
+                Double diff = analysisController.determineGradeLevelForString(sentence);
+
+
+                if (diff > grade && !ogSentence.contains("exclamation") && !current.html.contains(sentence)) {
+                    String curr = sentence;
                     int spaceIndex = curr.indexOf("&nbsp");
 
                     System.out.println("sp:" + spaceIndex);
 
                     if (spaceIndex != -1) {
-                        curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + this.difficultiesCache.get(sentNumber) + ");'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
+                        curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diff + ");'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
                     } else {
-                        curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + this.difficultiesCache.get(sentNumber) + ");'>" + curr + "</i> ";
+                        curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diff + ");'>" + curr + "</i> ";
                     }
+
 
                     while (curr.indexOf(" <u>") != -1) {
                         curr = curr.substring(0, curr.indexOf(" <u>")) + "&nbsp" + curr.substring(curr.indexOf(" <u>") + 1);
                     }
 
+                    sentence = curr;
+                    System.out.println(sentence);
 
-                    split[i] = curr;
-                    System.out.println(split[i]);
-                    placed = true;
+                    current.html = current.html.replace(ogSentence, sentence);
+
+
+                    for (int c = 0; c < current.html.length() - 2; c++) {
+                        if (current.html.charAt(c) == ' ' && current.html.substring(c + 1, c + 3).equals("<u")) {
+                            current.html = current.html.substring(0, c) + "&nbsp" + current.html.substring(c + 1);
+                        }
+                    }
+                    if(ogSentence.indexOf("<i") != -1){
+                        return ok();
+                    } else {
+                        return ok("!");
+                    }
+
+
+                } else if(ogSentence.contains("exclamation") && !current.html.contains(sentence)){
+                    return ok("REM");
                 }
 
-                if (split[i].charAt(split[i].length() - 1) == '.') {
-                    sentNumber++;
-                    placed = false;
-                }
-
-
-            }
-
-
-            current.html = rebuildHTML(split);
-
-            for (int c = 0; c < current.html.length() - 2; c++) {
-                if (current.html.charAt(c) == ' ' && current.html.substring(c + 1, c + 3).equals("<u")) {
-                    current.html = current.html.substring(0, c) + "&nbsp" + current.html.substring(c + 1);
-                }
+                return ok();
             }
 
 
@@ -1288,208 +1361,136 @@ public class SimplePassageController extends Controller {
                 }
             }
 
-            System.out.println(current.html);
             p.save();
-        } else System.out.println("null");
 
-
-        return ok();
-    }
-
-
-    private ArrayList<Double> diffCache;
-
-    public Result singularSentenceBreakdown(Long passageId, int grade, String sentence) {
-        if(session("userFirstName") == null) return ok(index.render(null));
-        SimplePassage p = SimplePassage.byId(passageId);
-        if(diffCache == null) diffCache = getDifficulties(p);
-
-
-        PassageText current = PassageText.bySimplePassageAndGrade(passageId, grade);
-
-        String ogSentence = sentence;
-
-        if (current.html != null && current.html.length() > 0) {
-
-
-            if(analysisController == null) analysisController = new PassageAnalysisController();
-            Double diff = analysisController.determineGradeLevelForString(sentence);
-
-
-            if (diff > grade && !ogSentence.contains("exclamation") && !current.html.contains(sentence)) {
-                String curr = sentence;
-                int spaceIndex = curr.indexOf("&nbsp");
-
-                System.out.println("sp:" + spaceIndex);
-
-                if (spaceIndex != -1) {
-                    curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diff + ");'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
-                } else {
-                    curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diff + ");'>" + curr + "</i> ";
-                }
-
-
-                while (curr.indexOf(" <u>") != -1) {
-                    curr = curr.substring(0, curr.indexOf(" <u>")) + "&nbsp" + curr.substring(curr.indexOf(" <u>") + 1);
-                }
-
-                sentence = curr;
-                System.out.println(sentence);
-
-                current.html = current.html.replace(ogSentence, sentence);
-
-
-                for (int c = 0; c < current.html.length() - 2; c++) {
-                    if (current.html.charAt(c) == ' ' && current.html.substring(c + 1, c + 3).equals("<u")) {
-                        current.html = current.html.substring(0, c) + "&nbsp" + current.html.substring(c + 1);
-                    }
-                }
-                if(ogSentence.indexOf("<i") != -1){
-                    return ok();
-                } else {
-                    return ok("!");
-                }
-
-
-            } else if(ogSentence.contains("exclamation") && !current.html.contains(sentence)){
-                return ok("REM");
-            }
-
+            // since this is saving, in theory this will reload and come up with the corrections
             return ok();
-        }
-
-
-        // do i actually need to do this?
-        for (PassageText pt : p.htmlRepresentations) {
-            if (pt.grade == current.grade) {
-                pt.html = current.html;
-                break;
-            }
-        }
-
-        p.save();
-
-        // since this is saving, in theory this will reload and come up with the corrections
-        return ok();
+        } else return badRequest();
     }
 
     public Result savePassagePlainText(Long passageId, String text) {
-        try {
-            SimplePassage p = SimplePassage.byId(passageId);
-            p.text = text;
-            p.save();
-            return ok("true");
-        } catch (Exception e) {
-            return badRequest();
-        }
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            try {
+                SimplePassage p = SimplePassage.byId(passageId);
+                p.text = text;
+                p.save();
+                return ok("true");
+            } catch (Exception e) {
+                return badRequest();
+            }
+        } else return badRequest();
     }
 
 
     public void copySimplePassage(int grade, SimplePassage p){
 
-            SimplePassage atGrade = new SimplePassage(p.text, p.title + "-(" + PassageAnalysisController.displayGrade(grade) + " edit)", p.source);
-            atGrade.instructorID = p.instructorID;
-            atGrade.htmlRepresentations = new HashSet<PassageText>(); 
-            atGrade.sentences = p.sentences; 
-            atGrade.tags = p.tags; 
+        SimplePassage atGrade = new SimplePassage(p.text, p.title + "-(" + PassageAnalysisController.displayGrade(grade) + " edit)", p.source);
+        atGrade.instructorID = p.instructorID;
+        atGrade.htmlRepresentations = new HashSet<PassageText>();
+        atGrade.sentences = p.sentences;
+        atGrade.tags = p.tags;
 
-            atGrade.num_characters = p.num_characters; 
-            atGrade.numWords = p.numWords; 
-            atGrade.numSyllables = p.numSyllables; 
+        atGrade.num_characters = p.num_characters;
+        atGrade.numWords = p.numWords;
+        atGrade.numSyllables = p.numSyllables;
 
-            atGrade.analyzed = true;
-            atGrade.grade = grade;
-
-
+        atGrade.analyzed = true;
+        atGrade.grade = grade;
 
 
-            String html = "";
 
-            for (PassageText c : p.htmlRepresentations) {
-                if (c.grade == grade) {
-                    PassageText copyText = new PassageText(c.grade, c.html);
-                    html = c.html;
-                    atGrade.htmlRepresentations.add(copyText);
-                    break;
-                }
-            }
 
-            for(int i = 0; i < grade; i++){
-                PassageText copyText = new PassageText(grade, html);
+        String html = "";
+
+        for (PassageText c : p.htmlRepresentations) {
+            if (c.grade == grade) {
+                PassageText copyText = new PassageText(c.grade, c.html);
+                html = c.html;
                 atGrade.htmlRepresentations.add(copyText);
+                break;
             }
+        }
 
+        for(int i = 0; i < grade; i++){
+            PassageText copyText = new PassageText(grade, html);
+            atGrade.htmlRepresentations.add(copyText);
+        }
+
+        atGrade.save();
+
+
+        atGrade.questions = new HashSet<PassageQuestion>();
+        for(PassageQuestion q : p.questions){
+            PassageQuestion copyQuestion = new PassageQuestion(q.basis_id, q.active);
+            copyQuestion.correctAnswer = q.correctAnswer;
+            copyQuestion.position = q.position;
+            atGrade.questions.add(copyQuestion);
             atGrade.save();
 
+            PassageQuestionPrompt copyPrompt = new PassageQuestionPrompt(copyQuestion, PassageQuestionPrompt.byPassageQuestion(q.id).get(0).text);
+            copyQuestion.prompt = copyPrompt;
+            copyPrompt.save();
+            copyQuestion.save();
 
-            atGrade.questions = new HashSet<PassageQuestion>();
-            for(PassageQuestion q : p.questions){
-                PassageQuestion copyQuestion = new PassageQuestion(q.basis_id, q.active);
-                copyQuestion.correctAnswer = q.correctAnswer;
-                copyQuestion.position = q.position;
-                atGrade.questions.add(copyQuestion);
-                atGrade.save();
-
-                PassageQuestionPrompt copyPrompt = new PassageQuestionPrompt(copyQuestion, PassageQuestionPrompt.byPassageQuestion(q.id).get(0).text);
-                copyQuestion.prompt = copyPrompt;
-                copyPrompt.save();
+            for(PassageQuestionChoice c : q.choices){
+                PassageQuestionChoice copyChoice = new PassageQuestionChoice(c.entity_id, c.correct, c.active);
+                copyChoice.position = c.position;
+                copyQuestion.choices.add(copyChoice);
                 copyQuestion.save();
 
-                for(PassageQuestionChoice c : q.choices){
-                    PassageQuestionChoice copyChoice = new PassageQuestionChoice(c.entity_id, c.correct, c.active);
-                    copyChoice.position = c.position;
-                    copyQuestion.choices.add(copyChoice);
-                    copyQuestion.save();
-
-                    PassageQuestionAnswer copyAnswer = new PassageQuestionAnswer(copyChoice, PassageQuestionAnswer.byPassageQuestionChoice(c.id).get(0).text);
-                    copyChoice.answer = copyAnswer;
-                    copyAnswer.save();
-                    copyChoice.save();
-                }
-                copyQuestion.save();
+                PassageQuestionAnswer copyAnswer = new PassageQuestionAnswer(copyChoice, PassageQuestionAnswer.byPassageQuestionChoice(c.id).get(0).text);
+                copyChoice.answer = copyAnswer;
+                copyAnswer.save();
+                copyChoice.save();
             }
+            copyQuestion.save();
+        }
 
 
-            atGrade.save(); 
+        atGrade.save();
     }
 
 
 
 
     public Result savePassageHtml(Long passageId, int grade) {
-        try {
-            SimplePassage p = SimplePassage.byId(passageId);
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            try {
+                SimplePassage p = SimplePassage.byId(passageId);
 
-            if (grade == -1) grade = p.grade;
+                if (grade == -1) grade = p.grade;
 
-            Map<String, String[]> parameters = request().body().asFormUrlEncoded();
+                Map<String, String[]> parameters = request().body().asFormUrlEncoded();
 
 
-            String html = parameters.get("html")[0];
+                String html = parameters.get("html")[0];
 
-            //https://dzone.com/articles/jquery-ajax-play-2
-            //http://stackoverflow.com/questions/16408867/send-post-json-with-ajax-and-play-framework-2
-            for (PassageText c : p.htmlRepresentations) {
-                if (c.grade == grade) {
-                    c.html = html;
-                    break;
+                //https://dzone.com/articles/jquery-ajax-play-2
+                //http://stackoverflow.com/questions/16408867/send-post-json-with-ajax-and-play-framework-2
+                for (PassageText c : p.htmlRepresentations) {
+                    if (c.grade == grade) {
+                        c.html = html;
+                        break;
+                    }
                 }
+
+
+                copySimplePassage(grade,p);
+                //p.save();
+                return ok("true");
+            } catch (Exception e) {
+                return badRequest();
             }
-
-
-            copySimplePassage(grade,p);
-            //p.save();
-            return ok("true");
-        } catch (Exception e) {
-            return badRequest();
-        }
+        } else return badRequest();
     }
 
 
 
     public Result checkSentence(String sentence, int grade, Long passageId) {
-        if(session("userFirstName") == null) return ok(index.render(null));
-        return singularSentenceBreakdown(passageId, grade, sentence);
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            if(session("userFirstName") == null) return ok(index.render(null));
+            return singularSentenceBreakdown(passageId, grade, sentence);
+        } else return badRequest();
     }
 
     public String trimHTMLChars(String a){
@@ -1505,31 +1506,33 @@ public class SimplePassageController extends Controller {
     public Result checkWord(String word, int grade, Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
-        word = trimHTMLChars(word);
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            word = trimHTMLChars(word);
 
-        System.out.println(word);
+            System.out.println(word);
 
-        Word enteredWord = Word.byRawString(word);
+            Word enteredWord = Word.byRawString(word);
 
-        // (POS p, String word, String sentence, Long passageId, String ogText)
-        if (enteredWord != null) {
-            if (enteredWord.ageOfAcquisition - 6 > grade) {
-                if (Suggestion.byWord(enteredWord.lemma) == null) {
-                    if (this.analysisController == null) analysisController = new PassageAnalysisController();
-                    try {
-                        analysisController.generateSuggestionsForWord(enteredWord.partsOfSpeech.get(0), enteredWord.lemma, word, passageId, enteredWord.lemma);
+            // (POS p, String word, String sentence, Long passageId, String ogText)
+            if (enteredWord != null) {
+                if (enteredWord.ageOfAcquisition - 6 > grade) {
+                    if (Suggestion.byWord(enteredWord.lemma) == null) {
+                        if (this.analysisController == null) analysisController = new PassageAnalysisController();
+                        try {
+                            analysisController.generateSuggestionsForWord(enteredWord.partsOfSpeech.get(0), enteredWord.lemma, word, passageId, enteredWord.lemma);
 
-                    } catch (Exception e) {
-                        return badRequest();
+                        } catch (Exception e) {
+                            return badRequest();
+                        }
                     }
+                    return ok("UNDERLINE");
+                } else {
+                    return ok("REM");
                 }
-                return ok("UNDERLINE");
-            } else {
-                return ok("REM");
             }
-        }
-        // instead of returning a bad request...shouldn't this word be underlined and it's suggestions added
-        return ok("REM");
+            // instead of returning a bad request...shouldn't this word be underlined and it's suggestions added
+            return ok("REM");
+        } else return badRequest();
     }
 
 }

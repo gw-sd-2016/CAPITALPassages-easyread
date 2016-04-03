@@ -145,6 +145,9 @@
                                     <i class="glyphicon glyphicon-tag"></i> @tag.keyword
                                 </a>
                             }
+
+                            <button type="button" class="btn btn-primary" onclick="saveHtml(quill.getHTML());">
+                                <i class="glyphicon glyphicon-floppy-save"></i> Save</button>
                         </div>
                     </div>
 
@@ -161,22 +164,11 @@
 
                     </div>
                     <br>
-                    <br>
-
-
                     <h4>Passage Body</h4>
                         <!-- http://quilljs.com/docs/quickstart/ -->
                         <!-- Create the editor container -->
 
-                    <div id="editor">
-                    </div>
-
-
-                    <button type="button" class="btn btn-primary" onclick="saveHtml(quill.getHTML());">
-                        <i class="glyphicon glyphicon-floppy-save"></i> Save</button>
-
-
-                    <br>
+                    <div id="editor"></div>
                     <br>
 
                 </div>
