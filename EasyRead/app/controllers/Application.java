@@ -112,10 +112,8 @@ public class Application extends Controller {
                         controllers.routes.javascript.SimplePassageController.editPromptForQuestion(),
                         controllers.routes.javascript.SimplePassageController.addChoiceToQuestion(),
                         controllers.routes.javascript.SimplePassageController.deleteQuestion(),
-                        controllers.routes.javascript.SimplePassageController.deleteChoiceForQuestion()
-
-
-        )
+                        controllers.routes.javascript.SimplePassageController.deleteChoiceForQuestion(),
+                        controllers.routes.javascript.SimplePassageController.changeVisibility())
         );
     }
 

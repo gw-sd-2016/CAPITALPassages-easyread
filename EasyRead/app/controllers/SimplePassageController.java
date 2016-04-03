@@ -39,6 +39,7 @@ public class SimplePassageController extends Controller {
 
         if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
             SimplePassage p = new SimplePassage(text, title, source);
+            p.visibleToStudents = true;
 
             Map<String, String[]> parameters = request().body().asFormUrlEncoded();
 
@@ -80,6 +81,17 @@ public class SimplePassageController extends Controller {
         }
 
 
+    }
+
+    public Result changeVisibility(Long passageId){
+        try{
+            SimplePassage p = SimplePassage.byId(passageId);
+            p.visibleToStudents = !p.visibleToStudents;
+            p.save();
+            return ok();
+        } catch (Exception e){
+            return badRequest();
+        }
     }
 
     // QUESTION CREATION
@@ -615,6 +627,16 @@ public class SimplePassageController extends Controller {
             SimplePassageData data = new SimplePassageData(passage.text, passage.title, 1, "category", passage.source);
             Form<SimplePassageData> form = Form.form(SimplePassageData.class);
             form = form.fill(data);
+
+            if(!passage.analyzed && passage.original ){
+                grade = 0;
+            }
+            else if(grade > passage.grade && !passage.original || grade < 0){
+                flash("warning","The grade you requested was unavailable so you were re-routed");
+                grade = passage.grade;
+            }
+
+
             return ok(editSimplePassageAtGrade.render(form, passageId, grade));
         } else {
             return ok(index.render(session("userFirstName")));
@@ -802,8 +824,8 @@ public class SimplePassageController extends Controller {
 
     }
 
-    HashMap<String, String> sugMap = new HashMap<String, String>();
-    String[] split;
+    private HashMap<String, String> sugMap = new HashMap<String, String>();
+    private String[] split;
 
     public void generatePassageTextAtGrade(Long passageId, int grade) {
         System.out.println("gen text");
@@ -1265,7 +1287,7 @@ public class SimplePassageController extends Controller {
     }
 
 
-    ArrayList<Double> diffCache;
+    private ArrayList<Double> diffCache;
 
     public Result singularSentenceBreakdown(Long passageId, int grade, String sentence) {
         if(session("userFirstName") == null) return ok(index.render(null));
@@ -1355,7 +1377,8 @@ public class SimplePassageController extends Controller {
 
     public void copySimplePassage(int grade, SimplePassage p){
 
-            SimplePassage atGrade = new SimplePassage(p.text, p.title, p.source); 
+            SimplePassage atGrade = new SimplePassage(p.text, p.title + "-(" + PassageAnalysisController.displayGrade(grade) + " edit)", p.source);
+            atGrade.instructorID = p.instructorID;
             atGrade.htmlRepresentations = new HashSet<PassageText>(); 
             atGrade.sentences = p.sentences; 
             atGrade.tags = p.tags; 
@@ -1364,14 +1387,29 @@ public class SimplePassageController extends Controller {
             atGrade.numWords = p.numWords; 
             atGrade.numSyllables = p.numSyllables; 
 
-            atGrade.analyzed = true; 
+            atGrade.analyzed = true;
+            atGrade.grade = grade;
 
-            
+
+
+
+            String html = "";
+
             for (PassageText c : p.htmlRepresentations) {
-                if (c.grade <= grade) {
-                    atGrade.htmlRepresentations.add(c); 
+                if (c.grade == grade) {
+                    PassageText copyText = new PassageText(c.grade, c.html);
+                    html = c.html;
+                    atGrade.htmlRepresentations.add(copyText);
+                    break;
                 }
             }
+
+            for(int i = 0; i < grade; i++){
+                PassageText copyText = new PassageText(grade, html);
+                atGrade.htmlRepresentations.add(copyText);
+            }
+
+            atGrade.save();
 
 
             atGrade.questions = new HashSet<PassageQuestion>();
@@ -1428,7 +1466,9 @@ public class SimplePassageController extends Controller {
                 }
             }
 
-            p.save();
+
+            copySimplePassage(grade,p);
+            //p.save();
             return ok("true");
         } catch (Exception e) {
             return badRequest();

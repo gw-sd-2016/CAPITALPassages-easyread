@@ -24,8 +24,6 @@
                             Answer Passage Questions
                         </a>
                     }
-
-
                     @for(tag <- passage.tags) {
 
 
@@ -69,13 +67,10 @@
                     <strong> Displaying at Grade Level:  </strong>  @passage.grade
                     <br>
                     <strong> Source:  </strong> @passage.source <br><br>
-
-
                 </div>
 
 
-               <div id="editor">
-               </div>
+               <div id="editor">@passage.text</div>
             </div>
         </div>
 
@@ -158,7 +153,7 @@
 
                 $(document).ready(function(){
                     //http://stackoverflow.com/questions/9913971/scala-how-can-i-get-an-escaped-representation-of-a-string
-                    quill.setText("@passage.text");
+
                 });
         </script>
 

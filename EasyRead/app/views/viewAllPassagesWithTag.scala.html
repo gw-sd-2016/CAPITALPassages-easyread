@@ -31,59 +31,83 @@
                                 <th>Grade</th>
                                 <th>Source</th>
                                 <th>Tag</th>
-                                <th>Actions</th>
+                                @if(Long.valueOf(session().get("userId")) == inst.id){
+                                    <th>Actions</th>
+                                }
+
 
                             </tr>
                         </thead>
                         <tbody>
-                        @for(passage <- SimplePassage.byPassageTagKeyword(name)) {
+                        @for(passage <- passages) {
                             <tr>
 
-                                <td><a href="/view?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
+                                @if(Long.valueOf(session().get("userId")) == inst.id){
+                                    <td><a href="/editPassageAtGrade?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
+                                } else {
+                                    <td><a href="/viewPassageAsStudent?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
+                                }
+
                                 @if(passage.text.length >= 200) {
-                                    <td>@passage.text.substring(0, 200)....</td>
+                                    <td>
+                                    @passage.text.substring(0, 200)
+
+
+
+
+                                    </td>
+
+
 
                                 } else {
-                                    <td>@passage.text</td>
+                                    <td>
+
+                                        @Html(passage.text)....
+
+                                    </td>
                                 }
 
+                            <td>@inst.firstName @inst.lastName</td>
 
-                                <td>@inst.firstName @inst.lastName</td>
+                            <td>@if(!passage.analyzed) {
+                                Grade Level not available yet.
+                            } else {
+                                @PassageAnalysisController.displayGrade(passage.grade)
+                            }
 
-                                <td>@if(passage.sentences.size == 0) {
-                                    Grade Level not available yet.
-                                } else {
-                                    @PassageAnalysisController.displayGrade(passage.grade)
+                            </td>
+                            <td>@passage.source</td>
+
+
+                            <td>
+                            @for(tag <- passage.tags) {
+                                <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.keyword)" style="margin-bottom: 20px ;">
+                                    <i class="glyphicon glyphicon-tag"></i> @tag.keyword
+
+                                </a>
+                            }
+                            </td>
+                                @if(Long.valueOf(session().get("userId")) == inst.id) {
+
+                                    <td style="width : 10%">
+
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-small btn-danger" id="deletePassage" onclick="deletePassage(@passage.id)">
+                                                <i class="glyphicon glyphicon-trash"></i> Delete
+                                            </button>
+
+                                            <a class="btn btn-primary" onclick="changeVis(@passage.id);">
+                                            @if(passage.visibleToStudents){
+                                                <i class="glyphicon glyphicon-eye-close"></i>
+                                                Hide From Students
+                                            } else {
+                                                <i class="glyphicon glyphicon-eye-open"></i>
+                                                Make Visible to Students
+                                            }
+                                            </a>
+                                        </div>
+                                    </td>
                                 }
-
-                                </td>
-                                <td>@passage.source</td>
-
-                                <td>
-                                @for(tag <- passage.tags) {
-
-
-                                    <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.keyword)" style="margin-bottom: 20px ;">
-                                        <i class="glyphicon glyphicon-tag"> @tag.keyword</i>
-
-                                    </a>
-
-
-                                }
-                                </td>
-
-
-                                <td style="width: 10%">
-                                    <a href="@routes.SimplePassageController.editPassage(passage.id, passage.grade)" class="btn btn-small btn-info">
-                                        <i class="glyphicon glyphicon-edit"></i>
-                                        Edit
-                                    </a>
-                                        <!--  <button type="button" class="btn btn-small btn-danger has-spinner" id="deletePassage" name=" @passage.id:|:@passage.title" style="width: 75px;">
-                                    <span class="spinner"><i class="glyphicon glyphicon-spin fa-refresh"></i></span>
-                                    <i class="glyphicon glyphicon-trash"></i> Delete
-                                    </button>-->
-                                </td>
-
                             </tr>
                         }
                         </tbody>

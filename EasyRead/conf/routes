@@ -55,7 +55,7 @@ GET        /editPrompt                              controllers.SimplePassageCon
 GET        /addChoice                               controllers.SimplePassageController.addChoiceToQuestion(questionId : Long, newChoice : String, isCorrect : Boolean)
 GET         /deletePassageQuestion                controllers.SimplePassageController.deleteQuestion(questionId : Long, passageId : Long)
 GET         /deletePassageQuestionChoice          controllers.SimplePassageController.deleteChoiceForQuestion(questionId : Long, passageId : Long, choiceId : Long)
-
+GET         /changeV                              controllers.SimplePassageController.changeVisibility(passageId : Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                         controllers.Assets.at(path="/public", file)

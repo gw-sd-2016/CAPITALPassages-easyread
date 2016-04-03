@@ -109,6 +109,8 @@ create table simple_passage (
   num_syllables             integer,
   num_words                 integer,
   analyzed                  tinyint(1) default 0,
+  visible_to_students       tinyint(1) default 0,
+  original                  tinyint(1) default 0,
   constraint pk_simple_passage primary key (id))
 ;
 

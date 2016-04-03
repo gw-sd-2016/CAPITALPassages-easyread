@@ -68,6 +68,15 @@ public class SimplePassage extends Model {
     @Expose
     public boolean analyzed = false;
 
+    @Expose
+    @Required
+    public boolean visibleToStudents;
+
+    @Expose
+    @Required
+    public boolean original;
+
+
     public List<String> getStopWords() {
         return stopWords;
     }
@@ -169,7 +178,6 @@ public class SimplePassage extends Model {
     public void delete(){
         for(Sentence s : this.sentences) s.delete();
         for(PassageQuestion q : this.questions) q.delete();
-        for(PassageTag t : this.tags) t.delete();
         for(PassageText pt : this.htmlRepresentations) pt.delete();
 
         super.delete();

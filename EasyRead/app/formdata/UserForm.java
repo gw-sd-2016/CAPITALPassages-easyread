@@ -42,10 +42,6 @@ public class UserForm {
         }
         else this.creatorId = creatorId;
         this.isStudent = isStudent;
-
-
-
-
     }
 
 }

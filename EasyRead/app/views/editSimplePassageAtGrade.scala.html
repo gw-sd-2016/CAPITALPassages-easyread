@@ -8,9 +8,12 @@
     @main("Edit a  Passage") {
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 
-        <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
 
-        <link rel="stylesheet" href="/assets/css/easyread.css"></>
+        <link rel="stylesheet" href="/assets/public/css/easyread.css">
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+        <script src="/assets/public/bootstrap/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="/assets/public/bootstrap/css/bootstrap.min.cs">
 
 
         <style type="text/css">
@@ -24,71 +27,38 @@
             background-color: #333 ;
             color: #fff ;
             box-shadow: inset 0 0 5px 5px #222 ;
+        }
+        </style>
 
-
-
-         .ui-btn.my-tooltip-btn,
-         .ui-btn.my-tooltip-btn:hover,
-         .ui-btn.my-tooltip-btn:active {
-                 background: none;
-                 border: 0;
-         }
-
-           .ui-widget-header,.ui-state-default, ui-button{
-            background:#b9cd6d;
-            border: 1px solid #b9cd6d;
-            color: #FFFFFF;
-            font-weight: bold;
-         }
-
-
-
+        @if(flash.containsKey("success")) {
+            <div class="alert alert-success">
+                <h2>Done!</h2> @flash.get("success")
+            </div>
+        }
+        @if(flash.containsKey("warning")){
+            <div class="alert alert-warning">
+                <h2>Done!</h2> @flash.get("warning")
+            </div>
         }
 
-
-        </style>
         <div id="left-panel" class="panel"></div>
 
-
         <div class="pull-right">
+            <h5>Choose The Grade Level this passage should be edited at</h5>
+            <div class="dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
 
+                    Grade
 
+                    @PassageAnalysisController.displayGrade(grade)
 
-
-
-
-            <div class="btn-group">
-
-                <h5>Choose The Grade Level this passage should be edited at</h5>
-                <div class="dropdown">
-                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-
-                        Grade
-
-                        @PassageAnalysisController.displayGrade(grade)
-
-                        <span class="caret"></span></button>
-                    <ul class="dropdown-menu">
-                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=0">K</a></li>
-                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=1">1</a></li>
-                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=2">2</a></li>
-                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=3">3</a></li>
-                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=4">4</a></li>
-                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=5">5</a></li>
-                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=6">6</a></li>
-                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=7">7</a></li>
-                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=8">8</a></li>
-                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=9">9</a></li>
-                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=10">10</a></li>
-                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=11">11</a></li>
-                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=12">12</a></li>
-                        <li><a href="editPassageAtGrade?passageId=@passageId&grade=13">College</a></li>
-                    </ul>
-                </div>
-
-
+                    <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                @for(p <- SimplePassage.byId(passageId).htmlRepresentations.toList.sortBy(_.grade).distinct){
+                    <li><a href="editPassageAtGrade?passageId=@passageId&grade=@p.grade">@PassageAnalysisController.displayGrade(p.grade)</a></li>
+                }
+                </ul>
             </div>
-
         </div>
 
         <a id="left-panel-link" class="btn btn-primary" href="#left-panel" style="display: none ;">
@@ -125,42 +95,55 @@
                             }reader</strong>
 
 
-                            <div>
-                        @if(!routes.SimplePassageController.isAnalyzing.equals("prog")){
+                    <div>
 
-                            <div class="btn-group">
-                                <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passageId" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
-                                    <i class="glyphicon glyphicon-plus"></i>
-                                    Add new Questions
-                                </a>
 
-                                <a class="btn btn-primary" id="add" href="/editQuestions?passageId=@passageId" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
-                                    <i class="glyphicon glyphicon-pen"></i>
+                        <div class="btn-group">
+                            <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passageId">
+                                <i class="glyphicon glyphicon-plus"></i>
+                                Add new Questions
+                            </a>
+
+                            <a class="btn btn-primary" onclick="changeVis();">
+                            @if(SimplePassage.byId(passageId).visibleToStudents){
+                                <i class="glyphicon glyphicon-eye-close"></i>
+                                Hide From Students
+                            } else {
+                                <i class="glyphicon glyphicon-eye-open"></i>
+                                Make Visible to Students
+                            }
+                            </a>
+
+                            @if(SimplePassage.byId(passageId).questions.size() > 0){
+                                <a class="btn btn-primary" id="add" href="/editQuestions?passageId=@passageId">
+                                    <i class="glyphicon glyphicon-edit"></i>
                                     Edit Questions
                                 </a>
 
-                            <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
-                                <i id="spinner" class="glyphicon glyphicon-refresh"></i> Analyze
-                            </button>
-                                </div>
-                        } else {
-                            <div class="btn-group">
-                                <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passageId" style="margin-bottom: 20px ;">
-                                    <i class="glyphicon glyphicon-plus"></i>
-                                    Add new Questions
+                            }
+                            @if(!routes.SimplePassageController.isAnalyzing.equals("prog")){
+                                <a class="btn btn-primary btn-success has-spinner" id="analyzePassages">
+                                    <i id="spinner" class="glyphicon glyphicon-refresh"></i> Analyze
                                 </a>
 
-                                <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
+                            } else {
+
+                                <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages">
                                     <i id="spinner" class="glyphicon glyphicon-refresh glyphicon-spin"></i> Analyze
                                 </button>
 
-                            </div>
-                        }
+                            }
 
+                            @for(tag <- SimplePassage.byId(passageId).tags){
+                                <a class="btn btn-primary" href="/viewAllPassagesWithTag?name=@tag.keyword">
+                                    <i class="glyphicon glyphicon-tag"></i> @tag.keyword
+                                </a>
+                            }
+                        </div>
                     </div>
 
 
-                    <h4>Title</h4>
+                        <h4>Title</h4>
                         <input type="text" name="passageTitle" placeholder="Passage Title" value="@form("passageTitle").value">
 
                         <h4>Source</h4>
@@ -184,7 +167,7 @@
 
 
                     <button type="button" class="btn btn-primary" onclick="saveHtml(quill.getHTML());">
-                        Save</button>
+                        <i class="glyphicon glyphicon-floppy-save"></i> Save</button>
 
 
                     <br>
@@ -195,9 +178,9 @@
         }
 
 
- <link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
-      <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
-      <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+        <link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+        <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+        <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 
 
         <script src="/assets/js/jquery.panelslider.min.js"></script>
@@ -286,7 +269,7 @@
                     /*var text = quill.getHTML();
 
 
-*/
+                     */
 
                     var text = quill.getText();
                     var html = quill.getHTML();
@@ -294,26 +277,26 @@
 
 
 
-/*
-                    // white space check from http://stackoverflow.com/questions/1496826/check-if-a-single-character-is-a-whitespace
-                    if(/\s/.test(text.charAt(pos))) pos--;
+                    /*
+                     // white space check from http://stackoverflow.com/questions/1496826/check-if-a-single-character-is-a-whitespace
+                     if(/\s/.test(text.charAt(pos))) pos--;
 
-                    if(/\s/.test(text.charAt(pos))) return null;
+                     if(/\s/.test(text.charAt(pos))) return null;
 
-                    var startOfWord = 0;
-                    var endOfWord = 0;
-                    for(endOfWord = pos; endOfWord < text.length - 5; endOfWord++){
-                        if(/\s/.test(text.charAt(endOfWord)) || text.substring(endOfWord, endOfWord + 5) == "&nbsp" || text.substring(endOfWord, endOfWord + 2) == ".<"){
-                            break;
-                        }
-                    }
-                    for(startOfWord = endOfWord - 1; startOfWord >= 0; startOfWord--){
-// white space check from http://stackoverflow.com/questions/1496826/check-if-a-single-character-is-a-whitespace
-                        if(/\s/.test(text.charAt(startOfWord))){
-                            startOfWord++;
-                            break;
-                        }
-                    }*/
+                     var startOfWord = 0;
+                     var endOfWord = 0;
+                     for(endOfWord = pos; endOfWord < text.length - 5; endOfWord++){
+                     if(/\s/.test(text.charAt(endOfWord)) || text.substring(endOfWord, endOfWord + 5) == "&nbsp" || text.substring(endOfWord, endOfWord + 2) == ".<"){
+                     break;
+                     }
+                     }
+                     for(startOfWord = endOfWord - 1; startOfWord >= 0; startOfWord--){
+                     // white space check from http://stackoverflow.com/questions/1496826/check-if-a-single-character-is-a-whitespace
+                     if(/\s/.test(text.charAt(startOfWord))){
+                     startOfWord++;
+                     break;
+                     }
+                     }*/
 
 
 
@@ -337,8 +320,8 @@
                         }
                     }
 
-                    if(!/\s/.test(text.charAt(endOfWord))) endOfWord++; 
-                  
+                    if(!/\s/.test(text.charAt(endOfWord))) endOfWord++;
+
                     capturedWord = text.substring(startOfWord, endOfWord);
 
                     if(check == true) {
@@ -457,8 +440,8 @@
                             {'html' : realText },
 
                             function(data) {
-                                console.log("saved");
                                 alert("Passage Saved!");
+                                window.location.href = "/viewAllPassages"
                             });
 
                 }
@@ -499,7 +482,7 @@
                 function checkWord(word){
                     jsRoutes.controllers.SimplePassageController.checkWord(word, @SimplePassage.byId(passageId).grade, @passageId ).ajax({
                         success : function(data) {
-                           quill.formatText(quill.getText().indexOf(word), quill.getText().indexOf(word) + word.length , 'underline', data.toString() == "UNDERLINE");
+                            quill.formatText(quill.getText().indexOf(word), quill.getText().indexOf(word) + word.length , 'underline', data.toString() == "UNDERLINE");
                         },
                         error : function(err) {
                             //window.location = "";
@@ -528,8 +511,8 @@
                                 }
 
 
-                               // console.log("sentence really is: " + sentence);
-                               // console.log("full - " + html);
+                                // console.log("sentence really is: " + sentence);
+                                // console.log("full - " + html);
                                 var start = 0;
                                 var firstEnd = 0;
                                 var secondEnd = 0;
@@ -796,6 +779,16 @@
 
                 });
 
+                function changeVis(){
+                    jsRoutes.controllers.SimplePassageController.changeVisibility(@passageId).ajax({
+                        success : function(data) {
+                            window.location.reload();
+                        },
+                        error : function(err) {
+                            //window.location = "";
+                        }
+                    });
+                }
 
                 function switchSpinner(){
                     var on = "glyphicon glyphicon-refresh glyphicon-spin";
@@ -854,22 +847,22 @@
                     alert(alertString);
                 }
 
-                  
-                        $( "#dialog-2" ).dialog({
-                           autoOpen: true, 
-                           buttons: {
-                              OK: function() {$(this).dialog("close");}
-                           },
-                           title: "Success",
-                           position: {
-                              my: "left center",
-                              at: "left center"
-                           }
-                        });
-                        $( "#opener-2" ).click(function() {
-                           $( "#dialog-2" ).dialog( "open" );
-                        });
-                    
+
+                $( "#dialog-2" ).dialog({
+                    autoOpen: true,
+                    buttons: {
+                        OK: function() {$(this).dialog("close");}
+                    },
+                    title: "Success",
+                    position: {
+                        my: "left center",
+                        at: "left center"
+                    }
+                });
+                $( "#opener-2" ).click(function() {
+                    $( "#dialog-2" ).dialog( "open" );
+                });
+
 
         </script>
 

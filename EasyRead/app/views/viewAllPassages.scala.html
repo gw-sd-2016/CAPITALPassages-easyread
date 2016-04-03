@@ -1,17 +1,17 @@
 @(passages: List[models.SimplePassage], inst: models.User)
 
-@main("View All Passages") {
+    @main("View All Passages") {
 
-    <link rel="stylesheet" href="/assets/css/easyread.css"></>
+        <link rel="stylesheet" href="/assets/public/css/easyread.css">
 
-    @if(flash.containsKey("success")) {
-        <div class="alert alert-success">
-            <h2>Done!</h2> @flash.get("success")
-        </div>
-    }
+        @if(flash.containsKey("success")) {
+            <div class="alert alert-success">
+                <h2>Done!</h2> @flash.get("success")
+            </div>
+        }
 
-    <div>
         <div>
+            <div>
 
 
 
@@ -30,135 +30,248 @@
             }
 
 
-        </div>
-
-        <div id="students" class="box">
-
-            <div class="box-header">
-                <i class="fa fa-group fa-2x"></i>
-                <h5>View All Passages</h5>
             </div>
 
+            <div id="students" class="box">
 
-            <div class="box-content box-table" style="padding: 10px ;">
-            @if(passages.size == 0) {
-                <div class="well">
-                    <strong><em>There are no passages in the system!</em></strong>
+                <div class="box-header">
+                    <i class="fa fa-group fa-2x"></i>
+                    <h5>View All Passages</h5>
                 </div>
-            } else {
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Text</th>
-                            <th>Instructor</th>
-                            <th>Grade</th>
-                            <th>Source</th>
-                            <th>Tag</th>
-                            @if(Long.valueOf(session().get("userId")) == inst.id){
-                                <th>Actions</th>
-                            }
 
 
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @for(passage <- passages) {
-                        <tr>
-
-                        @if(Long.valueOf(session().get("userId")) == inst.id){
-                            <td><a href="/editPassageAtGrade?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
-                        } else {
-                            <td><a href="/viewPassageAsStudent?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
-                        }
-
-                            @if(passage.text.length >= 200) {
-                                <td>
-                                    @passage.text.substring(0, 200)
-
-
-
-
-                                </td>
-
-
-
-                            } else {
-                                <td>
-
-                                @Html(passage.text)....
-
-                                </td>
-                            }
-
-                            <td>@inst.firstName @inst.lastName</td>
-
-                            <td>@if(!passage.analyzed) {
-                                Grade Level not available yet.
-                            } else {
-                                @PassageAnalysisController.displayGrade(passage.grade)
-                            }
-
-                            </td>
-                            <td>@passage.source</td>
-
-
-                            <td>
-                            @for(tag <- passage.tags) {
-                                <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.keyword)" style="margin-bottom: 20px ;">
-                                    <i class="fa fa-tag"> @tag.keyword</i>
-
-                                </a>
-                            }
-                            </td>
-                            @if(Long.valueOf(session().get("userId")) == inst.id) {
-
-                                <td style="width : 10%">
-
-                                    <button type="button" class="btn btn-small btn-danger" id="deletePassage" onclick="deletePassage(@passage.id)" style="width: 75px;">
-                                    <i class="fa fa-trash"></i> Delete
-                                    </button>
-
-                                </td>
-                            }
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-            }
-
-            </div>
-
-
-            <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
-
-            <script>
-                    function deletePassage(passageId) {
-
-                        var result = confirm("Are you sure you want to delete this passage? This cannot be undone.");
-                        if (result) {
-                            jsRoutes.controllers.SimplePassageController.deletePassage(passageId).ajax({
-                                success : function(data) {
-                                    window.location.reload();
-                                },
-                                error : function(err) {
+                <div class="box-content box-table" style="padding: 10px ;">
+                @if(passages.size == 0) {
+                    <div class="well">
+                        <strong><em>There are no passages in the system!</em></strong>
+                    </div>
+                } else {
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Text</th>
+                                <th>Instructor</th>
+                                <th>Grade</th>
+                                <th>Source</th>
+                                <th>Tag</th>
+                                @if(Long.valueOf(session().get("userId")) == inst.id){
+                                    <th>Actions</th>
                                 }
-                            });
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @if(Long.valueOf(session().get("userId")) == inst.id){
+                                @for(passage <- passages) {
+                                    <tr>
+
+                                        @if(Long.valueOf(session().get("userId")) == inst.id){
+                                            <td><a href="/editPassageAtGrade?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
+                                        } else {
+                                            <td><a href="/viewPassageAsStudent?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
+                                        }
+
+                                        @if(passage.text.length >= 200) {
+                                            <td>
+                                            @passage.text.substring(0, 200)
+
+
+
+
+                                            </td>
+
+
+
+                                        } else {
+                                            <td>
+
+                                                @Html(passage.text)....
+
+                                            </td>
+                                        }
+
+                                    <td>@inst.firstName @inst.lastName</td>
+
+                                    <td>@if(!passage.analyzed) {
+                                        Grade Level not available yet.
+                                    } else {
+                                        @PassageAnalysisController.displayGrade(passage.grade)
+                                    }
+
+                                    </td>
+                                    <td>@passage.source</td>
+
+
+                                    <td>
+                                    @for(tag <- passage.tags) {
+                                        <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.keyword)" style="margin-bottom: 20px ;">
+                                            <i class="glyphicon glyphicon-tag"></i> @tag.keyword
+
+                                        </a>
+                                    }
+                                    </td>
+                                        @if(Long.valueOf(session().get("userId")) == inst.id) {
+
+                                            <td style="width : 10%">
+
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-small btn-danger" id="deletePassage" onclick="deletePassage(@passage.id)">
+                                                        <i class="glyphicon glyphicon-trash"></i> Delete
+                                                    </button>
+
+                                                    <a class="btn btn-primary" onclick="changeVis(@passage.id);">
+                                                    @if(passage.visibleToStudents){
+                                                        <i class="glyphicon glyphicon-eye-close"></i>
+                                                        Hide From Students
+                                                    } else {
+                                                        <i class="glyphicon glyphicon-eye-open"></i>
+                                                        Make Visible to Students
+                                                    }
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            } else {
+                                @for(passage <- passages.filterNot(x => !x.visibleToStudents)) {
+                                    <tr>
+
+                                        @if(Long.valueOf(session().get("userId")) == inst.id){
+                                            <td><a href="/editPassageAtGrade?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
+                                        } else {
+                                            <td><a href="/viewPassageAsStudent?passageId=@passage.id&grade=@passage.grade">@passage.title</a> </td>
+                                        }
+
+                                        @if(passage.text.length >= 200) {
+                                            <td>
+                                            @passage.text.substring(0, 200)
+
+
+
+
+                                            </td>
+
+
+
+                                        } else {
+                                            <td>
+
+                                                @Html(passage.text)....
+
+                                            </td>
+                                        }
+
+                                    <td>@inst.firstName @inst.lastName</td>
+
+                                    <td>@if(!passage.analyzed) {
+                                        Grade Level not available yet.
+                                    } else {
+                                        @PassageAnalysisController.displayGrade(passage.grade)
+                                    }
+
+                                    </td>
+                                    <td>@passage.source</td>
+
+
+                                    <td>
+                                    @for(tag <- passage.tags) {
+                                        <a class="btn btn-primary" id="nav" href="@routes.SimplePassageController.viewAllPassagesWithTag(tag.keyword)" style="margin-bottom: 20px ;">
+                                            <i class="glyphicon glyphicon-tag"></i> @tag.keyword
+
+                                        </a>
+                                    }
+                                    </td>
+                                        @if(Long.valueOf(session().get("userId")) == inst.id) {
+
+                                            <td style="width : 10%">
+
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-small btn-danger" id="deletePassage" onclick="deletePassage(@passage.id)">
+                                                        <i class="glyphicon glyphicon-trash"></i> Delete
+                                                    </button>
+
+                                                    <a class="btn btn-primary" onclick="changeVis(@passage.id);">
+                                                    @if(passage.visibleToStudents){
+                                                        <i class="glyphicon glyphicon-eye-close"></i>
+                                                        Hide From Students
+                                                    } else {
+                                                        <i class="glyphicon glyphicon-eye-open"></i>
+                                                        Make Visible to Students
+                                                    }
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            }
+
+
+                        </tbody>
+                    </table>
+                }
+
+                </div>
+
+
+                <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+
+                <script>
+                        function deletePassage(passageId) {
+
+                            var result = confirm("Are you sure you want to delete this passage? This cannot be undone.");
+                            if (result) {
+                                jsRoutes.controllers.SimplePassageController.deletePassage(passageId).ajax({
+                                    success : function(data) {
+                                        window.location.reload();
+                                    },
+                                    error : function(err) {
+                                    }
+                                });
+                            }
+
                         }
 
-                    }
-
-                    $('button#analyzePassages').click(function() {
-                        var button = $(this);
-                        button.toggleClass('active');
+                        $('button#analyzePassages').click(function() {
+                            var button = $(this);
+                            button.toggleClass('active');
 
 
 
-                        var result = confirm("Are you sure you want to analyze passages? This may take a couple minutes");
+                            var result = confirm("Are you sure you want to analyze passages? This may take a couple minutes");
 
-                        if (result) {
-                            switchSpinner();
-                            jsRoutes.controllers.SimplePassageController.analyzePassages().ajax({
+                            if (result) {
+                                switchSpinner();
+                                jsRoutes.controllers.SimplePassageController.analyzePassages().ajax({
+                                    success : function(data) {
+                                        window.location.reload();
+                                    },
+                                    error : function(err) {
+                                        //window.location = "";
+                                    }
+                                });
+                            }
+
+                        });
+
+                        function switchSpinner(){
+                            var on = "glyphicon glyphicon-refresh glyphicon-spin";
+                            var off = "glyphicon glyphicon-refresh";
+
+
+                            document.getElementsByTagName()
+                            var elem = document.getElementById("spinner");
+
+                            if(elem.className.substring(elem.className.length - 4) == "spin") elem.className = off;
+                            else elem.className = on;
+                        }
+
+                        function changeVis(pasageId){
+                            jsRoutes.controllers.SimplePassageController.changeVisibility(passageId).ajax({
                                 success : function(data) {
                                     window.location.reload();
                                 },
@@ -168,22 +281,8 @@
                             });
                         }
 
-                    });
 
-                    function switchSpinner(){
-                        var on = "glyphicon glyphicon-refresh glyphicon-spin";
-                        var off = "glyphicon glyphicon-refresh";
+                </script>
 
 
-                        document.getElementsByTagName()
-                        var elem = document.getElementById("spinner");
-
-                        if(elem.className.substring(elem.className.length - 4) == "spin") elem.className = off;
-                        else elem.className = on;
-                    }
-
-
-            </script>
-
-
-}
+    }
