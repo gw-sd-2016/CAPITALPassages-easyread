@@ -34,6 +34,13 @@
                  border: 0;
          }
 
+           .ui-widget-header,.ui-state-default, ui-button{
+            background:#b9cd6d;
+            border: 1px solid #b9cd6d;
+            color: #FFFFFF;
+            font-weight: bold;
+         }
+
 
 
         }
@@ -186,7 +193,16 @@
                 </div>
             </div>
         }
+
+
+ <link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+      <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+      <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+
         <script src="/assets/js/jquery.panelslider.min.js"></script>
+
+
         <script>
                 $('#left-panel-link').panelslider({side: 'left', clickClose: false, duration: 200 });
                 $('#right-panel-link').panelslider({side: 'right', clickClose: false, duration: 200 });
@@ -821,6 +837,8 @@
                     $('[data-toggle="tooltip"]').tooltip()
                 })
 
+
+
                 function showJustification(grade){
 
                     grade = Math.ceil(grade);
@@ -831,8 +849,27 @@
                     else alertString += "a College Level Reader";
 
 
+
+
                     alert(alertString);
                 }
+
+                  
+                        $( "#dialog-2" ).dialog({
+                           autoOpen: true, 
+                           buttons: {
+                              OK: function() {$(this).dialog("close");}
+                           },
+                           title: "Success",
+                           position: {
+                              my: "left center",
+                              at: "left center"
+                           }
+                        });
+                        $( "#opener-2" ).click(function() {
+                           $( "#dialog-2" ).dialog( "open" );
+                        });
+                    
 
         </script>
 

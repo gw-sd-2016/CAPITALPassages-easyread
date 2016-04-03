@@ -163,4 +163,18 @@ public class SimplePassage extends Model {
 
        return r;
     }
+
+
+    @Override
+    public void delete(){
+        for(Sentence s : this.sentences) s.delete();
+        for(PassageQuestion q : this.questions) q.delete();
+        for(PassageTag t : this.tags) t.delete();
+        for(PassageText pt : this.htmlRepresentations) pt.delete();
+
+        super.delete();
+    }
+
+
+
 }

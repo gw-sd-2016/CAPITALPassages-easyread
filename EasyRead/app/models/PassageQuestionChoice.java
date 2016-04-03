@@ -91,8 +91,14 @@ public class PassageQuestionChoice extends Model {
     }
 
     public void deepDelete(){
-        PassageQuestionAnswer ans = PassageQuestionAnswer.byPassageQuestionChoice(id).get(0);
-        ans.delete();
+
+        try{
+            PassageQuestionAnswer ans = PassageQuestionAnswer.byPassageQuestionChoice(id).get(0);
+            ans.delete();
+        } catch(Exception e){
+
+        }
+
 
         List<PassageQuestionResponse> resps = PassageQuestionResponse.byChoice(id);
 

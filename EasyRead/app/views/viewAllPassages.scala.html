@@ -115,17 +115,10 @@
 
                                 <td style="width : 10%">
 
-
-                                    <a href="@routes.SimplePassageController.editPassage(passage.id, passage.grade)" class="btn btn-small btn-info" style="width : 50px ;">
-                                        <i class="fa fa-edit"></i> Edit
-                                    </a>
-
-
-                                        <!--  <button type="button" class="btn btn-small btn-danger has-spinner" id="deletePassage" name=" @passage.id:|:@passage.title" style="width: 75px;">
-                                    <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
+                                    <button type="button" class="btn btn-small btn-danger" id="deletePassage" onclick="deletePassage(@passage.id)" style="width: 75px;">
                                     <i class="fa fa-trash"></i> Delete
                                     </button>
-                                    -->
+
                                 </td>
                             }
                         </tr>
@@ -140,30 +133,20 @@
             <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
 
             <script>
-                    $('button#deletePassage').click(function() {
-                        var button = $(this);
-                        button.toggleClass('active');
+                    function deletePassage(passageId) {
 
-                        var passageData = $(this).attr('name').split(":|:");
-                        var passageId = passageData[0];
-                        var passageName = passageData[1];
-
-                        var result = confirm("Are you sure you want to delete passage '" + passageName + "'? This cannot be undone.");
+                        var result = confirm("Are you sure you want to delete this passage? This cannot be undone.");
                         if (result) {
-                            button.prop("disabled", true);
                             jsRoutes.controllers.SimplePassageController.deletePassage(passageId).ajax({
                                 success : function(data) {
                                     window.location.reload();
                                 },
                                 error : function(err) {
-                                    //window.location = "";
                                 }
                             });
-                        } else {
-                            button.toggleClass('active');
                         }
 
-                    });
+                    }
 
                     $('button#analyzePassages').click(function() {
                         var button = $(this);

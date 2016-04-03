@@ -1000,49 +1000,19 @@ public class SimplePassageController extends Controller {
     public Result deletePassage(Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
-
         if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
             SimplePassage a = SimplePassage.byId(passageId);
-
-            System.out.println("PASSAGEID: " + passageId);
 
             if (a == null) {
                 flash("error", "Couldn't find a passage matching this id to delete");
                 return ok("false");
             }
 
-		/*
-
-		for(PassageQuestion p : a.questions){
-			for(PassageQuestionPrompt prompt : PassageQuestionPrompt.byPassageQuestion(p.question.id)){
-        		prompt.delete("");
-        	}
-
-        	for(PassageQuestionChoice c : p.choices){
-        		 PassageQuestionAnswer.byId(c.id)).dele
-        	}
-
-		}
-
-        for(PassageQuestionRecord p : PassageQuestionRecord.all()){
-            if(a.questions.contains(p.question)){
-
-            	p.delete("");
-            }
-        }
-
-
-    	System.out.println("Records should be deleted");
-		 */
             a.delete();
-
-
             return ok("true");
         } else {
             return ok(index.render(session("userFirstName")));
         }
-
-
     }
 
     // do we possible need to clean up response here?? are they unreachable
@@ -1381,6 +1351,62 @@ public class SimplePassageController extends Controller {
             return badRequest();
         }
     }
+
+
+    public void copySimplePassage(int grade, SimplePassage p){
+
+            SimplePassage atGrade = new SimplePassage(p.text, p.title, p.source); 
+            atGrade.htmlRepresentations = new HashSet<PassageText>(); 
+            atGrade.sentences = p.sentences; 
+            atGrade.tags = p.tags; 
+
+            atGrade.num_characters = p.num_characters; 
+            atGrade.numWords = p.numWords; 
+            atGrade.numSyllables = p.numSyllables; 
+
+            atGrade.analyzed = true; 
+
+            
+            for (PassageText c : p.htmlRepresentations) {
+                if (c.grade <= grade) {
+                    atGrade.htmlRepresentations.add(c); 
+                }
+            }
+
+
+            atGrade.questions = new HashSet<PassageQuestion>();
+            for(PassageQuestion q : p.questions){
+                PassageQuestion copyQuestion = new PassageQuestion(q.basis_id, q.active);
+                copyQuestion.correctAnswer = q.correctAnswer;
+                copyQuestion.position = q.position;
+                atGrade.questions.add(copyQuestion);
+                atGrade.save();
+
+                PassageQuestionPrompt copyPrompt = new PassageQuestionPrompt(copyQuestion, PassageQuestionPrompt.byPassageQuestion(q.id).get(0).text);
+                copyQuestion.prompt = copyPrompt;
+                copyPrompt.save();
+                copyQuestion.save();
+
+                for(PassageQuestionChoice c : q.choices){
+                    PassageQuestionChoice copyChoice = new PassageQuestionChoice(c.entity_id, c.correct, c.active);
+                    copyChoice.position = c.position;
+                    copyQuestion.choices.add(copyChoice);
+                    copyQuestion.save();
+
+                    PassageQuestionAnswer copyAnswer = new PassageQuestionAnswer(copyChoice, PassageQuestionAnswer.byPassageQuestionChoice(c.id).get(0).text);
+                    copyChoice.answer = copyAnswer;
+                    copyAnswer.save();
+                    copyChoice.save();
+                }
+                copyQuestion.save();
+            }
+
+
+            atGrade.save(); 
+    }
+
+
+
 
     public Result savePassageHtml(Long passageId, int grade) {
         try {
