@@ -56,6 +56,8 @@ GET        /addChoice                               controllers.SimplePassageCon
 GET         /deletePassageQuestion                controllers.SimplePassageController.deleteQuestion(questionId : Long, passageId : Long)
 GET         /deletePassageQuestionChoice          controllers.SimplePassageController.deleteChoiceForQuestion(questionId : Long, passageId : Long, choiceId : Long)
 GET         /changeV                              controllers.SimplePassageController.changeVisibility(passageId : Long)
+GET         /viewStudentAnswers                     controllers.SimplePassageController.viewStudentAnswers()
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                         controllers.Assets.at(path="/public", file)

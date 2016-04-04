@@ -17,16 +17,22 @@
 
             @if(Long.valueOf(session().get("userId")) == inst.id){
 
+                <div class="btn-group-vertical">
+
+
                 @if(!routes.SimplePassageController.isAnalyzing.equals("prog")){
-                    <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
+                    <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages">
                         <i id="spinner" class="glyphicon glyphicon-refresh"></i> Analyze
                     </button>
                 } else {
-                    <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages" style="margin-left:10px ; margin-top:10px ; margin-bottom: 20px ;">
+                    <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages">
                         <i id="spinner" class="glyphicon glyphicon-refresh glyphicon-spin"></i> Analyze
                     </button>
                 }
 
+                <a href="/viewStudentAnswers" class = "btn btn-primary">View Your Student's Answers</a>
+
+                </div>
             }
 
 

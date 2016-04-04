@@ -70,6 +70,14 @@ public class PassageQuestionResponse extends Model {
     }
 
 
+    public static List<PassageQuestionResponse> byUser(Long userId) {
+        return find.where()
+                .ne("disavowed", true)
+                .eq("submitter_id", userId)
+                .findList();
+    }
+
+
     public static List<PassageQuestionResponse> byChoice(Long choiceId){
         return find.where().ne("disavowed", true).eq("entity_id",choiceId).findList();
     }

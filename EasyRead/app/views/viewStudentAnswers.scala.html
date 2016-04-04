@@ -1,0 +1,59 @@
+@(students: List[models.User])
+
+@main("View Student Answers") {
+
+    <link rel="stylesheet" href="/assets/public/css/easyread.css">
+
+    @if(flash.containsKey("success")) {
+        <div class="alert alert-success">
+            <h2>Done!</h2> @flash.get("success")
+        </div>
+    }
+
+
+<div id="students" class="box">
+
+    <div class="box-header">
+        <i class="fa fa-group fa-2x"></i>
+        <h5>View Your Student's Answers</h5>
+    </div>
+
+
+    <div class="box-content box-table" style="padding: 10px ;">
+        @if(students.size == 0) {
+            <div class="well">
+                <strong><em>You don't have any students in the system!</em></strong>
+            </div>
+        } else {
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Perentage Correct</th>
+                        <th>Questions Attempted</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+
+                    @for(student <- students) {
+                        <tr>
+                            <td>@student.firstName @student.lastName</td>
+                            <td>@User.percentageCorrect(student.id)%</td>
+                            <td>@PassageQuestionResponse.byUser(student.id).size()</td>
+                        </tr>
+                    }
+
+                }
+
+    </tbody>
+    </table>
+
+
+    </div>
+
+
+    <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+
+
+}

@@ -257,6 +257,20 @@ public class SimplePassageController extends Controller {
 
     }
 
+    public Result viewStudentAnswers(){
+        if(session("userFirstName") == null) return ok(index.render(null));
+
+        List<User> students = new ArrayList<User>();
+        User currentUser = User.byId(Long.valueOf(session("userId")));
+        if(currentUser.creatorId == 0){
+            for(User u : User.getAll()){
+                if(u.creatorId == currentUser.id){
+                    students.add(u);
+                }
+            }
+            return ok(viewStudentAnswers.render(students));
+        } else return badRequest();
+    }
 
 
     public Result editQuestionChoices(Long questionId) {
@@ -1483,6 +1497,7 @@ public class SimplePassageController extends Controller {
             }
         } else return badRequest();
     }
+
 
 
 

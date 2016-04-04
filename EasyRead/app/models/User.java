@@ -485,6 +485,21 @@ public class User extends Model {
         }
     }
 
+    public static double percentageCorrect(Long id){
+        List<PassageQuestionResponse> res = PassageQuestionResponse.byUser(id);
+
+        int size = res.size();
+
+        int total = 0;
+
+        for(PassageQuestionResponse response : res){
+            if(PassageQuestionChoice.byId(response.entity_id).correct) total++;
+        }
+
+        if(size == 0) return 0;
+        return total/size;
+    }
+
 /*
     public static void createSomeUsers(int numUsers, Role role) {
         for (int i = 0; i < numUsers; i++) {
