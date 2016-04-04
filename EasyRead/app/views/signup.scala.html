@@ -1,6 +1,14 @@
 @(form: Form[formdata.UserForm])
     @main("Signup") {
 
+        @if(flash.containsKey("failure")) {
+            <div class="alert alert-danger">
+                <h2>Try Again!</h2> @flash.get("failure")
+            </div>
+        }
+
+
+
         @helper.form(routes.Application.signup_submit()) {
         <!DOCTYPE html>
             <html lang="en">
@@ -71,9 +79,10 @@
 
 
                             <div class="text-center">
-                                <button type="submit" class="button medium semiround">Submit</button>
+                                <button type="submit" class="btn btn-success">Submit</button>
                             </div>
 
+                            </form>
 
                     </div> <!-- /container -->
 

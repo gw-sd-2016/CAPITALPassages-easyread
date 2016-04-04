@@ -1,6 +1,13 @@
 @(form: Form[formdata.LoginForm])
     @main("Login") {
 
+        @if(flash.containsKey("failure")) {
+            <div class="alert alert-danger">
+                <h2>Try Again!</h2> @flash.get("failure")
+            </div>
+        }
+
+
         @helper.form(routes.Application.login_submit()) {
 
 

@@ -131,7 +131,7 @@ public class User extends Model {
         this.lastName = formData.get("lastName");
         this.type = Role.INSTRUCTOR;
 
-        if(formData.get("isStudent").equals("true")){
+        if(formData.get("isStudent") != null && formData.get("isStudent").equals("true")){
             try {
                 this.creatorId = User.byUsername(formData.get("instUsername")).id;
             } catch(Exception e) {

@@ -14,6 +14,8 @@ import views.html.signup;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static play.data.Form.form;
 
@@ -28,12 +30,32 @@ public class Application extends Controller {
 
     public Result signup_submit() throws NoSuchAlgorithmException, InvalidKeySpecException {
 
+
+
         Form<UserForm> newUserForm = form(UserForm.class).bindFromRequest();
+
+        //http://www.tutorialspoint.com/java/java_regular_expressions.htm
+        Pattern r = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+
+
 
         if (newUserForm.hasErrors()) {
             return badRequest(signup.render(newUserForm));
         } else {
             User newUser = new User(newUserForm);
+
+            Matcher m = r.matcher(newUser.email);
+
+            if(!m.find()){
+                flash("failure", "That doesn't look like an email address.");
+                return ok(signup.render(form(UserForm.class)));
+            } else if(newUser.firstName.equals("")
+                    || newUser.lastName.equals("")
+                    || newUser.username.equals("")){
+                flash("failure", "Sorry, you forgot to fill in some information.");
+                return ok(signup.render(form(UserForm.class)));
+            }
             if(newUser.creatorId != null){
                 if(newUser.creatorId != 0) newUser.type = User.Role.STUDENT;
                 User.create(newUser);
@@ -67,6 +89,7 @@ public class Application extends Controller {
         LoginForm correctedForm = new LoginForm(loginForm.data().get("usernameOrEmail"), loginForm.data().get("password"));
 
         if (correctedForm.validate() != null) {
+            flash("failure", "Incorrect Username or Password");
             return badRequest(login.render(loginForm));
         } else {
             User loggedInUser = User.byLogin(loginForm.data().get("usernameOrEmail"), loginForm.data().get("password"));
