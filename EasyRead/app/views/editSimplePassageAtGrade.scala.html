@@ -407,6 +407,20 @@
 
             function saveHtml(html){
 
+                if(requests.length > 0) setFlag();
+
+                jsRoutes.controllers.SimplePassageController.savePassagePlainText(@passage.id, quill.getText() ).ajax({
+                    success : function(data) {
+                        console.log("saved plain text");
+                    },
+                    error : function(err) {
+                        //window.location = "";
+                    },
+                    complete : function() {
+
+                    }
+                });
+
                 var realText = trimUnecessary(html, @passageId);
                 $.post(
                         'saveHt?passageId=' + @passageId + '&grade=' + @SimplePassage.byId(passageId).grade ,

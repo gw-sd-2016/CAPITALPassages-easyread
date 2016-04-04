@@ -2,7 +2,7 @@ package controllers;
 
 import formdata.LoginForm;
 import formdata.UserForm;
-import models.*;
+import models.User;
 import net.sf.extjwnl.JWNLException;
 import play.Routes;
 import play.data.Form;
@@ -29,15 +29,11 @@ public class Application extends Controller {
     }
 
     public Result signup_submit() throws NoSuchAlgorithmException, InvalidKeySpecException {
-
-
-
         Form<UserForm> newUserForm = form(UserForm.class).bindFromRequest();
 
         //http://www.tutorialspoint.com/java/java_regular_expressions.htm
         Pattern r = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
                 + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
-
 
 
         if (newUserForm.hasErrors()) {
@@ -78,11 +74,6 @@ public class Application extends Controller {
         return ok(index.render(null));
     }
 
-    public void setAnalyzing(){
-        session("analyzing", "true");
-
-    }
-
     public Result login_submit() throws NoSuchAlgorithmException, InvalidKeySpecException {
         Form<LoginForm> loginForm = form(LoginForm.class).bindFromRequest();
 
@@ -102,14 +93,9 @@ public class Application extends Controller {
         }
     }
 
-    public Result getLoggedInUserId(){
-        return ok(String.valueOf(this.loggedInUser.id));
-    }
-
     public Result signup() throws NoSuchAlgorithmException, InvalidKeySpecException {
         return ok(signup.render(form(UserForm.class)));
     }
-
 
     public Result javascriptRoutes() {
         response().setContentType("text/javascript");
@@ -139,6 +125,5 @@ public class Application extends Controller {
                         controllers.routes.javascript.SimplePassageController.changeVisibility())
         );
     }
-
 
 }
