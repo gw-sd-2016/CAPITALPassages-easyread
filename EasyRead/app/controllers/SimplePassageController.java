@@ -1341,7 +1341,7 @@ public class SimplePassageController extends Controller {
                     if(ogSentence.indexOf("<i") != -1){
                         return ok();
                     } else {
-                        return ok("!");
+                        return ok("!" + diff);
                     }
 
 
