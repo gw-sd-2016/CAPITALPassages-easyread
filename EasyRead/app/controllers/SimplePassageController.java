@@ -1,6 +1,5 @@
 package controllers;
 
-
 import formdata.PassageQuestionAnswerData;
 import formdata.SimplePassageData;
 import formdata.SimplePassageNumQuestionsData;
@@ -10,9 +9,7 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.*;
-
 import java.util.*;
-
 import static play.data.Form.form;
 
 public class SimplePassageController extends Controller {

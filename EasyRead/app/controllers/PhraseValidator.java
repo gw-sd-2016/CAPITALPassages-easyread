@@ -10,9 +10,18 @@ import models.Suggestion;
  */
 public interface PhraseValidator {
 
-    // Can check the n-gram frequency of any -gram related to the -suggested-word_ field of the Suggestion Object
+    /**
+     * This method gets the frequency of the three-gram for the Suggestion object
+     * @param s Suggestion object that needs its frequency filled in
+     * @param p 3-gram who's frequency will be added to the Suggestion object's frequency field
+     */
     void fetchFrequencies(Suggestion s, String p);
 
-    // Checks if the fequency of the Suggestion object's suggested_word is greater than that of the original word
+    /**
+     * This method zeroes out the frequency field of the Suggestion object for suggestions
+     * that form less frequently used phrases than the original
+     * @param s Suggestion object holding the suggested word and the original
+     * @param p String representing the three gram
+     */
     void checkOriginal(Suggestion s, String p);
 }
