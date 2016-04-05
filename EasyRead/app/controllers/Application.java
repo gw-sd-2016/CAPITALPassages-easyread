@@ -19,10 +19,10 @@ import java.util.regex.Pattern;
 
 import static play.data.Form.form;
 
+// This controller was part of the original project
 
 public class Application extends Controller {
 
-    public User loggedInUser;
 
     public Result index() throws JWNLException {
         return ok(index.render(session("userFirstName")));
@@ -69,7 +69,6 @@ public class Application extends Controller {
     }
 
     public Result logout() {
-        this.loggedInUser = null;
         session().clear();
         return ok(index.render(null));
     }
@@ -88,7 +87,6 @@ public class Application extends Controller {
 
             session("userId", loggedInUser.id.toString());
             session("userFirstName", loggedInUser.firstName);
-            this.loggedInUser = loggedInUser;
             return ok(index.render(session("userFirstName")));
         }
     }

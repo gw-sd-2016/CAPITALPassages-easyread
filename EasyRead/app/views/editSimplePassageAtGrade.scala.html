@@ -409,7 +409,7 @@
 
                 if(requests.length > 0) setFlag();
 
-                jsRoutes.controllers.SimplePassageController.savePassagePlainText(@passage.id, quill.getText() ).ajax({
+                jsRoutes.controllers.SimplePassageController.savePassagePlainText(@passageId, quill.getText() ).ajax({
                     success : function(data) {
                         console.log("saved plain text");
                     },

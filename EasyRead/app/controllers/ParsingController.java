@@ -1,6 +1,5 @@
 package controllers;
 
-import edu.stanford.nlp.dcoref.CoNLL2011DocumentReader;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
@@ -29,15 +28,22 @@ public class ParsingController {
 
     }
 
+    // Helper method for calling revise suggestions in Analysis Controller
     public void reviseSuggestions(){
         a.reviseSuggestions();
     }
 
-
-    // code from: http://nlp.stanford.edu/software/corenlp.shtml
-    /*
-	 * 	Manning, Christopher D., Surdeanu, Mihai, Bauer, John, Finkel, Jenny, Bethard, Steven J., and McClosky, David. 2014. The Stanford CoreNLP Natural Language Processing Toolkit. In Proceedings of 52nd Annual Meeting of the Association for Computational Linguistics: System Demonstrations, pp. 55-60. [pdf] [bib]
-	 */
+    /**
+     * This method uses the sample code from Stanford CoreNLP to tokenize the text as sentences and words
+     * This method counts the number of syllables, characters, and words in each passage
+     * Makes calls to fill in missing syllables and word Suggestions and sets Parts of speech for all Passages of text
+     * At the end of this method Grade level has been determined and the passage is set
+     * code from: http://nlp.stanford.edu/software/corenlp.shtml
+     * Manning, Christopher D., Surdeanu, Mihai, Bauer, John, Finkel, Jenny, Bethard, Steven J., and McClosky, David. 2014. The Stanford CoreNLP Natural Language Processing Toolkit. In Proceedings of 52nd Annual Meeting of the Association for Computational Linguistics: System Demonstrations, pp. 55-60. [pdf] [bib]
+     * @param passage
+     * @param t
+     * @throws JWNLException
+     */
     public void parse(SimplePassage passage, String t) throws JWNLException {
 
         //int startingCount = this.sentences.size();

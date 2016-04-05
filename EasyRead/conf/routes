@@ -46,7 +46,6 @@ GET        /checkS                                   controllers.SimplePassageCo
 POST       /createPHT                              controllers.SimplePassageController.createPassageHTML(text : String, title : String, source : String)
 GET        /inProg                                controllers.SimplePassageController.isAnalyzing()
 GET        /analyzeS                                controllers.SimplePassageController.analyzeSingularPassage(passageId : Long)
-GET        /loggedInId                              controllers.Application.getLoggedInUserId()
 GET        /moveQ                                   controllers.SimplePassageController.moveQuestion(questionId : Long, up : Boolean)
 GET        /moveC                                   controllers.SimplePassageController.moveChoice(choiceId : Long, questionId : Long, up : Boolean)
 GET        /editCA                                  controllers.SimplePassageController.editChoiceAnswer(choiceId : Long, questionId : Long, newText : String)

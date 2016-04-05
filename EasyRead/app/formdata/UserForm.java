@@ -4,9 +4,6 @@ package formdata;
 import models.User;
 
 public class UserForm {
-    private static final String EMAIL_PATTERN =
-            "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-                    + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
     public String firstName;
     public String lastName;
@@ -19,8 +16,7 @@ public class UserForm {
     public String instUsername;
 
 
-    public UserForm() {
-    }
+    public UserForm() {}
 
     public UserForm(String firstName, String lastName, String email, String username, String password, String passwordRepeat, Long creatorId, boolean isStudent, String instUsername) {
         this.firstName = firstName;
@@ -29,9 +25,9 @@ public class UserForm {
         this.username = username;
         this.password = password;
         this.passwordRepeat = passwordRepeat;
-        //this.c = userId;
         this.instUsername = instUsername;
 
+        // if this person is a student set the creatorId to be their instructor
         if(isStudent){
             try {
                 this.creatorId = User.byUsername(this.instUsername).id;
