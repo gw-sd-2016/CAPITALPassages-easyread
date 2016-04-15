@@ -17,7 +17,7 @@ public class SimplePassageController extends Controller {
     private ParsingController parsingController;
     private PassageAnalysisController analysisController;
     private ArrayList<Double> difficultiesCache;
-    public boolean inProgress = false;
+    public static boolean inProgress = false;
 
     // New Passage Methods
     public Result createSimplePassage() throws JWNLException {
@@ -858,15 +858,9 @@ public class SimplePassageController extends Controller {
     }
 
 
-    public Result isAnalyzing(){
-        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
-            if(inProgress) return ok("prog");
-            else return ok("fine");
-        } else{
-            return badRequest();
-        }
+    public static boolean isAnalyzing(){
+        return inProgress;
     }
-
 
     public Result analyzePassages() throws JWNLException {
         if(session("userFirstName") == null) return ok(index.render(null));
@@ -1038,13 +1032,14 @@ public class SimplePassageController extends Controller {
     }
 
 
-    public Result acceptWord(String word, int grade) {
+    public Result acceptWord(String word, int grade, Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
         if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
-            Word thisWord = Word.byLemma(word);
+            Word thisWord = Word.byRawString(word);
             if (thisWord != null) {
                 thisWord.ageOfAcquisition = grade + 6;
+                generatePassageTextAtGrade(passageId, grade);
                 thisWord.save();
                 flash("success", "We'll remember that word is okay!");
                 return ok();

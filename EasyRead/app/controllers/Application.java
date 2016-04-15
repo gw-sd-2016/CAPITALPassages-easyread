@@ -110,7 +110,6 @@ public class Application extends Controller {
                         controllers.routes.javascript.SimplePassageController.checkWord(),
                         controllers.routes.javascript.SimplePassageController.checkSentence(),
                         controllers.routes.javascript.SimplePassageController.createPassageHTML(),
-                        controllers.routes.javascript.SimplePassageController.isAnalyzing(),
                         controllers.routes.javascript.SimplePassageController.analyzeSingularPassage(),
                         controllers.routes.javascript.SimplePassageController.moveQuestion(),
                         controllers.routes.javascript.SimplePassageController.moveChoice(),

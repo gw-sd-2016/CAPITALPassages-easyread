@@ -17,6 +17,7 @@ import java.util.Properties;
 public class ParsingController {
 
     private PassageAnalysisController a = new PassageAnalysisController();
+    private MashapeController mController = new MashapeController();
     private StanfordCoreNLP pipeline;
 
 
@@ -45,9 +46,6 @@ public class ParsingController {
      * @throws JWNLException
      */
     public void parse(SimplePassage passage, String t) throws JWNLException {
-
-        //int startingCount = this.sentences.size();
-
         if (pipeline == null) initPipeline();
 
         // create an empty Annotation just with the given text
@@ -62,13 +60,8 @@ public class ParsingController {
 
         int i = 0;
 
-        int originalSCount =/*passage.sentences.size();*/ 0;
-
-        if (originalSCount == 0) {
-            passage.num_characters = 0;
-            passage.numSyllables = 0;
-        }
-
+        passage.num_characters = 0;
+        passage.numSyllables = 0;
         passage.numWords = 0;
 
         long startingSentenceID = 0;
@@ -103,43 +96,34 @@ public class ParsingController {
                         wordForm.word = lemma;
                         wordForm.save();
                     }
-						/*if(originalSCount == 0) {*/
-                    new MashapeController().getNumSyllablesForWord(lemma, passage);
+
+                    mController.getNumSyllablesForWord(lemma, passage);
 
 
-                    if(originalSCount == 0) passage.numWords++;
+                    passage.numWords++;
                     a.generateSuggestionsForWord(p, lemma, s.text, passage.id, token.originalText());
-                    //}
-
                 }
 
                 Word thisWord = Word.byLemma(lemma);
 
-
                 if (thisWord != null && thisWord.partsOfSpeech != null) {
                     thisWord.partsOfSpeech.add(p);
-
-
                     thisWord.save();
-
-
-                    //}
                 }
 
                 s.words.add(thisWord);
             }
 
-            if (originalSCount == 0) passage.sentences.add(s);
+            passage.sentences.add(s);
             sentenceNum++;
         }
 
-        if(originalSCount == 0) a.determineGradeLevel(passage);
+        a.determineGradeLevel(passage);
         try {
             passage.save();
         } catch (Exception e) {
             System.out.println("Couldn't Save");
         }
-
-
     }
+
 }

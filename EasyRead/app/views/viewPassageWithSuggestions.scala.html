@@ -254,7 +254,7 @@
             }
 
             function acceptWord(word){
-                jsRoutes.controllers.SimplePassageController.acceptWord(word.id,$_GET('grade')).ajax({
+                jsRoutes.controllers.SimplePassageController.acceptWord(word,$_GET('grade')).ajax({
                     success : function(data) {
                         //window.location.reload();
                     },
@@ -379,23 +379,12 @@
                 });
             }
 
-
-
-
-
-
-
                 //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items
                 // locate your element and add the Click Event Listener
 
                 function isEmpty( el ){
                     return !$.trim(el.html())
                 }
-
-
-
-
-
 
 
                 $(document).ready(function(){

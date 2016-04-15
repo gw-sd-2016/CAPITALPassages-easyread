@@ -127,7 +127,7 @@
                             </a>
 
                         }
-                        @if(!routes.SimplePassageController.isAnalyzing.equals("prog")){
+                        @if(SimplePassageController.isAnalyzing == false){
                             <a class="btn btn-primary btn-success has-spinner" id="analyzePassages">
                                 <i id="spinner" class="glyphicon glyphicon-refresh"></i> Analyze
                             </a>
@@ -705,8 +705,9 @@
                 return vars;
             }
 
-            function acceptWord(word){
-                jsRoutes.controllers.SimplePassageController.acceptWord(word.id, @grade).ajax({
+            function acceptWord(word, grade){
+                switchSpinner();
+                jsRoutes.controllers.SimplePassageController.acceptWord(word, grade, @passageId).ajax({
                     success : function(data) {
                         //window.location.reload();
                     },
@@ -766,7 +767,7 @@
                 }
 
                 var upperDiv = '<div id="title" style="max-width: 100%;"><h1>' + string + '</h1></div>';
-                var approvalDiv = "<div id='accept'><button class='btn btn-primary' onclick='acceptWord(" + string + ", " + $_GET('grade') + ");'>This is okay!</button></div><br>";
+                var approvalDiv = "<div id='accept'><button class='btn btn-primary' onclick='acceptWord(\"" + string + "\", " + $_GET('grade') + ");'>This is okay!</button></div><br>";
 
                 var synonymnDiv = "<div class='container-fluid'> <div id='list'>";
 
@@ -822,6 +823,7 @@
                     jsRoutes.controllers.SimplePassageController.analyzeSingularPassage(@passageId).ajax({
                         success : function(data) {
                             window.location.reload();
+                            switchSpinner();
                         },
                         error : function(err) {
                             //window.location = "";
@@ -856,7 +858,7 @@
             $( document ).ready(function() {
 
                 // http://stackoverflow.com/questions/24309803/playframework-jsvalue-in-html-template
-                underlineSpecificWords(@Html(Json.stringify(Json.toJson(SimplePassage.byId(passageId).text.split(" ").toList.distinct.filter(p => (Word.byLemma(p) != null && Word.byLemma(p).ageOfAcquisition > grade + 6) && !SimplePassage.byId(passageId).getStopWords().contains(p))))));
+                underlineSpecificWords(@Html(Json.stringify(Json.toJson(SimplePassage.byId(passageId).text.split(" ").toList.distinct.filter(p => (Word.byRawString(p) != null && Word.byRawString(p).ageOfAcquisition > (grade + 6)) && !SimplePassage.byId(passageId).getStopWords().contains(p))))));
 
 
                 //http://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items

@@ -2,7 +2,7 @@
 
     @main("View All Passages") {
 
-        <link rel="stylesheet" href="/assets/public/css/easyread.css">
+        <link rel="stylesheet" href="/assets/css/easyread.css">
 
         @if(flash.containsKey("success")) {
             <div class="alert alert-success">
@@ -20,7 +20,7 @@
                 <div class="btn-group-vertical">
 
 
-                @if(!routes.SimplePassageController.isAnalyzing.equals("prog")){
+                @if(SimplePassageController.isAnalyzing == false){
                     <button type="button" class="btn btn-primary btn-success has-spinner" id="analyzePassages">
                         <i id="spinner" class="glyphicon glyphicon-refresh"></i> Analyze
                     </button>
