@@ -407,11 +407,16 @@
 
             function saveHtml(html){
 
-                if(requests.length > 0) setFlag();
+                if(requests.length > 0){
+                    setFlag();
+                }
+
+
 
                 jsRoutes.controllers.SimplePassageController.savePassagePlainText(@passageId, quill.getText() ).ajax({
                     success : function(data) {
                         console.log("saved plain text");
+                        alert("Passage Saved!");
                     },
                     error : function(err) {
                         //window.location = "";
@@ -853,6 +858,17 @@
                 if(elem.className.substring(elem.className.length - 4) == "spin") elem.className = off;
                 else elem.className = on;
             }
+
+            function turnOnSaveIndicator(){
+                var on = "glyphicon glyphicon-refresh glyphicon-spin";
+                var off = "glyphicon glyphicon-refresh";
+
+                var elem = document.getElementById("saveSpinner");
+
+                if(elem.className.substring(elem.className.length - 4) == "spin") elem.className = off;
+                else elem.className = on;
+            }
+
 
 
             $( document ).ready(function() {

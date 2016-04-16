@@ -920,36 +920,36 @@ public class SimplePassageController extends Controller {
             SimplePassage p = SimplePassage.byId(passageId);
 
             if(p != null) {
-                if(!p.analyzed){
+                if(!p.analyzed) {
                     parseAndAddSuggestions(p);
-
-                    if(p.htmlRepresentations != null){
-                        for(PassageText pt : p.htmlRepresentations) pt.delete();
-                    }
-
-
-
-                    p.htmlRepresentations = new HashSet<PassageText>();
-
-                    this.difficultiesCache = getDifficulties(p);
-
-                    int stopPoint = 14;
-                    if(!p.original) stopPoint = p.grade;
-
-                    for (int i = 0; i < stopPoint; i++) {
-                        generatePassageTextAtGrade(p.id, i);
-                        beginSentenceBreakdown(p.id, i);
-                    }
-
-
-                    p.analyzed = true;
-
-
-                    parsingController.reviseSuggestions();
-
-                    p.save();
-
                 }
+                if(p.htmlRepresentations != null){
+                    for(PassageText pt : p.htmlRepresentations) pt.delete();
+                }
+
+
+
+                p.htmlRepresentations = new HashSet<PassageText>();
+
+                this.difficultiesCache = getDifficulties(p);
+
+                int stopPoint = 14;
+                if(p.analyzed) stopPoint = p.grade;
+
+                for (int i = 0; i <= stopPoint; i++) {
+                    generatePassageTextAtGrade(p.id, i);
+                    beginSentenceBreakdown(p.id, i);
+                }
+
+
+                p.analyzed = true;
+
+
+                parsingController.reviseSuggestions();
+
+                p.save();
+
+
                 this.inProgress = false;
                 flash("success", "Passage Analysis Completed.");
                 return ok("true");
@@ -991,7 +991,10 @@ public class SimplePassageController extends Controller {
             }
         }
 
+
+
         current.html = "<div>" + p.text + "</div>";
+
 
         HashSet<String> alreadySeen = new HashSet<String>();
 
@@ -1018,8 +1021,8 @@ public class SimplePassageController extends Controller {
             }
         }
 
-
         current.html = current.html.replace("</u> <u>", "</u>&nbsp<u>");
+
 
         if(!isOverwriting){
             p.htmlRepresentations.add(current);

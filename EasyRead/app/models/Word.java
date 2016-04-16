@@ -108,6 +108,14 @@ public class Word extends Model {
 
         Word w;
 
+        int x = lc.indexOf('>');
+
+
+        if(x != -1){
+            int y = lc.lastIndexOf("<");
+            lc = lc.substring(0, lc.indexOf("<")) + lc.substring(x + 1, y);
+        }
+
         w = Word.byLemma(lc);
 
         if (w == null && lc.length() - 1 > 0) w = Word.byLemma(lc.substring(0, lc.length() - 1));

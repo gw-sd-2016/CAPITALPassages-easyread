@@ -162,6 +162,7 @@ public class WordNetController {
 
 
     public String realizeVerb(String w, String pos){
+        pos = pos.toLowerCase();
         String correct;
         if(pos.contains("present participle")){
             correct = convertToGerund(w);
@@ -180,6 +181,7 @@ public class WordNetController {
     }
 
     public String realizeNoun(String w, String pos){
+        pos = pos.toLowerCase();
         String correct = w;
         if(pos.contains("plural")) {
             WordElement word = xmlLexicon.getWord(w, LexicalCategory.NOUN);
