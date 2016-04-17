@@ -24,7 +24,7 @@ public class ParsingController {
     private void initPipeline() {
         Properties props = new Properties();
         // do we still need all these annotators
-        props.put("annotators", "tokenize, ssplit, pos, lemma, ner");
+        props.put("annotators", "tokenize, ssplit, pos, lemma");
         pipeline = new StanfordCoreNLP(props);
 
     }
@@ -83,7 +83,7 @@ public class ParsingController {
                 String stem = token.lemma();
 
                 // this is the NER label of the token
-                String ne = token.get(CoreAnnotations.NamedEntityTagAnnotation.class);
+                //String ne = token.get(CoreAnnotations.NamedEntityTagAnnotation.class);
 
                 POS p = new POS(pos);
 

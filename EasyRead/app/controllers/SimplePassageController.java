@@ -756,7 +756,11 @@ public class SimplePassageController extends Controller {
             else if(grade > passage.grade && !passage.original || grade < 0){
                 flash("warning","The grade you requested was unavailable so you were re-routed");
                 grade = passage.grade;
+            } else if(PassageText.bySimplePassageAndGrade(passageId, grade) == null){
+                flash("danger", "This Passage isn't finished analyzing yet!");
+                return viewAllPassages();
             }
+
 
 
             return ok(editSimplePassageAtGrade.render(form, passageId, grade));
@@ -869,39 +873,39 @@ public class SimplePassageController extends Controller {
             this.inProgress = true;
             for (SimplePassage p : SimplePassage.all()) {
 
-                if(!p.analyzed){
-                    parseAndAddSuggestions(p);
 
-                    if(p.htmlRepresentations != null){
-                        for(PassageText pt : p.htmlRepresentations) pt.delete();
-                    }
+                parseAndAddSuggestions(p);
 
-
-
-                    p.htmlRepresentations = new HashSet<PassageText>();
-
-                    this.difficultiesCache = getDifficulties(p);
-
-
-                    int stopPoint = 14;
-                    if(!p.original) stopPoint = p.grade;
-
-                    for (int i = 0; i < stopPoint; i++) {
-                        generatePassageTextAtGrade(p.id, i);
-                        beginSentenceBreakdown(p.id, i);
-                    }
-
-
-
-                    p.analyzed = true;
-
-
-                    parsingController.reviseSuggestions();
-
-                    p.save();
+                if(p.htmlRepresentations != null){
+                    for(PassageText pt : p.htmlRepresentations) pt.delete();
                 }
 
+
+
+                p.htmlRepresentations = new HashSet<PassageText>();
+
+                this.difficultiesCache = getDifficulties(p);
+
+
+                int stopPoint = 13;
+                if(!p.original) stopPoint = p.grade;
+
+                for (int i = 0; i <= stopPoint; i++) {
+                    generatePassageTextAtGrade(p.id, i);
+                    beginSentenceBreakdown(p.id, i);
+                }
+
+
+
+                p.analyzed = true;
+
+
+                parsingController.reviseSuggestions();
+
+                p.save();
             }
+
+
             this.inProgress = false;
             flash("success", "Passage Analysis Completed.");
             return ok("true");
@@ -920,9 +924,9 @@ public class SimplePassageController extends Controller {
             SimplePassage p = SimplePassage.byId(passageId);
 
             if(p != null) {
-                if(!p.analyzed) {
-                    parseAndAddSuggestions(p);
-                }
+
+                parseAndAddSuggestions(p);
+
                 if(p.htmlRepresentations != null){
                     for(PassageText pt : p.htmlRepresentations) pt.delete();
                 }
@@ -933,7 +937,7 @@ public class SimplePassageController extends Controller {
 
                 this.difficultiesCache = getDifficulties(p);
 
-                int stopPoint = 14;
+                int stopPoint = 13;
                 if(p.analyzed) stopPoint = p.grade;
 
                 for (int i = 0; i <= stopPoint; i++) {

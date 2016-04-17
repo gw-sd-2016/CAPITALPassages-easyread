@@ -3,6 +3,7 @@ package models;
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.Expose;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
+import org.apache.commons.lang3.StringEscapeUtils;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
 
@@ -14,6 +15,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 
 @Entity
 public class Word extends Model {
@@ -103,24 +105,48 @@ public class Word extends Model {
         return find.where().ne("disavowed", true).eq("id", id).findUnique();
     }
 
+
+    public static String validPartsOfString(String s){
+        char[] arr = s.toCharArray();
+
+        StringBuilder sb = new StringBuilder();
+
+        boolean valid = true;
+
+
+        for(int i = 0; i < arr.length; i++){
+            if(valid && (Character.isLetter(arr[i]) || arr[i] == '\'' || arr[i] == '-')){
+                sb.append(arr[i]);
+            } else if(arr[i] == '<'){
+                valid = false;
+            } else if(arr[i] == '>'){
+                if(valid) sb = new StringBuilder();
+                valid = true;
+
+            }
+
+        }
+
+        return sb.toString();
+    }
+
+
+
     public static Word byRawString(String s) {
         String lc = s.toLowerCase();
 
         Word w;
 
-        int x = lc.indexOf('>');
+        try{
+            //http://stackoverflow.com/questions/14998726/replace-html-codes-with-equivalent-characters-in-java
+            String flattened = validPartsOfString(StringEscapeUtils.unescapeHtml4(lc));
 
+            w = Word.byLemma(flattened);
 
-        if(x != -1){
-            int y = lc.lastIndexOf("<");
-            lc = lc.substring(0, lc.indexOf("<")) + lc.substring(x + 1, y);
+            return w;
+        } catch(Exception e){
+            return null;
         }
-
-        w = Word.byLemma(lc);
-
-        if (w == null && lc.length() - 1 > 0) w = Word.byLemma(lc.substring(0, lc.length() - 1));
-
-        return w;
     }
 
     public static Word byId(String id) {

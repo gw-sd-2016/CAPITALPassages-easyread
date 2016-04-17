@@ -765,11 +765,10 @@
 
 
                 if(window.getComputedStyle(leftPanel).display === 'none'){
-                    console.log("doing this");
-
                     $("#left-panel-link").click();
 
                 }
+
 
                 var upperDiv = '<div id="title" style="max-width: 100%;"><h1>' + string + '</h1></div>';
                 var approvalDiv = "<div id='accept'><button class='btn btn-primary' onclick='acceptWord(\"" + string + "\", " + $_GET('grade') + ");'>This is okay!</button></div><br>";

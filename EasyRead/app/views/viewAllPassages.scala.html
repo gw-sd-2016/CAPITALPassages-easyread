@@ -9,6 +9,11 @@
                 <h2>Done!</h2> @flash.get("success")
             </div>
         }
+        @if(flash.containsKey("danger")) {
+            <div class="alert alert-danger">
+                <h2>Try Again Later!</h2> @flash.get("danger")
+            </div>
+        }
 
         <div>
             <div>
