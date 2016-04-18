@@ -169,6 +169,14 @@
                 <br>
 
             </div>
+
+            <div class="info">
+                <strong>Hints:</strong>
+                <br>
+                <h7>Analyzing a passage with unsaved changes saves it first</h7>
+                <br>
+                <h7>Editing a passage at a lower grade level creates a new one for you with the changes</h7>
+            </div>
         </div>
     }
 
@@ -421,11 +429,12 @@
                         function(data) {
                             @if(grade != SimplePassage.byId(passageId).grade) {
                             alert("Your changes have been saved in a new Passage called " + "@SimplePassage.byId(passageId).title" + "-(" + @grade + " edit)");
+                            window.location.href = "/viewAllPassages"
                             } else {
                             alert("Your changes have been saved!");
                             }
 
-                            window.location.href = "/viewAllPassages"
+
                         });
 
             }
@@ -866,6 +875,8 @@
             }
 
             $('a#analyzePassages').click(function() {
+
+                saveHtml(quill.getHTML());
                 var button = $(this);
                 button.toggleClass('active');
 
