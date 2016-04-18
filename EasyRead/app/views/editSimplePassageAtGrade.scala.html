@@ -47,11 +47,8 @@
         <h5>Choose The Grade Level this passage should be edited at</h5>
         <div class="dropdown">
             <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-
                 Grade
-
                 @PassageAnalysisController.displayGrade(grade)
-
                 <span class="caret"></span></button>
             <ul class="dropdown-menu">
             @for(p <- SimplePassage.byId(passageId).htmlRepresentations.toList.sortBy(_.grade).distinct){
@@ -297,7 +294,7 @@
                     checkWord(capturedWord);
                 }
 
-                return quill.getHTML().substring(startOfWord, endOfWord);
+                return quill.getText().substring(startOfWord, endOfWord);
 
             }
 
@@ -396,9 +393,12 @@
                 var arr = getCapturedSentence(pos);
                 capturedSentence = arr[0];
 
+                capturedSentence = removeEmptyElems(capturedSentence);
+
                 console.log("sentence is: " + capturedSentence );
 
                 if(capturedSentence.split(" ").length > 2){
+
                     checkSentence(capturedSentence, arr[1]);
                 }
 
@@ -411,28 +411,20 @@
                     setFlag();
                 }
 
-
-
-                jsRoutes.controllers.SimplePassageController.savePassagePlainText(@passageId, quill.getText() ).ajax({
-                    success : function(data) {
-                        console.log("saved plain text");
-                        alert("Passage Saved!");
-                    },
-                    error : function(err) {
-                        //window.location = "";
-                    },
-                    complete : function() {
-
-                    }
-                });
-
                 var realText = trimUnecessary(html, @passageId);
                 $.post(
                         'saveHt?passageId=' + @passageId + '&grade=' + @SimplePassage.byId(passageId).grade ,
-                        {'html' : realText },
+                        {'html' : realText,
+                            'plain' : quill.getText()
+                        },
 
                         function(data) {
-                            alert("Passage Saved!");
+                            @if(grade != SimplePassage.byId(passageId).grade) {
+                            alert("Your changes have been saved in a new Passage called " + "@SimplePassage.byId(passageId).title" + "-(" + @grade + " edit)");
+                            } else {
+                            alert("Your changes have been saved!");
+                            }
+
                             window.location.href = "/viewAllPassages"
                         });
 
@@ -440,7 +432,7 @@
 
             function trimUnecessary( html,  passageId) {
 
-                var passageText = "@SimplePassage.byId(passageId).text";
+                var passageText = @Html(Literal(Constant(SimplePassage.byId(passageId).text)).toString);
 
 
                 var firstWord = passageText.substring(0, passageText.indexOf(" "));
@@ -472,7 +464,7 @@
             }
 
             function checkWord(word){
-                jsRoutes.controllers.SimplePassageController.checkWord(word, @SimplePassage.byId(passageId).grade, @passageId ).ajax({
+                jsRoutes.controllers.SimplePassageController.checkWord(word, @grade, @passageId ).ajax({
                     success : function(data) {
                         quill.formatText(quill.getText().indexOf(word), quill.getText().indexOf(word) + word.length , 'underline', data.toString() == "UNDERLINE");
                     },
@@ -498,7 +490,7 @@
                         console.log("index " + index);
 
                         if (data.toString() == "REM") {
-                            console.log("REM");
+                            console.log("REM sentenece " + sentenceNum);
 
 
                             var currentS = 0;
@@ -514,27 +506,29 @@
 
 
 
-                            // console.log("sentence really is: " + sentence);
+                            console.log("sentence really is: " + html.substring(index));
                             // console.log("full - " + html);
                             var start = 0;
                             var firstEnd = 0;
                             var secondEnd = 0;
 
 
-                            var l = "<span class=\"glyphicon glyphicon-exclamation-sign onclick=showJustification(\">".length;
+                            var l = "<span class=\"glyphicon glyphicon-exclamation-sign onclick=\"showJustification(1);\">".length;
 
                             //console.log("index of first <: " + index);
 
                             for (var i = index; i < html.length; i++) {
-                                if (html.charAt(i) == '<' && html.substring(i, i + 5) == "<span" && start == 0) {
-                                    start = i;
-                                    //firstEnd = start + l;
+                                if (html.charAt(i) == 's' && html.substring(i, i + 4) == "span" && start == 0) {
+                                    start = i - 1;
+                                    firstEnd = start + l;
+                                    if(html.charAt(firstEnd) != '>') firstEnd++;
+                                    // account for some justifications being two digits
 
                                 }
 
-                                if (start != 0 && html.charAt(i) == '>' && html.substring(i - 1, i) == "\"") {
+                               /* if (start != 0 && html.charAt(i) == '>' && html.substring(i - 1, i) == "\"") {
                                     firstEnd = i + 1;
-                                }
+                                }*/
 
 
                                 if (firstEnd != 0 && i > start + l && html.charAt(i) == '>' && html.substring(i - 1, i) == "n") {
@@ -543,10 +537,19 @@
                                 }
                             }
 
+                            console.log(start);
+                            console.log(firstEnd);
+                            console.log(secondEnd);
+
 
                             if (start != 0 && firstEnd != 0 && secondEnd != 0) {
-                                html = html.substring(0, start) + html.substring(firstEnd, secondEnd - 6) + html.substring(secondEnd + 2);
+                                var restOfStr = html.substring(secondEnd + 2);
 
+                                var ogSecondEnd = secondEnd;
+
+                                if(restOfStr.substring(0, 4) == "nbsp") restOfStr = restOfStr.substring(5);
+
+                                html = html.substring(0, start) + html.substring(firstEnd + 1, ogSecondEnd - 6)  + restOfStr;
 
                                 quill.setHTML(html);
 
@@ -633,6 +636,9 @@
 
                             for(innerRealEnd = innerRealStart + 1; innerRealEnd < html.length; innerRealEnd++){
                                 if(html.charAt(innerRealEnd) == '.' && (/\s/.test(html.charAt(innerRealEnd + 1)) || html.charAt(innerRealEnd + 1) == '&' || html.charAt(innerRealEnd + 1) == '<')){
+
+
+
                                     break;
                                 }
                             }
@@ -641,14 +647,25 @@
 
                             var insertString = "<span class='glyphicon glyphicon-exclamation-sign' onclick='showJustification("+ data.toString().substring(1) + ");'>&nbsp;</span>";
 
+                            if(html.charAt(innerRealStart) != '<') innerRealStart++;
+                            if(html.charAt(innerRealStart) == ';') innerRealStart++;
 
-                            var firstPart = html.substring(0, innerRealStart + 1);
 
-                            var afterSpace = html.substring(innerRealStart + 2);
+
+                            var firstPart = html.substring(0, innerRealStart);
+
+
+
+                            var afterSpace = html.substring(innerRealStart);
+
+
+
 
 
                             quill.setHTML(firstPart + insertString + afterSpace);
+
                         }
+
                         console.log("--sen search");
                         checkWordsInSentence(sentenceNum);
                         console.log("end sen search");
@@ -660,6 +677,38 @@
 
                     }
                 });
+            }
+
+            function removeEmptyElems(str){
+                var ret = str;
+
+                var valid = true;
+                var caughtIndex = 0;
+
+                for(var i = 0; i < ret.length; i++){
+                    console.log("char at i -- " + ret.charAt(i));
+
+                    if((ret.charAt(i) == 'i' || ret.charAt(i) == 's') && i > 0 && ret.charAt(i - 1) == '<'){
+                        console.log("!");
+                        i++;
+                        while(i < ret.length - 1 && (ret.substring(i, i + 2) != "i>" || ret.substring(i, i + 2) != "n>")) i++;
+                        i++;
+                    } else if(valid == true && ret.charAt(i) == '>'){
+                        console.log("non closed");
+                        ret = ret.substring(i + 1);
+                    } else if (ret.charAt(i) == '>'){
+                        console.log("closed");
+                        ret = ret.substring(0, caughtIndex) + ret.substring(i + 1);
+                        valid = true;
+                    }else if(ret.charAt(i) == '<'){
+                        console.log("start");
+                        valid = false;
+                        caughtIndex = i;
+                    }
+
+                }
+
+                return ret;
             }
 
             function checkWordsInSentence(sentenceNum){
@@ -857,17 +906,6 @@
                 if(elem.className.substring(elem.className.length - 4) == "spin") elem.className = off;
                 else elem.className = on;
             }
-
-            function turnOnSaveIndicator(){
-                var on = "glyphicon glyphicon-refresh glyphicon-spin";
-                var off = "glyphicon glyphicon-refresh";
-
-                var elem = document.getElementById("saveSpinner");
-
-                if(elem.className.substring(elem.className.length - 4) == "spin") elem.className = off;
-                else elem.className = on;
-            }
-
 
 
             $( document ).ready(function() {

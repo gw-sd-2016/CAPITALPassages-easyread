@@ -34,6 +34,7 @@ public class SimplePassageController extends Controller {
 
         if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
             SimplePassage p = new SimplePassage(text, title, source);
+            p.original = true;
             p.visibleToStudents = true;
 
             Map<String, String[]> parameters = request().body().asFormUrlEncoded();
@@ -997,7 +998,7 @@ public class SimplePassageController extends Controller {
 
 
 
-        current.html = "<div>" + p.text + "</div>";
+        current.html =  p.text;
 
 
         HashSet<String> alreadySeen = new HashSet<String>();
@@ -1251,10 +1252,15 @@ public class SimplePassageController extends Controller {
 
                         System.out.println("sp:" + spaceIndex);
 
+
+                        double diffValue = this.difficultiesCache.get(sentNumber);
+
+                        String diffString = "" + (int) Math.round(diffValue);
+
                         if (spaceIndex != -1) {
-                            curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + this.difficultiesCache.get(sentNumber) + ");'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
+                            curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diffString + ");'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
                         } else {
-                            curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + this.difficultiesCache.get(sentNumber) + ");'>" + curr + "</i> ";
+                            curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diffString + ");'>" + curr + "</i> ";
                         }
 
                         while (curr.indexOf(" <u>") != -1) {
@@ -1267,7 +1273,7 @@ public class SimplePassageController extends Controller {
                         placed = true;
                     }
 
-                    if (split[i].charAt(split[i].length() - 1) == '.') {
+                    if (split[i].length() - 1 > 0 && split[i].charAt(split[i].length() - 1) == '.') {
                         sentNumber++;
                         placed = false;
                     }
@@ -1329,10 +1335,15 @@ public class SimplePassageController extends Controller {
 
                     System.out.println("sp:" + spaceIndex);
 
+                    double diffValue = diff;
+
+                    String diffString = "" + (int) Math.round(diffValue);
+
+
                     if (spaceIndex != -1) {
-                        curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diff + ");'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
+                        curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diffString + ");'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
                     } else {
-                        curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diff + ");'>" + curr + "</i> ";
+                        curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diffString + ");'>" + curr + "</i> ";
                     }
 
 
@@ -1354,7 +1365,7 @@ public class SimplePassageController extends Controller {
                     if(ogSentence.indexOf("<i") != -1){
                         return ok();
                     } else {
-                        return ok("!" + diff);
+                        return ok("!" + diffString);
                     }
 
 
@@ -1477,18 +1488,28 @@ public class SimplePassageController extends Controller {
 
 
                 String html = parameters.get("html")[0];
+                String plainText = parameters.get("plain")[0];
 
                 //https://dzone.com/articles/jquery-ajax-play-2
                 //http://stackoverflow.com/questions/16408867/send-post-json-with-ajax-and-play-framework-2
                 for (PassageText c : p.htmlRepresentations) {
                     if (c.grade == grade) {
                         c.html = html;
+                        if(grade == p.grade) {
+                            c.save();
+                        }
                         break;
                     }
                 }
 
+                p.text = plainText;
 
-                copySimplePassage(grade,p);
+                if(grade != p.grade) copySimplePassage(grade,p);
+                else {
+                    p.save();
+
+                }
+
                 //p.save();
                 return ok("true");
             } catch (Exception e) {

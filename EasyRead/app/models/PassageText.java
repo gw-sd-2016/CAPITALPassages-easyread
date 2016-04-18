@@ -38,7 +38,12 @@ public class PassageText extends Model {
     public static Finder<String, PassageText> find = new Finder<String, PassageText>(String.class, PassageText.class);
 
     public static PassageText bySimplePassageAndGrade(Long simple_passage_id, int grade) {
-        return find.where().eq("simple_passage_id", simple_passage_id).eq("grade",grade).findUnique();
+
+        try {
+            return find.where().eq("simple_passage_id", simple_passage_id).eq("grade",grade).findUnique();
+        } catch(Exception e){
+            return null;
+        }
     }
 
 
