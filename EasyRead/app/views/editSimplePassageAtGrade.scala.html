@@ -494,7 +494,7 @@
                         console.log("CHECK SENTENCE " + sentenceNum);
                         var html = quill.getHTML();
 
-                        var index = html.indexOf(sentence);
+                        var index = 0;
 
                         console.log("index " + index);
 
@@ -645,9 +645,6 @@
 
                             for(innerRealEnd = innerRealStart + 1; innerRealEnd < html.length; innerRealEnd++){
                                 if(html.charAt(innerRealEnd) == '.' && (/\s/.test(html.charAt(innerRealEnd + 1)) || html.charAt(innerRealEnd + 1) == '&' || html.charAt(innerRealEnd + 1) == '<')){
-
-
-
                                     break;
                                 }
                             }
@@ -671,8 +668,21 @@
 
 
 
-                            quill.setHTML(firstPart + insertString + afterSpace);
+                               afterSpace =  afterSpace.replace("<div>","");
+                                afterSpace = afterSpace.replace("</div>","");
 
+
+                            insertString = insertString.substring(0, insertString.indexOf("&")) + removeEmptyElems(afterSpace.substring(0, afterSpace.indexOf(" "))) + "</span>";
+
+                            afterSpace =  afterSpace.substring(afterSpace.indexOf(" "));
+
+                            console.log("insert " + insertString);
+
+                            if(sentenceNum == 0){
+                                quill.setHTML(insertString + afterSpace);
+                            } else {
+                                quill.setHTML(firstPart + insertString + afterSpace);
+                            }
                         }
 
                         console.log("--sen search");
