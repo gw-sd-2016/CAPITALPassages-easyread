@@ -9,17 +9,29 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.*;
+
 import java.util.*;
+
 import static play.data.Form.form;
 
 public class SimplePassageController extends Controller {
 
     private ParsingController parsingController;
     private PassageAnalysisController analysisController;
+
+    // avoid fetching difficulties per sentence more than once
     private ArrayList<Double> difficultiesCache;
+
+    // determines whether or not spinner is active in UI
     public static boolean inProgress = false;
 
     // New Passage Methods
+
+    /**
+     * Renders Passage Creation Form
+     * @return routed to form
+     * @throws JWNLException
+     */
     public Result createSimplePassage() throws JWNLException {
         if(session("userFirstName") == null) return ok(index.render(null));
 
@@ -28,6 +40,36 @@ public class SimplePassageController extends Controller {
         } else return badRequest();
     }
 
+    /**
+     * Method called on submission of Passage Creation form
+     * @return Renders table view of all passages on finish
+     */
+    public Result createSimplePassage_submit() {
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            if(session("userFirstName") == null) return ok(index.render(null));
+            Form<SimplePassageData> createSPForm = form(SimplePassageData.class).bindFromRequest();
+
+            if (createSPForm.hasErrors()) {
+                return badRequest(createSimplePassage.render(createSPForm));
+            }
+
+            SimplePassage newPassage = new SimplePassage(createSPForm.get());
+            newPassage.instructorID = Integer.valueOf(session("userId"));
+
+
+            newPassage.save();
+            return redirect(routes.SimplePassageController.viewAllPassages());
+        } else return badRequest();
+    }
+
+
+    /**
+     * Allows to be saved with HTML formatting from ajax call
+     * @param text - String representing Passage Text
+     * @param title - String representing Passage Title
+     * @param source - String representing Passage Source
+     * @return Routes user to Manage Passages page
+     */
     public Result createPassageHTML(String text, String title, String source) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
@@ -79,6 +121,11 @@ public class SimplePassageController extends Controller {
 
     }
 
+    /**
+     * Allows an instructor to hide of show passages to their students
+     * @param passageId - Id of the Passage Object you are operating on
+     * @return Routes user back to manage passages page
+     */
     public Result changeVisibility(Long passageId){
 
         if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
@@ -95,7 +142,65 @@ public class SimplePassageController extends Controller {
         }
     }
 
+
+    /**
+     * This method is called on submission of the edit passage form
+     * @param passageId Id of Passage being edited
+     * @return Success or failure of edit
+     */
+    public Result edit_submit(Long passageId) {
+        if(session("userFirstName") == null) return ok(index.render(null));
+
+
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+
+            SimplePassage passage = SimplePassage.byId(passageId);
+            if (passage == null) {
+                return redirect(routes.SimplePassageController.viewAllPassages());
+            }
+
+            Form<SimplePassageData> form = Form.form(SimplePassageData.class).bindFromRequest();
+
+            if (form.hasErrors()) {
+                return badRequest(editSimplePassageAtGrade.render(form, passageId, SimplePassage.byId(passageId).grade));
+            }
+
+
+            SimplePassageData data = form.get();
+
+            PassageText current = PassageText.bySimplePassageAndGrade(passageId, data.grade);
+            current.html = data.passageText;
+
+
+            passage.text = data.passageText;
+            passage.grade = data.grade;
+            passage.source = data.source;
+
+            passage.title = data.passageTitle;
+
+
+            passage.sentences = null;
+
+
+            passage.save();
+
+            flash("success", "Modified Passage details have been saved.");
+            return redirect(routes.SimplePassageController.viewS(passageId, passage.grade));
+        } else {
+            return ok(index.render(session("userFirstName")));
+        }
+
+    }
+
+
     // QUESTION CREATION
+
+    /**
+     * This method allows us to render the question form properly with the correct number of question fields
+     * The actual layout is handled by Javascript
+     * @param passageId Passage to add Questions too
+     * @return Success or Failure of setting Questions
+     */
     public Result setNumQuestions(Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
@@ -107,6 +212,10 @@ public class SimplePassageController extends Controller {
 
     }
 
+    /**
+     * This method runs when number of questions is set
+     * @return Success or failure of setting number of Questions
+     */
     public Result setNumQuestions_submit() {
 
         if(session("userFirstName") == null) return ok(index.render(null));
@@ -240,7 +349,11 @@ public class SimplePassageController extends Controller {
 
     }
 
-
+    /**
+     * Renders the add questions page with existing questions already filled id
+     * @param passageId Id of Passage you are editing questions in
+     * @return rendered question form filled in
+     */
     public Result editQuestions(Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
@@ -255,6 +368,10 @@ public class SimplePassageController extends Controller {
 
     }
 
+    /**
+     * Renders table view of an instructors students and the answers they've given to assigned questions
+     * @return Rendered Page
+     */
     public Result viewStudentAnswers(){
         if(session("userFirstName") == null) return ok(index.render(null));
 
@@ -271,6 +388,11 @@ public class SimplePassageController extends Controller {
     }
 
 
+    /**
+     * This method is called when a change is made to the choices tied to a Question
+     * @param questionId Id of the Question you are editing
+     * @return Success or Failure of edit
+     */
     public Result editQuestionChoices(Long questionId) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
@@ -285,6 +407,12 @@ public class SimplePassageController extends Controller {
 
     }
 
+    /**
+     * This method is called on submission of Questions form
+     * values are populated in the javascript and mapped to form
+     * @param passageId Id of Passage questions are being edited for
+     * @return Success or Failure of submission
+     */
     public Result editQuestions_submit(Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
@@ -397,52 +525,12 @@ public class SimplePassageController extends Controller {
         }
     }
 
-
-    public Result edit_submit(Long passageId) {
-        if(session("userFirstName") == null) return ok(index.render(null));
-
-
-        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
-
-            SimplePassage passage = SimplePassage.byId(passageId);
-            if (passage == null) {
-                return redirect(routes.SimplePassageController.viewAllPassages());
-            }
-
-            Form<SimplePassageData> form = Form.form(SimplePassageData.class).bindFromRequest();
-
-            if (form.hasErrors()) {
-                return badRequest(editSimplePassageAtGrade.render(form, passageId, SimplePassage.byId(passageId).grade));
-            }
-
-
-            SimplePassageData data = form.get();
-
-            PassageText current = PassageText.bySimplePassageAndGrade(passageId, data.grade);
-            current.html = data.passageText;
-
-
-            passage.text = data.passageText;
-            passage.grade = data.grade;
-            passage.source = data.source;
-
-            passage.title = data.passageTitle;
-
-
-            passage.sentences = null;
-
-
-            passage.save();
-
-            flash("success", "Modified Passage details have been saved.");
-            return redirect(routes.SimplePassageController.viewS(passageId, passage.grade));
-        } else {
-            return ok(index.render(session("userFirstName")));
-        }
-
-    }
-
-
+    /**
+     * This method is called when questions are being reordered
+     * @param questionId Question Being Edited
+     * @param up Move Question forward or backward
+     * @return Success or Failure of Move
+     */
     public Result moveQuestion(Long questionId, boolean up){
         if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
             try{
@@ -466,6 +554,13 @@ public class SimplePassageController extends Controller {
         } else return badRequest();
     }
 
+    /**
+     * This method is called when the choices for a question are being reordered
+     * @param choiceId Choice being edited
+     * @param questionId Question within which choices are being edited
+     * @param up Move Choice forward or backward
+     * @return
+     */
     public Result moveChoice(Long choiceId, Long questionId, boolean up){
 
         if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
@@ -490,6 +585,13 @@ public class SimplePassageController extends Controller {
         } else return badRequest();
     }
 
+    /**
+     * Changes the Answer for a given question Choice
+     * @param choiceId Id of Choice being edited
+     * @param questionId Id of Question for this Choice
+     * @param newText Text of the Answer being assigned
+     * @return Success or Failure or Edit
+     */
     public Result editChoiceAnswer(Long choiceId, Long questionId, String newText){
         if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
             try{
@@ -514,6 +616,12 @@ public class SimplePassageController extends Controller {
     }
 
 
+    /**
+     * Sets a Choice as the correct Answer for the Question
+     * @param choiceId Id of Choice being set as correct
+     * @param questionId Id of Question where this choice exists
+     * @return Success or Failure of setting correct answer
+     */
     public Result setAsCorrectAnswer(Long choiceId, Long questionId){
         try{
             PassageQuestionChoice c = PassageQuestionChoice.byId(choiceId);
@@ -543,7 +651,12 @@ public class SimplePassageController extends Controller {
     }
 
 
-
+    /**
+     * Change the Text that appears in the front end with a Question
+     * @param questionId Id of Question being Edited
+     * @param newText New Text to display with Question
+     * @return Success or Failure of edit
+     */
     public Result editPromptForQuestion(Long questionId, String newText){
         if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
             try{
@@ -560,6 +673,13 @@ public class SimplePassageController extends Controller {
         } else return badRequest();
     }
 
+    /**
+     * Helper method for adding a choice to a question from front end form
+     * @param questionId Question Being Updated
+     * @param newChoice Text to associate as the Answer for this Choice
+     * @param isCorrect boolean representing whether this is the correct answer or not
+     * @return Succes or Failure of Add
+     */
     public Result addChoiceToQuestion(Long questionId, String newChoice, boolean isCorrect){
 
         if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
@@ -593,6 +713,12 @@ public class SimplePassageController extends Controller {
 
     }
 
+    /**
+     * This method deletes Questions + associated prompts, choices, answers, responses and records
+     * @param questionId Id of Question to delete
+     * @param passageId Id of Passage that contains this Question
+     * @return Success or Failure of delete
+     */
     public Result deleteQuestion(Long questionId, Long passageId){
 
         try{
@@ -614,7 +740,13 @@ public class SimplePassageController extends Controller {
         }
     }
 
-    // what if you delete the correct answer?
+    /**
+     * Helper method to delete all the choices associated with a question
+     * @param questionId Id of Question being edited
+     * @param passageId Id of passage that this question is assigned to
+     * @param choiceId Id of choice being altered
+     * @return Success or Failure of delete
+     */
     public Result deleteChoiceForQuestion(Long questionId, Long passageId, Long choiceId){
 
         if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
@@ -642,6 +774,11 @@ public class SimplePassageController extends Controller {
         } else return badRequest();
     }
 
+    /**
+     * This method submits a page for Students where they can give answers to assigned questions
+     * @param passageId id of Passage for which Questions are being attempted
+     * @return Redirects to page showing which answers were correct
+     */
     public Result answerPassageQuestions_submit(Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
@@ -719,6 +856,11 @@ public class SimplePassageController extends Controller {
         return ok(viewPassageQuestionAnswers.render(passageId, inst));
     }
 
+    /**
+     * Instructor page where you can view the answers to your assigned questions
+     * @param passageId Id of Passage we are fetching responses for
+     * @return
+     */
     public Result viewPassageQuestionAnswers(Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
@@ -728,16 +870,38 @@ public class SimplePassageController extends Controller {
         return ok(viewPassageQuestionAnswers.render(passageId, inst));
     }
 
-
+    /**
+     * Renders a page where students can answer assigned questions
+     * @param passageId Id of Passage user is responding to
+     * @return Rendered page of questions or redirect
+     */
     public Result answerPassageQuestions(Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
         return ok(answerPassageQuestions.render(form(PassageQuestionAnswerData.class), passageId));
     }
 
-
+    /**
+     * Instructors can view all questions created for a specific passage
+     * @param passageId Id of Passage we are fetching questions for
+     * @return Rendered table view of questions
+     */
+    public Result viewPassageQuestions(Long passageId) {
+        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
+            if(session("userFirstName") == null) return ok(index.render(null));
+            return ok(viewPassageQuestions.render(passageId));
+        } else return badRequest();
+    }
 
     //-- end questions
 
+
+    /**
+     * Renders the create passage window with the fields and text editor populated with saved data
+     * @param passageId Id of Passage being edited
+     * @param grade - grade level at which we are editing this passage
+     * Editing an ORIGINAL passage at a level below its determined grade creates a new passage
+     * @return Rendered passage form with values filled in
+     */
     public Result editPassage(Long passageId, int grade) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
@@ -771,6 +935,12 @@ public class SimplePassageController extends Controller {
     }
 
 
+    /**
+     * Renders a view where Passage can be seen along with suggestions for making it readable at the input grade
+     * @param passageId Id of Passage being viewed
+     * @param grade Grade at which you are viewing passage
+     * @return Rendered page with passage info
+     */
     public Result viewS(Long passageId, int grade) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
@@ -794,8 +964,13 @@ public class SimplePassageController extends Controller {
 
     }
 
-
-
+    /**
+     * This method permits student users to view a passage without suggestions editing with their instructors changes
+     * Grade level may not be changed by the student
+     * @param passageId Id of Passage being displayed
+     * @param grade Grade level of student viewing this page
+     * @return Rendered view of Passage and Passage Tags
+     */
     public Result viewAsStudent(Long passageId, int grade) {
         if(session("userFirstName") == null) return ok(index.render(null));
         User user = User.byId(session("userId"));
@@ -813,33 +988,16 @@ public class SimplePassageController extends Controller {
     }
 
 
-    public Result viewPassageQuestions(Long passageId) {
-        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
-            if(session("userFirstName") == null) return ok(index.render(null));
-            return ok(viewPassageQuestions.render(passageId));
-        } else return badRequest();
-    }
 
 
-    public Result createSimplePassage_submit() {
-        if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
-            if(session("userFirstName") == null) return ok(index.render(null));
-            Form<SimplePassageData> createSPForm = form(SimplePassageData.class).bindFromRequest();
+// Core Processes
 
-            if (createSPForm.hasErrors()) {
-                return badRequest(createSimplePassage.render(createSPForm));
-            }
-
-            SimplePassage newPassage = new SimplePassage(createSPForm.get());
-            newPassage.instructorID = Integer.valueOf(session("userId"));
-
-
-            newPassage.save();
-            return redirect(routes.SimplePassageController.viewAllPassages());
-        } else return badRequest();
-    }
-
-
+    /**
+     * Helper method that allows us to begin Stanford CoreNLP Parsing and other
+     * necessary tasks to get Suggestions
+     * @param p Passage to update with Suggestions
+     * @throws JWNLException -- WordNet Library is used and could thrown Exception
+     */
     public void parseAndAddSuggestions(SimplePassage p) throws JWNLException{
         String[] sentences = p.text.split(" ");
 
@@ -863,10 +1021,16 @@ public class SimplePassageController extends Controller {
     }
 
 
+    // Helper method for telling whether or not analysis is in progress to assist with front end spinner display
     public static boolean isAnalyzing(){
         return inProgress;
     }
 
+    /**
+     * Parses, and gets difficulty for all Passages in the system
+     * @return Success or Failure of Analysis
+     * @throws JWNLException
+     */
     public Result analyzePassages() throws JWNLException {
         if(session("userFirstName") == null) return ok(index.render(null));
 
@@ -916,6 +1080,12 @@ public class SimplePassageController extends Controller {
     }
 
 
+    /**
+     * Preforms parsing, difficulty analysis, and generates HTML for the input Passage
+     * @param passageId Id of Passage to analyze
+     * @return Success or Failure of Analysis
+     * @throws JWNLException
+     */
     public Result analyzeSingularPassage(Long passageId) throws JWNLException {
         if(session("userFirstName") == null) return ok(index.render(null));
 
@@ -967,13 +1137,18 @@ public class SimplePassageController extends Controller {
         }
     }
 
+    // Keep track of Suggestions that have already been set and no need to split the passage text over and over again
     private HashMap<String, String> sugMap = new HashMap<String, String>();
     private String[] split;
 
+    /**
+     * This method generates the HTML from the passage text inserting the proper ! and underlines for sentence
+     * and word difficulty. Whenever this method is called, wholly new HTML is generated for the input grade level
+     * @param passageId Passage to update HTML for
+     * @param grade Grade Level to updated HTML for
+     */
     public void generatePassageTextAtGrade(Long passageId, int grade) {
-        System.out.println("gen text");
         SimplePassage p = SimplePassage.byId(passageId);
-
 
         boolean isOverwriting = false;
 
@@ -996,8 +1171,6 @@ public class SimplePassageController extends Controller {
             }
         }
 
-
-
         current.html =  p.text;
 
 
@@ -1011,6 +1184,7 @@ public class SimplePassageController extends Controller {
                     w = w.split(" ")[0];
                 }
 
+                // The word is also too difficulted if it is an inflected form or a root word that is too difficult
                 Word raw = Word.byRawString(w);
                 Word inflected = InflectedWordForm.byInflectedForm(w);
 
@@ -1035,11 +1209,16 @@ public class SimplePassageController extends Controller {
         } else {
             current.save();
         }
-
-        System.out.println("GenText END");
     }
 
-
+    /**
+     * This method is called when the "This is ok" button is pressed in the Suggestions Bar. Calling this will set
+     * the difficulty of the word to be the input grade.
+     * @param word Word to update
+     * @param grade Grade to set as the corresponding age of acquisition for the word
+     * @param passageId Passage this word is contained in
+     * @return
+     */
     public Result acceptWord(String word, int grade, Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
@@ -1057,6 +1236,14 @@ public class SimplePassageController extends Controller {
         return badRequest();
     }
 
+    /**
+     * This method is called when a Suggestion in the Suggestions bar is clicked by the user and replaces all instances
+     * of the original word with the suggestion within this Passage
+     * @param passageId Id of Passage to be altered
+     * @param word Word being replaced
+     * @param replacement Word to use for replacement
+     * @return Renders updated passage or Error
+     */
     public Result replaceWord(Long passageId, String word, String replacement) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
@@ -1079,9 +1266,15 @@ public class SimplePassageController extends Controller {
     }
 
 
+  // Holder set for Suggestions already found
     private HashSet<Suggestion> suggestionCache;
 
 
+    /**
+     * Helper method that generates lists of Suggestions and caches them so that we don't need to look them up more than once
+     * @param p Simple Passage Object we are getting the Suggestions for
+     * @return
+     */
     public HashSet<Suggestion> getSuggestionsList(SimplePassage p) {
         String[] split = p.text.split(" ");
 
@@ -1098,7 +1291,9 @@ public class SimplePassageController extends Controller {
         return ret;
     }
 
-
+    /**
+     * Helper Class to allow sorting/avoid duplication of Suggestions
+     */
     private class SuggestionComp implements Comparator<Suggestion>{
         @Override
         public int compare(Suggestion o1, Suggestion o2) {
@@ -1108,6 +1303,11 @@ public class SimplePassageController extends Controller {
         }
     }
 
+    /**
+     * Returns a JSON array representing the Suggestions for a given Word represented by the input String
+     * @param word - Word to check database for suggestions on.
+     * @return JSON String of suggestions
+     */
     public Result getSuggestions(String word) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
@@ -1148,6 +1348,10 @@ public class SimplePassageController extends Controller {
 
     }
 
+    /**
+     * Renders table view of all passages in the system visible to the logged in User
+     * @return Success or failure of rendering page
+     */
     public Result viewAllPassages() {
         if(session("userFirstName") == null) return ok(index.render(null));
         Long instId = Long.valueOf((session("userId")));
@@ -1161,6 +1365,11 @@ public class SimplePassageController extends Controller {
         return ok(viewAllPassages.render(pList, inst));
     }
 
+    /**
+     * Method renders table view of all passages with a tag matching the input String
+     * @param name
+     * @return Success or Failure of Rendering view
+     */
     public Result viewAllPassagesWithTag(String name) {
         if(session("userFirstName") == null) return ok(index.render(null));
         Long instId = Long.valueOf((session("userId")));
@@ -1170,6 +1379,12 @@ public class SimplePassageController extends Controller {
         return ok(viewAllPassagesWithTag.render(pList, inst, name));
     }
 
+    /**
+     * Completely Deletes a Passage and all corresponding table data from the database
+     * called when delete button is pressed
+     * @param passageId Id Of Passage to be deleted
+     * @return Success or Failure of deleting
+     */
     public Result deletePassage(Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
 
@@ -1189,7 +1404,11 @@ public class SimplePassageController extends Controller {
     }
 
 
-
+    /**
+     * Gets the Difficulties of all sentences in a Passage
+     * @param p Passage of sentences to Analyze
+     * @return List of all of the sentence difficulties
+     */
     public ArrayList<Double> getDifficulties(SimplePassage p) {
         PassageAnalysisController analysisController = new PassageAnalysisController();
         ArrayList<Double> difficulties = new ArrayList<Double>();
@@ -1206,6 +1425,11 @@ public class SimplePassageController extends Controller {
     }
 
 
+    /**
+     * Helper method to reconstruct HTML string broken down for difficulty Check
+     * @param split - Array of Strings representing space separated values from original HTML
+     * @return - Fully formed HTML String for use in Quill Text Editor
+     */
     public String rebuildHTML(String[] split) {
         StringBuilder sb = new StringBuilder();
 
@@ -1225,6 +1449,12 @@ public class SimplePassageController extends Controller {
     }
 
 
+    /**
+     * Gets the difficutly of all the sentences in the input Passage and checks them against the input grade
+     * @param passageId Id of Passage where these sentences come from
+     * @param grade Grade to check the passages against
+     * @return
+     */
     public Result beginSentenceBreakdown(Long passageId, int grade) {
 
         if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
@@ -1309,8 +1539,17 @@ public class SimplePassageController extends Controller {
     }
 
 
+    // Avoid fetching difficulties more than necessary
     private ArrayList<Double> diffCache;
 
+    /**
+     * Gets the difficulty of a singular sentence and returns whether or not it is more difficult than
+     * the grade level passaged in.
+     * @param passageId - Id of Passage this sentence is in
+     * @param grade - Grade to check this sentence against
+     * @param sentence - String with text of sentence
+     * @return
+     */
     public Result singularSentenceBreakdown(Long passageId, int grade, String sentence) {
         if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
             if(session("userFirstName") == null) return ok(index.render(null));
@@ -1393,6 +1632,12 @@ public class SimplePassageController extends Controller {
         } else return badRequest();
     }
 
+    /**
+     * Method to allow saving of updated passage plain text from Quill Text Editor in front end
+     * @param passageId Id of Passage being saved
+     * @param text - String representing plain text of passage
+     * @return Success or failure of saving
+     */
     public Result savePassagePlainText(Long passageId, String text) {
         if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
             try {
@@ -1407,6 +1652,13 @@ public class SimplePassageController extends Controller {
     }
 
 
+    /**
+     * Helper method for Saving the Passage. If a passage is an original and you are editing it at a lower
+     * level than the original passage then a new Passage is created and editable up to the newly saved grade.
+     * Ex: edit a 9th grade passage down to 5th grade, new passage is created editable up to 5th grade level
+     * @param grade - Grade at which you are editing
+     * @param p - Passage being edited
+     */
     public void copySimplePassage(int grade, SimplePassage p){
 
         SimplePassage atGrade = new SimplePassage(p.text, p.title + "-(" + PassageAnalysisController.displayGrade(grade) + " edit)", p.source);
@@ -1476,8 +1728,12 @@ public class SimplePassageController extends Controller {
     }
 
 
-
-
+    /**
+     * Allows saving updated Passage HTML throw ajax call from the front end
+     * @param passageId - Id of Passage to be saved
+     * @param grade - Grade level of the passage currently being saved
+     * @return Returns String message on success or failure of save
+     */
     public Result savePassageHtml(Long passageId, int grade) {
         if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
             try {
@@ -1519,9 +1775,13 @@ public class SimplePassageController extends Controller {
         } else return badRequest();
     }
 
-
-
-
+    /**
+     * Allows Sentence difficulty to be checked through ajax call from Front End
+     * @param sentence String representation of new sentence
+     * @param grade - Grade level at which passage is currently being displayed in front end
+     * @param passageId - Id of passage being shown in front end
+     * @return String message that's either empty, has the difficulty if the sentence is too hard or REM to remove the !
+     */
     public Result checkSentence(String sentence, int grade, Long passageId) {
         if(User.byId(Long.valueOf(session("userId"))).creatorId == 0){
             if(session("userFirstName") == null) return ok(index.render(null));
@@ -1529,6 +1789,11 @@ public class SimplePassageController extends Controller {
         } else return badRequest();
     }
 
+    /**
+     * Returns String stripped of any HTML tags
+     * @param a String to be flattened
+     * @return Original string without tags
+     */
     public String trimHTMLChars(String a){
        StringBuilder sb = new StringBuilder();
 
@@ -1543,6 +1808,13 @@ public class SimplePassageController extends Controller {
     }
 
 
+    /**
+     * Allows Word difficulty to be checked through Ajax call from Front End
+     * @param word - String representation of Word Object to be checked
+     * @param grade - Grade currently shown in the UI to check this word against
+     * @param passageId - Id of the passage that this word appears in
+     * @return Sends a String to front end on whether to underline a word or not
+     */
     public Result checkWord(String word, int grade, Long passageId) {
         if(session("userFirstName") == null) return ok(index.render(null));
 

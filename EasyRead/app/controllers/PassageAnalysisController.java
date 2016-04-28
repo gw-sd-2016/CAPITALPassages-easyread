@@ -365,6 +365,19 @@ public class PassageAnalysisController {
 
                 HashSet<String> suggestions = c.synonymnLookup(word, p.name);
 
+                if(suggestions == null || suggestions.size() == 0){
+
+                    try{
+                        Word wordForm = InflectedWordForm.byInflectedForm(w.lemma);
+
+                        suggestions = c.synonymnLookup(wordForm.lemma, wordForm.partsOfSpeech.get(0).name);
+                    } catch(Exception e){
+                        System.out.println("tried and failed to resolve using base form of word");
+                    }
+
+
+                }
+
                 for (String root : suggestions) {
                     Word r = Word.byLemma(root);
                     if (!word.toLowerCase().equals(root.toLowerCase())

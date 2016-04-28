@@ -6,7 +6,6 @@ import com.avaje.ebean.annotation.Expose;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
-import java.util.List;
 
 @Entity
 public class PassageText extends Model {

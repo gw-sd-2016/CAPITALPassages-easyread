@@ -21,9 +21,11 @@ public class InflectedWordForm extends Model {
     @Expose
     public Long id;
 
+    //Form of word that appears in text
     @Expose
     public String word;
 
+    // Base form of word
     @Expose
     public String stem;
 

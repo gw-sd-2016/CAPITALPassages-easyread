@@ -24,7 +24,7 @@ public class PassageQuestionChoice extends Model {
 
     @Required
     @Expose
-    public Long entity_id;    // e.g. not being used for anything right now
+    public Long entity_id;    // question id
 
     @Required
     @Expose

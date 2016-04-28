@@ -3,7 +3,6 @@ package controllers;
 import formdata.LoginForm;
 import formdata.UserForm;
 import models.User;
-import models.Word;
 import net.sf.extjwnl.JWNLException;
 import play.Routes;
 import play.data.Form;
