@@ -271,7 +271,6 @@
 
             function getWordForPosition(pos, check){
                 var text = quill.getText();
-                var html = quill.getHTML();
 
                 // white space check from http://stackoverflow.com/questions/1496826/check-if-a-single-character-is-a-whitespace
                 if(/\s/.test(text.charAt(pos))) pos--;
@@ -281,12 +280,12 @@
                 var startOfWord = 0;
                 var endOfWord = 0;
                 for(endOfWord = pos; endOfWord < text.length - 1; endOfWord++){
-                    if(/\s/.test(text.charAt(endOfWord)) || text.charAt(endOfWord) == '.' && (/\s/.test(text.charAt(endOfWord + 1)) || text.charAt(endOfWord + 1) == '&' || text.charAt(endOfWord + 1) == '<')){
+                    if(/\s/.test(text.charAt(endOfWord)) || (text.charAt(endOfWord) == '.' && (/\s/.test(text.charAt(endOfWord + 1))) || text.charAt(endOfWord + 1) == '&' || text.charAt(endOfWord + 1) == '<')){
                         break;
                     }
                 }
                 for(startOfWord = endOfWord - 1; startOfWord >= 0; startOfWord--){
-// white space check from http://stackoverflow.com/questions/1496826/check-if-a-single-character-is-a-whitespace
+                // white space check from http://stackoverflow.com/questions/1496826/check-if-a-single-character-is-a-whitespace
                     if(/\s/.test(text.charAt(startOfWord)) || text.charAt(startOfWord) == '.'){
                         startOfWord++;
                         break;
@@ -299,7 +298,7 @@
 
                 if(check == true) {
                     console.log("Sending " + capturedWord);
-                    checkWord(capturedWord);
+                    checkWord(capturedWord, startOfWord, endOfWord);
                 }
 
                 return quill.getText().substring(startOfWord, endOfWord);
@@ -309,10 +308,6 @@
             function areWithinSameSentence(pos1, pos2){
                 return (getCapturedSentence(pos1)[0] == getCapturedSentence(pos2)[0]);
             }
-
-
-
-
 
             function removeDuplicateSentences(){
                 var toRemove = [];
@@ -349,7 +344,7 @@
 
             function findContainedWord(pos){
                 capturedWord = getWordForPosition(pos, true);
-                console.log("caught " + capturedWord);
+                //console.log("caught " + capturedWord);
             }
 
             function getCapturedSentence(pos){
@@ -360,28 +355,36 @@
                 var endOfSen = 0;
                 var sentenceCount = 0;
 
-                if(text.charAt(pos) == '.' && pos + 1 == text.length || text.charAt(pos) == '.' &&  (pos + 1 < text.length && (/\s/.test(text.charAt(pos + 1))))){
+                if((text.charAt(pos) == '.' && pos + 1 == text.length) || (text.charAt(pos) == '.' &&  (pos + 1 < text.length && (/\s/.test(text.charAt(pos + 1)))))){
                     pos--;
                 }
 
 
 
+                var encounteredNonSpace = false;
                 for(var i = pos; i >= 0; i--){
-                    if((text.charAt(i) == '.' && i + 1 == text.length) || (text.charAt(i) == '.' &&  i + 1 < text.length && /\s/.test(text.charAt(i + 1)))){
+                    //console.log(text.charAt(pos));
+                    if(encounteredNonSpace && ((text.charAt(i) == '.' && i + 1 == text.length) || (text.charAt(i) == '.' &&  i + 1 < text.length && /\s/.test(text.charAt(i + 1))))){
                         sentenceCount++;
+                        //console.log("increment");
+                    }
+                    if(/\s/.test(text.charAt(i)) == false) {
+                       // console.log("non space");
+                        encounteredNonSpace = true;
                     }
                 }
 
 
-                //console.log("sentence # " + sentenceCount);
+                console.log("sentence # " + sentenceCount);
 
                 var sNum = 0;
                 var posi = 0;
 
 
                 while(sNum < sentenceCount){
-                    if(html.charAt(posi) == '.' && posi + 1 == html.length || html.charAt(posi) == '.' && (/\s/.test(html.charAt(posi + 1)) || html.charAt(posi + 1) == '&' || html.charAt(posi + 1) == '<')){
+                    if((html.charAt(posi) == '.' && posi + 1 == html.length) || (html.charAt(posi) == '.' && (/\s/.test(html.charAt(posi + 1)) || html.charAt(posi + 1) == '&' || html.charAt(posi + 1) == '<'))){
                         sNum++;
+
                     }
                     posi++;
                 }
@@ -401,14 +404,13 @@
                 var arr = getCapturedSentence(pos);
                 capturedSentence = arr[0];
 
-                capturedSentence = removeEmptyElems(capturedSentence);
 
                 console.log("sentence is: " + capturedSentence );
 
-                if(capturedSentence.split(" ").length > 2){
 
-                    checkSentence(capturedSentence, arr[1]);
-                }
+
+                checkSentence(capturedSentence, arr[1]);
+
 
                 return capturedSentence;
             }
@@ -472,10 +474,10 @@
                 return html;
             }
 
-            function checkWord(word){
+            function checkWord(word, start, end){
                 jsRoutes.controllers.SimplePassageController.checkWord(word, @grade, @passageId ).ajax({
                     success : function(data) {
-                        quill.formatText(quill.getText().indexOf(word), quill.getText().indexOf(word) + word.length , 'underline', data.toString() == "UNDERLINE");
+                        quill.formatText(start, end , 'underline', data.toString() == "UNDERLINE");
                     },
                     error : function(err) {
                         //window.location = "";
@@ -498,12 +500,15 @@
 
                         console.log("index " + index);
 
-                        if (data.toString() == "REM") {
+                        if (data.toString().indexOf("REM") != -1) {
+
+                            var split = data.toString().split(" ");
+                            var sentence = split[1];
                             console.log("REM sentenece " + sentenceNum);
 
 
                             var currentS = 0;
-                            if(sentenceNum > 0){
+                            if (sentenceNum > 0) {
                                 for (var e = 0; e < html.length - 2; e++) {
                                     if (html.charAt(e) == '.' && (/\s/.test(html.charAt(e + 1)) || html.charAt(e + 1) == '&' || html.charAt(e + 1) == '<')) currentS++;
                                     if (currentS == sentenceNum) {
@@ -514,12 +519,12 @@
                             }
 
 
-
                             console.log("sentence really is: " + html.substring(index));
                             // console.log("full - " + html);
                             var start = 0;
                             var firstEnd = 0;
                             var secondEnd = 0;
+                            var innerBegin = 0;
 
 
                             var l = "<span class=\"glyphicon glyphicon-exclamation-sign onclick=\"showJustification(1);\">".length;
@@ -530,14 +535,18 @@
                                 if (html.charAt(i) == 's' && html.substring(i, i + 4) == "span" && start == 0) {
                                     start = i - 1;
                                     firstEnd = start + l;
-                                    if(html.charAt(firstEnd) != '>') firstEnd++;
+                                    if (html.charAt(firstEnd) != '>') firstEnd++;
+                                    while(html.charAt(i) != '<') i++;
+                                    innerBegin = i;
+
+
                                     // account for some justifications being two digits
 
                                 }
 
-                               /* if (start != 0 && html.charAt(i) == '>' && html.substring(i - 1, i) == "\"") {
-                                    firstEnd = i + 1;
-                                }*/
+                                /* if (start != 0 && html.charAt(i) == '>' && html.substring(i - 1, i) == "\"") {
+                                 firstEnd = i + 1;
+                                 }*/
 
 
                                 if (firstEnd != 0 && i > start + l && html.charAt(i) == '>' && html.substring(i - 1, i) == "n") {
@@ -546,84 +555,30 @@
                                 }
                             }
 
-                            console.log(start);
-                            console.log(firstEnd);
-                            console.log(secondEnd);
-
-
-                            if (start != 0 && firstEnd != 0 && secondEnd != 0) {
-                                var restOfStr = html.substring(secondEnd + 2);
-
-                                var ogSecondEnd = secondEnd;
-
-                                if(restOfStr.substring(0, 4) == "nbsp") restOfStr = restOfStr.substring(5);
-
-                                html = html.substring(0, start) + html.substring(firstEnd + 1, ogSecondEnd - 6)  + restOfStr;
-
-                                quill.setHTML(html);
-
-
-                                html = quill.getHTML();
-
-                                console.log("text: " + html);
-
-                                var currentS = 0;
-                                if(sentenceNum > 0){
-                                    for (var e = 0; e < html.length - 5; e++) {
-                                        if (html.charAt(e) == '.' && (/\s/.test(html.charAt(e + 1)) || html.charAt(e + 1) == '&' || html.charAt(e + 1) == '<')) {
-                                            currentS++;
-                                        }
-                                        if (currentS == sentenceNum) {
-                                            console.log("caught sentnece");
-                                            index = e + 2;
-                                            break;
-                                        }
-                                    }
-                                }
+                            console.log("start " + start);
+                            console.log("firstE " + firstEnd);
+                            console.log("secondE " + secondEnd);
 
 
 
-                                var nextS = 0;
-                                for (var c = index; c < html.length; c++) {
-                                    if (html.charAt(c) == '.' && (/\s/.test(html.charAt(c + 1)) || html.charAt(c + 1) == '&' || html.charAt(c + 1) == '<')) {
-                                        nextS = c;
-                                        break;
-                                    }
-                                }
-
-                                console.log("Current: " + index + " next: " + nextS);
+                            if (start != 0 && firstEnd != 0 && secondEnd != 0){
 
 
-                                html = quill.getHTML();
-
-                                currentS = 0;
-
-                                if(sentenceNum > 0){
-                                    for (var e = 0; e < html.length - 5; e++) {
-                                        if (html.charAt(e) == '.' && (/\s/.test(html.charAt(e + 1)) || html.charAt(e + 1) == '&' || html.charAt(e + 1) == '<')) {
-                                            currentS++;
-                                        }
-                                        if (currentS == sentenceNum) {
-                                            console.log("caught sentnece");
-                                            index = e + 2;
-                                            break;
-                                        }
-                                    }
-                                }
+                                console.log("first Part -" + html.substring(0, start));
+                                console.log("second part -" + sentence);
+                                console.log("third part -" + html.substring(firstEnd+1, innerBegin));
+                                console.log("fourth part -" + html.substring(secondEnd + 1));
 
 
-                                nextS = 0;
-                                for (var c = index; c < html.length; c++) {
-                                    if (html.charAt(c) == '.' && (/\s/.test(html.charAt(c + 1)) || html.charAt(c + 1) == '&' || html.charAt(c + 1) == '<')) {
-                                        nextS = c;
-                                        break;
-                                    }
-                                }
+                                var newHTML = html.substring(0, start) + html.substring(firstEnd + 1, innerBegin) + html.substring(secondEnd + 1);
 
-
+                                quill.setHTML(newHTML);
                             }
 
-                        } else if (data.toString().charAt(0) == '!') {
+
+
+                            
+                         } else if (data.toString().charAt(0) == '!') {
                             console.log("ADD");
 
                             var innerSCount = 0;
@@ -632,13 +587,12 @@
 
                             if (sentenceNum > 0){
                                 for(innerI = 0; innerI < html.length; innerI++){
-                                    if(html.charAt(innerI) == '.' && (/\s/.test(html.charAt(innerI + 1)) || html.charAt(innerI + 1) == '&' || html.charAt(innerI + 1) == '<')){
+                                    if(html.charAt(innerI) == '.' && ((/\s/.test(html.charAt(innerI + 1)) || html.charAt(innerI + 1) == '&' || html.charAt(innerI + 1) == '<'))){
                                         innerSCount++;
                                         if(innerSCount == sentenceNum) break;
                                     }
                                 }
                             }
-
 
                             var innerRealStart = innerI;
                             var innerRealEnd = innerI;
@@ -648,33 +602,23 @@
                                     break;
                                 }
                             }
-
-
-
                             var insertString = "<span class='glyphicon glyphicon-exclamation-sign' onclick='showJustification("+ data.toString().substring(1) + ");'>&nbsp;</span>";
 
                             if(html.charAt(innerRealStart) != '<') innerRealStart++;
                             if(html.charAt(innerRealStart) == ';') innerRealStart++;
 
-
-
                             var firstPart = html.substring(0, innerRealStart);
-
-
 
                             var afterSpace = html.substring(innerRealStart);
 
+                            afterSpace =  afterSpace.replace("<div>","");
+                            afterSpace = afterSpace.replace("</div>","");
 
 
-
-
-                               afterSpace =  afterSpace.replace("<div>","");
-                                afterSpace = afterSpace.replace("</div>","");
-
-
-                            insertString = insertString.substring(0, insertString.indexOf("&")) + removeEmptyElems(afterSpace.substring(0, afterSpace.indexOf(" "))) + "</span>";
-
-                            afterSpace =  afterSpace.substring(afterSpace.indexOf(" "));
+                            if(quickRemove(afterSpace.substring(0, afterSpace.indexOf(" "))) != ""){
+                                insertString = insertString.substring(0, insertString.indexOf("&")) + quickRemove(afterSpace.substring(0, afterSpace.indexOf(" "))) + "</span>";
+                                afterSpace =  afterSpace.substring(afterSpace.indexOf(" "));
+                            }
 
                             console.log("insert " + insertString);
 
@@ -684,6 +628,7 @@
                                 quill.setHTML(firstPart + insertString + afterSpace);
                             }
                         }
+                        
 
                         console.log("--sen search");
                         checkWordsInSentence(sentenceNum);
@@ -696,6 +641,7 @@
 
                     }
                 });
+
             }
 
             function removeEmptyElems(str){
@@ -730,6 +676,27 @@
                 return ret;
             }
 
+
+
+
+            function quickRemove(str){
+                var ret = "";
+                var valid = true;
+
+                for(var i = 0; i < str.length; i++){
+                    if(str.charAt(i) == '<'){
+                        valid = false;
+                    } else if(str.charAt(i) == '>'){
+                        valid = true;
+                    } else{
+                        if(valid) ret += str.charAt(i);
+                    }
+                }
+                return ret;
+            }
+
+
+
             function checkWordsInSentence(sentenceNum){
                 var text = quill.getText();
                 var start = 0;
@@ -745,7 +712,7 @@
                 var end = start + 1;
 
                 for(end = start + 1; end < text.length; end++){
-                    if(text.charAt(end) == '.' && end + 1 == text.length || (text.charAt(end) == '.' &&  (end + 1 < text.length && (/\s/.test(text.charAt(end + 1)))))){
+                    if((text.charAt(end) == '.' && end + 1 == text.length) || (text.charAt(end) == '.' &&  (end + 1 < text.length && (/\s/.test(text.charAt(end + 1)))))){
                         break;
                     }
                 }

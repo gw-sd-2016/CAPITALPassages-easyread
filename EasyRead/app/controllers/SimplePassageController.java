@@ -1322,6 +1322,7 @@ public class SimplePassageController extends Controller {
 
             String ogSentence = sentence;
 
+            sentence = trimHTMLChars(ogSentence);
             if (current.html != null && current.html.length() > 0) {
 
 
@@ -1329,7 +1330,7 @@ public class SimplePassageController extends Controller {
                 Double diff = analysisController.determineGradeLevelForString(sentence);
 
 
-                if (diff > grade && !ogSentence.contains("exclamation") && !current.html.contains(sentence)) {
+                 if (diff > grade && !ogSentence.contains("exclamation") && !current.html.contains(sentence)) {
                     String curr = sentence;
                     int spaceIndex = curr.indexOf("&nbsp");
 
@@ -1370,7 +1371,7 @@ public class SimplePassageController extends Controller {
 
 
                 } else if(ogSentence.contains("exclamation") && !current.html.contains(sentence)){
-                    return ok("REM");
+                    return ok("REM " + sentence);
                 }
 
                 return ok();
@@ -1529,12 +1530,16 @@ public class SimplePassageController extends Controller {
     }
 
     public String trimHTMLChars(String a){
-        a = a.replace("&nbsp;","");
-        a = a.replace("<div>","");
-        a = a.replace("</div>", "");
-        a = a.replace("<u>","");
-        return a.replace("</u>","");
+       StringBuilder sb = new StringBuilder();
 
+        for(int i = 0; i < a.length(); i++){
+            if(a.charAt(i) == '<'){
+                while(a.charAt(i) != '>' && i < a.length()) i++;
+            } else {
+                sb.append(a.charAt(i));
+            }
+        }
+        return sb.toString();
     }
 
 
