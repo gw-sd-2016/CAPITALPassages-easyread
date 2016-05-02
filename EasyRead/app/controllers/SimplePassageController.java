@@ -756,6 +756,13 @@ public class SimplePassageController extends Controller {
 
                 PassageQuestionChoice choice = PassageQuestionChoice.byId(choiceId);
 
+                if(choice.correct == true){
+                    flash("warning", "Can't Delete Correct Answer.");
+                    return badRequest(editPassageQuestionsChoices.render(PassageQuestion.byId(questionId), User.byId(Long.valueOf(session("userId")))));
+                } else if(q.choices.size() == 1){
+                    flash("warning", "Can't Delete Only Choice");
+                    return badRequest(editPassageQuestionsChoices.render(PassageQuestion.byId(questionId), User.byId(Long.valueOf(session("userId")))));
+                }
 
                 for(PassageQuestionChoice c : q.choices){
                     if(c.position > choice.position){
@@ -999,6 +1006,16 @@ public class SimplePassageController extends Controller {
      * @throws JWNLException -- WordNet Library is used and could thrown Exception
      */
     public void parseAndAddSuggestions(SimplePassage p) throws JWNLException{
+
+
+        if(p.sentences.size() > 0){
+            for(Sentence s : p.sentences){
+                s.delete();
+            }
+            p.sentences = null;
+            p.save();
+        }
+
         String[] sentences = p.text.split(" ");
 
         String portion = "";
@@ -1471,24 +1488,34 @@ public class SimplePassageController extends Controller {
 
                 System.out.println("----" + current.html);
 
-                String[] split = current.html.split(" ");
+                String[] split = new String[p.sentences.size()];
 
-                int sentNumber = 0;
+
                 boolean placed = false;
-                for (int i = 0; i < split.length; i++) {
-                    if (sentNumber < p.sentences.size() && this.difficultiesCache.get(sentNumber) > grade && !placed) {
-                        String curr = split[i];
+                for (int i = 0; i < p.sentences.size(); i++) {
+                    if (this.difficultiesCache.get(i) > grade && !placed) {
+                        String curr = p.sentences.get(i).text;
                         int spaceIndex = curr.indexOf("&nbsp");
+
+                        int whiteSpaceIndex = curr.indexOf(" ");
+
+                        int padding = 5;
+
+                        if(spaceIndex == -1){
+                            spaceIndex = whiteSpaceIndex;
+                            padding = 0;
+                        }
 
                         System.out.println("sp:" + spaceIndex);
 
 
-                        double diffValue = this.difficultiesCache.get(sentNumber);
+                        double diffValue = this.difficultiesCache.get(i);
 
                         String diffString = "" + (int) Math.round(diffValue);
 
                         if (spaceIndex != -1) {
-                            curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diffString + ");'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + 5) + "&nbsp";
+                            curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diffString + ");'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + padding) + "&nbsp";
+
                         } else {
                             curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diffString + ");'>" + curr + "</i> ";
                         }
@@ -1501,10 +1528,8 @@ public class SimplePassageController extends Controller {
                         split[i] = curr;
                         System.out.println(split[i]);
                         placed = true;
-                    }
-
-                    if (split[i].length() - 1 > 0 && split[i].charAt(split[i].length() - 1) == '.') {
-                        sentNumber++;
+                    }else {
+                        split[i] = p.sentences.get(i).text;
                         placed = false;
                     }
 
