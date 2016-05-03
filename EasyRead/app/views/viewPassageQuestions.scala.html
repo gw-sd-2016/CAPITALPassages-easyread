@@ -5,15 +5,33 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 
 
+            <!-- Bootstrap core CSS -->
+            <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+
+            <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
+
+            <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+
+        <div class="container" style="margin-bottom: 10px; margin-top: 10px">
+
+            <h3> Multiple Choice Question for @SimplePassage.byId(passageId).title</h3>
+        </div>
+
+
         @helper.form(routes.SimplePassageController.setNumQuestions_submit) {
 
-            <div style="padding-left:20px">
+
+
+            <div class="container" style="padding-left:20px">
 
 
 
 
                     <!-- https://davidwalsh.name/css-fixed-position and http://stackoverflow.com/questions/11399537/how-do-you-make-a-div-follow-as-you-scroll -->
-                <div class="pull-right" style="width:50%; height: 90%; overflow-y: scroll; position:fixed; top:100px; right:2%; padding-bottom:200px;  ">
+                <div class="pull-right" style="width:50%; height: 90%; overflow-y: scroll; position:fixed; top:150px; right:2%; padding-bottom:200px;  ">
 
                 @SimplePassage.byId(passageId).text
 
@@ -33,7 +51,8 @@
 
 
                     <p>
-                <h3> Multiple Choice Question for @SimplePassage.byId(passageId).title</h3>
+
+
                     @for(q <- SimplePassage.byId(passageId).questions.toList.sortWith { (o, p) => o.position < p.position }) {
                         <h3></h3>
                         <strong> @PassageQuestionPrompt.byPassageQuestion(q.id).get(0).text </strong>
@@ -42,9 +61,10 @@
                             <div class="radio">
                                 <label>
 
-                                <li>  @if(c.correct){
+                                <li>  @if(PassageQuestionAnswer.byPassageQuestionChoice(c.id).get(0).text.equals(q.correctAnswer)){
                                     <i class="glyphicon glyphicon-check"></i>
                                 } @PassageQuestionAnswer.byPassageQuestionChoice(c.id).get(0).text</li>
+
                                 </label>
                             </div>
                         }
@@ -55,8 +75,6 @@
                         <br>
                         }
 
-
-                    </p>
                     <br>
                     <p>
 
