@@ -423,7 +423,7 @@
 
                 var realText = trimUnecessary(html, @passageId);
                 $.post(
-                        'saveHt?passageId=' + @passageId + '&grade=' + @SimplePassage.byId(passageId).grade ,
+                        'saveHt?passageId=' + @passageId + '&grade=' + @grade ,
                         {'html' : realText,
                             'plain' : quill.getText()
                         },
