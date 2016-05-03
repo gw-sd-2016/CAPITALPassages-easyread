@@ -430,7 +430,7 @@
 
                         function(data) {
                             @if(grade != SimplePassage.byId(passageId).grade) {
-                            alert("Your changes have been saved in a new Passage called " + "@SimplePassage.byId(passageId).title" + "-(" + @grade + " edit)");
+                            alert("Your changes have been saved in a new Passage called " + "@Html(SimplePassage.byId(passageId).title)" + "-(" + @grade + " edit)");
                             window.location.href = "/viewAllPassages"
                             } else {
                             alert("Your changes have been saved!");

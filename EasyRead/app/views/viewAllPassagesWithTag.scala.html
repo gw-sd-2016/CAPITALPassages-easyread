@@ -31,7 +31,7 @@
                                 <th>Grade</th>
                                 <th>Source</th>
                                 <th>Tag</th>
-                                @if(Long.valueOf(session().get("userId")) == inst.id){
+                                @if(User.byId(Long.valueOf(session().get("userId"))).creatorId == 0){
                                     <th>Actions</th>
                                 }
 
@@ -87,7 +87,7 @@
                                 </a>
                             }
                             </td>
-                                @if(Long.valueOf(session().get("userId")) == inst.id) {
+                                @if(User.byId(Long.valueOf(session().get("userId"))).creatorId == 0) {
 
                                     <td style="width : 10%">
 
