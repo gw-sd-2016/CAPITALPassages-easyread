@@ -1243,8 +1243,8 @@ public class SimplePassageController extends Controller {
             Word thisWord = Word.byRawString(word);
             if (thisWord != null) {
                 thisWord.ageOfAcquisition = grade + 6;
-                generatePassageTextAtGrade(passageId, grade);
                 thisWord.save();
+                generatePassageTextAtGrade(passageId, grade);
                 flash("success", "We'll remember that word is okay!");
                 return ok();
             }

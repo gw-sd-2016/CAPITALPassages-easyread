@@ -89,7 +89,7 @@
 
                     for(var i = 0; i < checkboxes.length; i++){
                         if(checkboxes[i].type == "radio" && checkboxes[i].name != sender.name){
-                            if(checkboxes[i].name.indexOf(questionNumber) == 0) checkboxes[i].disabled = true;
+                            if(checkboxes[i].name.indexOf(questionNumber) == 0) checkboxes[i].checked = false;
                         }
                     }
                 }
