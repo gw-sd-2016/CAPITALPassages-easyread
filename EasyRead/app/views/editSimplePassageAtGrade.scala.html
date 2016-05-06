@@ -40,8 +40,6 @@
     }
 
 
-
-
     <div id="left-panel" class="panel"></div>
 
     <div class="pull-right">
@@ -74,8 +72,6 @@
 
             <!-- Left panel -->
 
-
-
         <div>
             <div class="box">
                 <div class="box-header">
@@ -91,16 +87,11 @@
                         </div>
                     }
                     <p>
-
-
                         <strong>
                             This page shows Suggestions to make this passage readable for a @if(grade == 0) { Kindergarten } @if(grade >= 12) { College Level } else {
                             @if(grade > 0) { Grade @grade}
                         }reader</strong>
-
-
                 <div>
-
 
                     <div class="btn-group">
                         <a class="btn btn-primary" id="add" href="/setNumQ?passageId=@passageId">
@@ -149,7 +140,6 @@
                     </div>
                 </div>
 
-
                     <h4>Title</h4>
                     <input type="text" name="passageTitle" placeholder="Passage Title" value="@form("passageTitle").value">
 
@@ -189,7 +179,7 @@
 
     <script src="/assets/js/jquery.panelslider.min.js"></script>
 
-
+    <!-- This entire example and the sliders are from  https://github.com/eduardomb/jquery-panelslider -->
     <script>
             $('#left-panel-link').panelslider({side: 'left', clickClose: false, duration: 200 });
             $('#right-panel-link').panelslider({side: 'right', clickClose: false, duration: 200 });
@@ -246,7 +236,14 @@
             //http://stackoverflow.com/questions/9913971/scala-how-can-i-get-an-escaped-representation-of-a-string
             quill.setHTML(@Html(Literal(Constant(PassageText.bySimplePassageAndGrade(passageId, grade).html)).toString));
 
+
+            /**
+             * Event Method from the Quill API that runs whenever a character in the editor is changes
+             * If it hasn't yet been 5 seconds since the user was typing the changes are added to an array
+             * if it has processing begins.
+             */
             quill.on('text-change', function(delta, source) {
+                // only run if the user made these changes...rather than a call to quill.format or something API based
                 if(source == "user") {
 
                     clearTimeout(typingTimer);
@@ -261,6 +258,7 @@
 
                     var range = quill.getSelection();
 
+                    // if we know where they were typing
                     if (range != null){
                         //console.log("request pushed");
                         requests.push(range.start);
@@ -270,6 +268,15 @@
             });
 
 
+            /**
+             * Helper method that finds the full word that this position is contained within.
+             * This method accounts for all forms of white space characters to give a clean
+             * representation of the word. Ideally without any extraneous HTML characters
+             * Has issues with words that include a period and prefixes like Mr.
+             * @param pos position within quill
+             * @param check -- check the difficulty of this word
+             * @returns {*} -- word
+             */
             function getWordForPosition(pos, check){
                 var text = quill.getText();
 
@@ -293,8 +300,10 @@
                     }
                 }
 
+
                 if(!/\s/.test(text.charAt(endOfWord))) endOfWord++;
 
+                // store the word found for use in other methhods
                 capturedWord = text.substring(startOfWord, endOfWord);
 
                 if(check == true) {
@@ -306,10 +315,12 @@
 
             }
 
+            // Helper method to see if we are checking two positions within the same sentence
             function areWithinSameSentence(pos1, pos2){
                 return (getCapturedSentence(pos1)[0] == getCapturedSentence(pos2)[0]);
             }
 
+            // Because we wait 5 seconds to process changes, have to make sure we aren't going through sentences more than once
             function removeDuplicateSentences(){
                 var toRemove = [];
                 for(var i = requests.length - 1; i >= 0; i--){
@@ -328,6 +339,11 @@
             }
 
 
+            /**
+             * This method is called when it's been 5 seconds and the user has made changes
+             * Making sure to only check each sentence once, this method checks over the changes
+             * and evaluates whether or not the sentence difficulty has changed and new words have been added
+             */
             function setFlag(){
 
                 removeDuplicateSentences();
@@ -335,19 +351,20 @@
                 console.log("reqs " + requests);
 
                 for(var i = 0; i < requests.length; i++){
-                    //findContainedWord(requests[i]);
                     findContainingSentence(requests[i]);
                 }
-
-                //console.log("end count " + requests.length);
                 requests = [];
             }
 
+            // Helper method that gets the word the cursor is currently inside of
             function findContainedWord(pos){
                 capturedWord = getWordForPosition(pos, true);
                 //console.log("caught " + capturedWord);
             }
 
+            // Helper method to figure out the HTML of your current sentence and what # sentence it is
+            // has difficulty with sentenes including prefixes like Mr. and extraneous .(s)
+            // Accounts for the fact that EasyRead has sentences that end with '. ' and '.<span..' and '.&nbsp
             function getCapturedSentence(pos){
                 var text = quill.getText();
                 var html = quill.getHTML();
@@ -361,7 +378,7 @@
                 }
 
 
-
+                // we have only reached the beginning of a sentence if we have reached something that could be a word
                 var encounteredNonSpace = false;
                 for(var i = pos; i >= 0; i--){
                     //console.log(text.charAt(pos));
@@ -401,14 +418,12 @@
                 return [quill.getHTML().substring(startOfSen, endOfSen), sentenceCount];
             }
 
+            // Helper method that identifies the current sentence
             function findContainingSentence(pos){
                 var arr = getCapturedSentence(pos);
                 capturedSentence = arr[0];
 
-
                 console.log("sentence is: " + capturedSentence );
-
-
 
                 checkSentence(capturedSentence, arr[1]);
 
@@ -416,6 +431,11 @@
                 return capturedSentence;
             }
 
+            /**
+             * Helper method to make ajax call to SimplePassageController to save the passage
+             * If you are editing the passage at a different grade level than the original then a new one will be created with your changes
+             * @param html
+             */
             function saveHtml(html){
 
                 if(requests.length > 0){
@@ -442,6 +462,7 @@
 
             }
 
+            // Helper method to remove empty divs
             function trimUnecessary( html,  passageId) {
 
                 var passageText = @Html(Literal(Constant(SimplePassage.byId(passageId).text)).toString);
@@ -475,6 +496,7 @@
                 return html;
             }
 
+            //This Method makes an ajax call to The SimplePassageController to check the difficulty of the input word and underline/un-underline
             function checkWord(word, start, end){
                 jsRoutes.controllers.SimplePassageController.checkWord(word, @grade, @passageId ).ajax({
                     success : function(data) {
@@ -489,6 +511,8 @@
                 });
             }
 
+
+            // This method makes an ajax call to The SimplePassageController to check the difficulty of the input sentence and add/remove an !
             function checkSentence(sentence, sentenceNum){
                 jsRoutes.controllers.SimplePassageController.checkSentence(sentence, @grade, @passageId ).ajax({
                     success : function(data) {
@@ -645,6 +669,7 @@
 
             }
 
+            // Helper method to remove extraneous HTML elements
             function removeEmptyElems(str){
                 var ret = str;
 
@@ -677,9 +702,7 @@
                 return ret;
             }
 
-
-
-
+            // Helper method to remove HTML elements while keeping text inside of them
             function quickRemove(str){
                 var ret = "";
                 var valid = true;
@@ -697,7 +720,7 @@
             }
 
 
-
+            // Helper method to go through an entire sentence after it's been checked and adjust word underlines
             function checkWordsInSentence(sentenceNum){
                 var text = quill.getText();
                 var start = 0;
@@ -746,6 +769,8 @@
                 return vars;
             }
 
+            // This method makes an ajax call to the SimplePassage Controller to accept a word at the current viewing grade level
+            // and get rid of it's underline
             function acceptWord(word, grade){
                 switchSpinner();
                 jsRoutes.controllers.SimplePassageController.acceptWord(word, grade, @passageId).ajax({
@@ -761,6 +786,8 @@
                 });
             }
 
+            // This method makes an ajax call to the SimplePassage Controller to replace all instances of the original word with the replacement
+            // and reload the page
             function replaceWord(word, replacement){
                 jsRoutes.controllers.SimplePassageController.replaceWord(@passageId, word, replacement).ajax({
                     success : function(data) {
@@ -775,7 +802,7 @@
                 });
             }
 
-
+            // This method finds all words in the input array and finds them in the passage to underline them
             function underlineSpecificWords(words){
 
                 var text = quill.getText();
@@ -795,6 +822,7 @@
             }
 
 
+            // This method adds the words listed as Suggestions to the Suggestions Bar
             function updateSynonymnList(string, arr){
                 arr = JSON.parse(arr);
                 var leftPanel = document.getElementById("left-panel");
@@ -838,6 +866,7 @@
                 leftPanel.innerHTML = upperDiv + approvalDiv + synonymnDiv;
             }
 
+            // Helper method to get list of Suggestions
             function getSuggestions(word){
                 jsRoutes.controllers.SimplePassageController.getSuggestions(word).ajax({
                     success : function(data) {
@@ -853,6 +882,8 @@
                 });
             }
 
+            //This method saves the passage and then makes an ajax call to the SimplePassageController to begin analysis for
+            // this passage only
             $('a#analyzePassages').click(function() {
 
                 saveHtml(quill.getHTML());
@@ -876,6 +907,7 @@
 
             });
 
+            // This method makes an ajax call to the SimplePassageController in order to make the passage visible for the viewing instructor's students
             function changeVis(){
                 jsRoutes.controllers.SimplePassageController.changeVisibility(@passageId).ajax({
                     success : function(data) {
@@ -887,6 +919,7 @@
                 });
             }
 
+            // Allows starting and stopping of analysis indicator
             function switchSpinner(){
                 var on = "glyphicon glyphicon-refresh glyphicon-spin";
                 var off = "glyphicon glyphicon-refresh";
@@ -911,7 +944,7 @@
                     return !$.trim(el.html())
                 }
 
-
+                // right click to bring up suggestions bar
                 //http://stackoverflow.com/questions/1206203/how-to-distinguish-between-left-and-right-mouse-click-with-jquery
                 //http://jsfiddle.net/Kn9s7/5/
                 $(document).on("contextmenu", "u", function(e){
@@ -922,13 +955,11 @@
 
             });
 
-
-            $(function () {
-                $('[data-toggle="tooltip"]').tooltip()
-            })
-
-
-
+            /**
+             * Retrives the difficulty for the sentence and displays it in an alert
+             * When HTML is generated, the grade that will be used as a parameter is hard coded in
+             * @param grade
+             */
             function showJustification(grade){
 
                 grade = Math.ceil(grade);
@@ -937,29 +968,8 @@
                 if(grade == 0) alertString += "Kindergarten Reader";
                 else if(grade < 13) alertString += "Grade " + grade + " Reader";
                 else alertString += "a College Level Reader";
-
-
-
-
                 alert(alertString);
             }
-
-
-            $( "#dialog-2" ).dialog({
-                autoOpen: true,
-                buttons: {
-                    OK: function() {$(this).dialog("close");}
-                },
-                title: "Success",
-                position: {
-                    my: "left center",
-                    at: "left center"
-                }
-            });
-            $( "#opener-2" ).click(function() {
-                $( "#dialog-2" ).dialog( "open" );
-            });
-
 
     </script>
 

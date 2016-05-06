@@ -19,7 +19,7 @@
             <div>
 
 
-
+            <!-- Make sure students and instructors are shown different information -->
             @if(Long.valueOf(session().get("userId")) == inst.id){
 
                 <div class="btn-group-vertical">
@@ -43,7 +43,7 @@
 
             </div>
 
-            <div id="students" class="box">
+            <div id="passages" class="box">
 
                 <div class="box-header">
                     <i class="fa fa-group fa-2x"></i>
@@ -232,6 +232,10 @@
                 <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
 
                 <script>
+                        /**
+                         * Makes an ajax call to the SimplePassageController to delete the passage with the corresponding Id
+                         * @param passageId
+                         */
                         function deletePassage(passageId) {
 
                             var result = confirm("Are you sure you want to delete this passage? This cannot be undone.");
@@ -247,6 +251,9 @@
 
                         }
 
+                        /**
+                         * Makes an ajax call to the SimplePassageController to begin analysis of all passages in the system
+                         */
                         $('button#analyzePassages').click(function() {
                             var button = $(this);
                             button.toggleClass('active');
@@ -269,18 +276,25 @@
 
                         });
 
+                        /**
+                         * Helper method to start the spinner that indicates to the user when analysis is happening
+                         */
                         function switchSpinner(){
+                            // the button has a different class name depending on whether it's spinning or not
                             var on = "glyphicon glyphicon-refresh glyphicon-spin";
                             var off = "glyphicon glyphicon-refresh";
 
-
-                            document.getElementsByTagName()
                             var elem = document.getElementById("spinner");
 
                             if(elem.className.substring(elem.className.length - 4) == "spin") elem.className = off;
                             else elem.className = on;
                         }
 
+                        /**
+                         * This method makes an Ajax call to The SimplePassageController that will hide or show this
+                         * passage to the instructors students.
+                         * @param passageId
+                         */
                         function changeVis(passageId){
                             jsRoutes.controllers.SimplePassageController.changeVisibility(passageId).ajax({
                                 success : function(data) {

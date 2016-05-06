@@ -18,20 +18,16 @@
 
 
 
-
-
-
-                <div>
-
                     <p>
                 <h3> Multiple Choice Question for @SimplePassage.byId(passageId).title</h3>
+                    <!-- Get list of questions and keep in order -->
                     @for(q <- SimplePassage.byId(passageId).questions.toList.sortWith { (o, p) => o.position < p.position }) {
                         <h3></h3>
                         <strong> @PassageQuestionPrompt.byPassageQuestion(q.id).get(0).text </strong>
+                        <!-- Get list of choices and keep in order -->
                         @for(c <- q.choices.toList.sortWith { (o, p) => o.position < p.position }) {
                             <div class="radio">
                                 <label>
-
                                     <input type="radio" name="@q.position,@c.position" onchange="setAnswer();" >@PassageQuestionAnswer.byPassageQuestionChoice(c.id).get(0).text
                                 </label>
 
@@ -40,11 +36,7 @@
                         <br>
                         <br>
                         }
-
-
-                    </p>
                     <br>
-
 
                     <p>
                         <button type="submit" class="btn btn-success">
@@ -52,27 +44,23 @@
                         </button>
                     </p>
 
-                </div>
 
-            </div>
-        }
+
+
 
         <script>
+                /**
+                 * This method keeps track of questions being created in the GUI by adding to arrays of questions, choices, correct answers, and other answers.
+                 * @param e - HTML element representing the div holding the question information
+                 */
                 function setAnswer(e){
                     //http://stackoverflow.com/questions/3001474/how-to-get-caller-element-using-javascript
                     var sender = (e && e.target) || (window.event && window.event.srcElement);
                     var name = sender.name;
 
-
-
                     var questionNumber = name.substr(0,name.indexOf(","));
 
-
-
                     var choiceNumber = name.substr(name.indexOf(",") + 1, name.length);
-
-
-
 
                     var previousAnswers = document.getElementsByName("answers[" + questionNumber + "]");
 
@@ -95,4 +83,5 @@
                 }
         </script>
 
+        }
     }

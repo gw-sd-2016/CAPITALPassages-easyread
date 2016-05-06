@@ -85,33 +85,10 @@
         <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
         <script>
 
-
-                function addTag() {
-//problem here
-                    //http://stackoverflow.com/questions/3001474/how-to-get-caller-element-using-javascript
-                    var numTags = document.getElementsByClassName('tag').length;
-
-                    console.log('tag' + numTags);
-
-
-                    var newTag ='<div class="tag" name="tag' + numTags + '"> Tag' +
-                            numTags + '<input type="text" name="names[' + numTags + ']" placeholder="Tag Name" value="names[' + numTags + ']"><label>Anything you want</label><input type="text" name="descriptions[' + numTags + ']" placeholder="Tag Description" value="descriptions[' + numTags + ']"><label>Ex: Grade, Source, Etc</label><input type="text" name="types[' + numTags + ']" placeholder="Tag Type" value="types[' + numTags + ']"></div>';
-
-
-                    realAddTag(document.getElementsByName("names["+ numTags +"]")[0].value, document.getElementsByName("descriptions["+ numTags +"]")[0].value, document.getElementsByName("types["+ numTags +"]")[0].value);
-
-
-                    var lastTag = document.getElementsByClassName('tag');
-
-
-                    var $this = $(lastTag);
-                    $(newTag).insertAfter(lastTag[lastTag.length - 1]);
-                }
-
-
-
+                // Array to hold PassageTags
                 var tags = [];
 
+                // Quill Text Editor Initiliaztion
                 var configs = {
                     readOnly: false,
                     theme: 'snow',
@@ -131,15 +108,27 @@
 
                 var quill = new Quill('#editor', configs);
 
+                /**
+                 * Event Method from Quill API that runs whenever even a sigle character is changed in the editor
+                 * This method also keeps the HTML fields that Play will bind with the form up to date with
+                 * changes in the Quill Editor
+                 * */
                 quill.on('text-change', function(delta, source) {
                     console.log("Called");
                     var element = document.getElementsByName("passageText")[0];
                     element.setAttribute("value", quill.getHTML());
                 });
 
+                /**
+                 * Helper function that adds to the list of tags and to the array that stores tags in the background
+                 *
+                 **/
                 function realAddTag(){
+                    // Concatenate to plain text list of tags in GUI
                     var str = document.getElementById("tag").value;
                     document.getElementById("tag").value = "";
+
+                    // add to tags array
                     tags = tags.concat(str);
                     console.log(tags[0]);
 
@@ -150,40 +139,10 @@
                 }
 
 
-                function trimUnecessary(html) {
-
-                    var passageText = quill.getText();
-
-
-                    var firstWord = passageText.substring(0, passageText.indexOf(" "));
-                    var lastWord = passageText.substring(passageText.lastIndexOf(" ") + 1, passageText.length);
-
-
-                    var foundFirst = false;
-                    var divIndex = 0;
-                    for (var i = 0; i < html.length; i++) {
-                        if (html.charAt(i) == '<' ) {
-                            if (html.charAt(i + 1) == 'd') {
-                                divIndex = i;
-                            }
-                        }
-
-                        if (!foundFirst && html.charAt(i) == firstWord.charAt(0) && html.substring(i, i + firstWord.length) == firstWord) {
-                            html = html.substring(divIndex, html.lastIndexOf(".") +  7);
-                            foundFirst = true;
-                        }
-
-                    }
-
-                    var i = html.length - 1;
-                    while(html.charAt(i) != ".") i--;
-                    html = html.substring(0, i + 1) + "</div>";
-
-
-
-                    return html;
-                }
-
+                /**
+                 * Calls ajax method on SimplePassageController to generate teh HTML for this passage
+                 * Takes the text from the Quill Text Editor and sends that along with a list of Passage Tags
+                 */
                 function createHTML(){
                     var realText = quill.getHTML();
 

@@ -10,7 +10,7 @@
         <div>
 
 
-            <div id="students" class="box">
+            <div id="answers" class="box">
 
                 <div class="box-header">
                     <i class="glyphicon glyphicon-group glyphicon-2x"></i>
@@ -73,53 +73,4 @@
                 $('#DataTables_Table_0_wrapper').css("clear", "none");
                 $('#DataTables_Table_0_wrapper').css("display", "inline-block");
         </script>
-
-        <script>
-                $('button#deletePassage').click(function() {
-                    var button = $(this);
-                    button.toggleClass('active');
-
-                    var passageData = $(this).attr('name').split(":|:");
-                    var passageId = passageData[0];
-                    var passageName = passageData[1];
-
-                    bootbox.confirm("Are you sure you want to delete passage '" + passageName + "'? This cannot be undone.", function(result) {
-                        if (result) {
-                            button.prop("disabled", true);
-                            jsRoutes.controllers.SimplePassageController.deletePassage(passageId).ajax({
-                                success : function(data) {
-                                    window.location.reload();
-                                },
-                                error : function(err) {
-                                    //window.location = "";
-                                }
-                            });
-                        } else {
-                            button.toggleClass('active');
-                        }
-                    });
-                });
-
-                $('button#analyzePassages').click(function() {
-                    var button = $(this);
-                    button.toggleClass('active');
-
-                    bootbox.confirm("Are you sure you want to analyze passages? This may take a couple minutes", function(result) {
-                        if (result) {
-                            button.prop("disabled", true);
-                            jsRoutes.controllers.SimplePassageController.analyzePassages().ajax({
-                                success : function(data) {
-                                    window.location.reload();
-                                },
-                                error : function(err) {
-                                    //	window.location = "";
-                                }
-                            });
-                        } else {
-                            button.toggleClass('active');
-                        }
-                    });
-                });
-        </script>
-
     }

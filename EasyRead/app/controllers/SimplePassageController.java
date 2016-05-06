@@ -1514,7 +1514,7 @@ public class SimplePassageController extends Controller {
                         String diffString = "" + (int) Math.round(diffValue);
 
                         if (spaceIndex != -1) {
-                            curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diffString + ");'>" + curr.substring(0, spaceIndex) + "</i>&nbsp" + curr.substring(spaceIndex + padding) + "&nbsp";
+                            curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diffString + ");'>" + curr.substring(0, spaceIndex) + "</i>" + curr.substring(spaceIndex + padding) + "&nbsp";
 
                         } else {
                             curr = "&nbsp<i class='glyphicon glyphicon-exclamation-sign' onclick='showJustification(" + diffString + ");'>" + curr + "</i> ";

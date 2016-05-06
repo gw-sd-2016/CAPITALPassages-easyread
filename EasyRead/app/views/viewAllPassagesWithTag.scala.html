@@ -9,7 +9,7 @@
 
 
 
-            <div id="students" class="box">
+            <div id="passages" class="box">
 
                 <div class="box-header">
                     <i class="glyphicon glyphicon-group fa-2x"></i>
@@ -115,11 +115,15 @@
                 }
                 </div>
             </div>
-        </div>
+
 
 
 
         <script>
+                /**
+                 * This method gets the information on what Passage needs to be deleted from the table view and
+                 * makes an ajax call to The SimplePassage controller to do the actual deletion
+                 */
                 $('button#deletePassage').click(function() {
                     var button = $(this);
                     button.toggleClass('active');
